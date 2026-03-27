@@ -1397,6 +1397,8 @@ function rTabla(){
     if(!meses[mes][lunes]) meses[mes][lunes] = [];
     meses[mes][lunes].push(p);
   });
+  // Sort months oldest first
+  mesesOrder.sort();
 
   let html = `<table class="ptabla">
     <thead><tr>
@@ -1405,15 +1407,28 @@ function rTabla(){
     </tr></thead><tbody>`;
 
   mesesOrder.forEach(mes => {
-    // Month header row
     const mesLabel = mes === 'sin-fecha' ? 'SIN FECHA' :
       new Date(mes+'-15').toLocaleDateString('es-AR',{month:'long',year:'numeric'}).toUpperCase();
-    html += `<tr><td colspan="10" style="background:#1e293b;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;padding:10px 16px;text-align:center">
-      🗓 ${mesLabel}
-    </td></tr>`;
+    const mesCollapsed = mesesCollapsed['mes_'+mes] || false;
+    const totalMes = Object.values(meses[mes]).reduce((s,arr)=>s+arr.length,0);
 
-    // Weeks within the month
-    Object.entries(meses[mes]).forEach(([lunes, pedSem]) => {
+    // Collapsible month header
+    html += `<tr onclick="toggleMes('mes_${mes}')" style="cursor:pointer">
+      <td colspan="10" style="background:#1e293b;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;padding:10px 16px;text-align:center;user-select:none">
+        <span style="margin-right:10px">${mesCollapsed?'▶':'▼'}</span>
+        🗓 ${mesLabel}
+        <span style="font-size:11px;font-weight:400;letter-spacing:0;opacity:.6;margin-left:8px">${totalMes} pedido${totalMes!==1?'s':''}</span>
+        ${mesCollapsed?`<span style="font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:8px;margin-left:8px;letter-spacing:0">MINIMIZADO</span>`:''}
+      </td>
+    </tr>`;
+
+    if(mesCollapsed) return;
+
+    // Sort weeks oldest first within the month
+    const semanasOrdenadas = Object.keys(meses[mes]).sort();
+
+    semanasOrdenadas.forEach(lunes => {
+      const pedSem = meses[mes][lunes];
       const collapsed = mesesCollapsed[lunes] || false;
       const count = pedSem.length;
       const lunesLabel = lunes === 'sin-fecha' ? 'Sin fecha' :
@@ -1466,8 +1481,8 @@ function rTabla(){
         });
       });
     }
-    }); // end weeks forEach
-  }); // end months forEach
+    }); // end semanasOrdenadas forEach
+  }); // end mesesOrder forEach
 
   html += '</tbody></table>';
   tabla.innerHTML = html;
@@ -1539,7 +1554,10 @@ function quickAccTabla(pedId, itemId, val){
   if(!item) return;
   item.accesorios = val;
   savePedido(p);
-  rTabla();
+  // Just update the select color without re-rendering
+  const ACC_COLORS = {pendiente:'#fef9c3',prep:'#fed7aa',ok:'#bbf7d0',prio:'#fecaca',prep_prio:'#fde68a',no:'#fee2e2',na:'#f3f4f6'};
+  const sel = event.target;
+  if(sel) sel.style.background = ACC_COLORS[val]||'#fff';
 }
 
 function quickEstadoTabla(pedId, val){
@@ -1547,7 +1565,14 @@ function quickEstadoTabla(pedId, val){
   if(!p) return;
   p.estado = val;
   savePedido(p);
-  rTabla();
+  // Just update the select color without re-rendering
+  const ESTADO_COLORS = {shop:'#c4b5fd',nuevo:'#bfdbfe',marroquineria:'#fed7aa',listo:'#bbf7d0',enviado:'#e5e7eb'};
+  const sel = event.target;
+  if(sel) sel.style.background = ESTADO_COLORS[val]||'#f3f4f6';
+  // Update produccion badge
+  const nue = pedidos.filter(p=>p.estado==='nuevo');
+  const badge = document.getElementById('produccion-badge');
+  if(badge){ badge.style.display=nue.length>0?'inline':'none'; badge.textContent=nue.length; }
 }
 
 function rPedidos(){
