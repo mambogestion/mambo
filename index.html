@@ -822,8 +822,16 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
         <div class="fg" style="margin-bottom:9px"><label>📏 Pecho (cm)</label><input id="cx2-pecho1" type="text" placeholder="ej: 45" autocomplete="off"></div>
         <div class="fg" style="margin-bottom:9px"><label>📏 Cuello (cm)</label><input id="cx2-cuello1" type="text" placeholder="ej: 28" autocomplete="off"></div>
       </div>
-      <div class="fg"><label>¿Cambiar correa por?</label>
-        <select id="cx2-swap1"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select>
+      <div class="fg"><label>Largo de correa</label>
+        <select id="cx2-largo1" onchange="onCx2Largo(1)">
+          <option value="1.20mt">1.20mt (estándar)</option>
+          <option value="2mt">2mt</option><option value="3mt">3mt</option>
+          <option value="4mt">4mt</option><option value="5mt">5mt</option>
+          <option value="10mt">10mt</option>
+        </select>
+      </div>
+      <div class="fg" id="cx2-swap1-wrap"><label>¿Cambiar correa por?</label>
+        <select id="cx2-swap1"><option value="">Correa (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select>
       </div>
     </div>
     <div style="background:#fff;border-radius:9px;padding:12px;margin-bottom:12px;border:1px solid var(--gray2)">
@@ -837,8 +845,16 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
         <div class="fg" style="margin-bottom:9px"><label>📏 Pecho (cm)</label><input id="cx2-pecho2" type="text" placeholder="ej: 52" autocomplete="off"></div>
         <div class="fg" style="margin-bottom:9px"><label>📏 Cuello (cm)</label><input id="cx2-cuello2" type="text" placeholder="ej: 32" autocomplete="off"></div>
       </div>
-      <div class="fg"><label>¿Cambiar correa por?</label>
-        <select id="cx2-swap2"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select>
+      <div class="fg"><label>Largo de correa</label>
+        <select id="cx2-largo2" onchange="onCx2Largo(2)">
+          <option value="1.20mt">1.20mt (estándar)</option>
+          <option value="2mt">2mt</option><option value="3mt">3mt</option>
+          <option value="4mt">4mt</option><option value="5mt">5mt</option>
+          <option value="10mt">10mt</option>
+        </select>
+      </div>
+      <div class="fg" id="cx2-swap2-wrap"><label>¿Cambiar correa por?</label>
+        <select id="cx2-swap2"><option value="">Correa (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select>
       </div>
     </div>
     <button class="btn btn-pk" onclick="addCombx2()">+ Agregar al pedido</button>
@@ -2496,6 +2512,15 @@ function addCombx2Arnes(){
   toast('✅ Mambo x2 arneses agregado');
 }
 
+function onCx2Largo(num){
+  const largo = document.getElementById(`cx2-largo${num}`)?.value || '1.20mt';
+  const swapWrap = document.getElementById(`cx2-swap${num}-wrap`);
+  if(swapWrap){
+    swapWrap.style.display = largo === '1.20mt' ? 'block' : 'none';
+    if(largo !== '1.20mt') document.getElementById(`cx2-swap${num}`).value = '';
+  }
+}
+
 function cx2CalcPrecios(){
   const total=parseFloat(document.getElementById('cx2-precio').value)||0;
   const mitad=total/2;
@@ -2515,8 +2540,9 @@ function addCombx2(){
 
   const makeItem=(num)=>{
     const swap=(document.getElementById(`cx2-swap${num}`)?.value)||'';
+    const largo=(document.getElementById(`cx2-largo${num}`)?.value)||'1.20mt';
     const tipoItem=soloArnes?'Arnés':'Combo 1 — Arnés + Correa';
-    const correaLabel=swap?swapLabels[swap]||'Correa 1.20mt':'Correa 1.20mt';
+    const correaLabel=swap?swapLabels[swap]||largo:largo;
     return {
       id:Date.now()+num+'',
       alias:document.getElementById(`cx2-bord${num}`).value.trim(),
@@ -2530,7 +2556,7 @@ function addCombx2(){
       cuello:document.getElementById(`cx2-cuello${num}`).value.trim(),
       accesorios:'pendiente',
       esCombx2:true,
-      largo:'1.20mt',
+      largo,
       swap,
       correaLabel,
     };
@@ -2542,6 +2568,9 @@ function addCombx2(){
   ['cx2-precio','cx2-mod1','cx2-bord1','cx2-pecho1','cx2-cuello1',
    'cx2-mod2','cx2-bord2','cx2-pecho2','cx2-cuello2'].forEach(id=>{
     document.getElementById(id).value='';
+  });
+  ['cx2-swap1','cx2-swap2','cx2-largo1','cx2-largo2'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value=id.includes('largo')?'1.20mt':'';
   });
   ['cx2-swap1','cx2-swap2'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
