@@ -1206,7 +1206,7 @@ function pedidoBlock(p, compact=false){
 
   const headerHTML=`
     <div class="pb-header">
-      <div class="pb-num">${p.num}</div>
+      <div class="pb-num">${fmtPedNum(p)}</div>
       <div style="flex:1;min-width:0">
         <div class="pb-cliente">${p.cliente}</div>
         <div style="font-size:11px;color:var(--gray3);font-weight:600;margin-top:1px">${envL}${p.provincia?' · '+p.provincia:''} · ${new Date(p.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'})}</div>
@@ -1359,8 +1359,12 @@ function rTabla(){
     const okQ = !curQ || p.cliente.toLowerCase().includes(curQ) || p.items.some(i=>(i.alias||'').toLowerCase().includes(curQ));
     return okF && okQ;
   });
-  // Tabla: oldest first (como el Excel). Cards: newest first.
-  // No invertimos aquí — los pedidos ya vienen en orden de carga.
+  // Tabla: oldest date first, then by num ASC
+  list = [...list].sort((a,b)=>{
+    const dateDiff = new Date(a.fecha||0) - new Date(b.fecha||0);
+    if(dateDiff !== 0) return dateDiff;
+    return (a.num||0) - (b.num||0);
+  });
   document.getElementById('p-cnt').textContent = list.length;
 
   if(!list.length){ tabla.innerHTML = emptyH('🐾','Sin pedidos'); return; }
@@ -1428,7 +1432,7 @@ function rTabla(){
     const semanasOrdenadas = Object.keys(meses[mes]).sort();
 
     semanasOrdenadas.forEach(lunes => {
-      const pedSem = meses[mes][lunes];
+      const pedSem = meses[mes][lunes].sort((a,b)=>(a.num||0)-(b.num||0));
       const collapsed = mesesCollapsed[lunes] || false;
       const count = pedSem.length;
       const lunesLabel = lunes === 'sin-fecha' ? 'Sin fecha' :
@@ -1466,7 +1470,7 @@ function rTabla(){
           html += `<tr>
             <td style="${sepStyle}">${first?`<div class="pt-alias" style="font-size:12px">${p.cliente||''}</div>`:'&nbsp;'}</td>
             <td style="${sepStyle}"><div style="font-weight:800;font-size:13px;color:var(--pink-dark)">${item.bordado||item.alias||'—'}</div></td>
-            <td style="${sepStyle}" class="pt-num">${first?p.num||'':''}</td>
+            <td style="${sepStyle}" class="pt-num">${first?fmtPedNum(p):''}</td>
             <td style="${sepStyle}" class="pt-prod">${prod}</td>
             <td style="${sepStyle}" class="pt-medidas">${item.pecho||'—'}</td>
             <td style="${sepStyle}" class="pt-medidas">${item.cuello||'—'}</td>
@@ -1582,7 +1586,8 @@ function rPedidos(){
     const okQ=!curQ||p.cliente.toLowerCase().includes(curQ)||p.items.some(i=>(i.alias||'').toLowerCase().includes(curQ));
     return okF&&okQ;
   });
-  list=[...list].reverse();
+  // Cards: newest date first
+  list=[...list].sort((a,b)=>new Date(b.fecha||0)-new Date(a.fecha||0));
   document.getElementById('p-cnt').textContent=list.length;
   document.getElementById('p-list').innerHTML=list.length?list.map(p=>pedidoBlock(p,false)).join(''):emptyH('🐾','Sin pedidos en este filtro');
 }
@@ -1943,7 +1948,7 @@ function rProd(){
       return ai.map((i,idx)=>`
         <tr>
           ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:8px 6px">
-            <div class="pt-num">#${p.num}</div>
+            <div class="pt-num">${fmtPedNum(p)}</div>
             <button onclick="setEstado('${p.id}','${nextEst}')" style="margin-top:5px;${btnStyle(btnC)};border:none;border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer">${btnL}</button>
           </td>`:''}
           <td style="padding:8px 10px"><div class="pt-model">${i.modelo?`<span style="color:var(--pink-dark);font-weight:800">${i.modelo}</span>`:'<span style="color:var(--gray3)">Sin modelo</span>'}</div></td>
@@ -2062,7 +2067,7 @@ function openNuevo(){
 function openEditar(id){
   const p=pedidos.find(x=>x.id===id);if(!p)return;
   editId=id;
-  document.getElementById('form-title').textContent='✏️ Editar Pedido #'+p.num;
+  document.getElementById('form-title').textContent='✏️ Editar Pedido '+fmtPedNum(p);
   document.getElementById('f-save-btn').textContent='Guardar cambios ✓';
   document.getElementById('f-num').value=p.num;
   document.getElementById('f-cli').value=p.cliente;
@@ -2875,6 +2880,13 @@ async function loadData(){
   loadFaltantes();
   initVista(); // Re-apply vista after data loads so tabla renders with actual data
 }
+function fmtPedNum(p){
+  if(!p.fecha||!p.num) return p.num||'';
+  const meses=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  const m = new Date(p.fecha).getMonth();
+  return `${meses[m]} #${p.num}`;
+}
+
 function fmt(n){const v=parseFloat(n)||0;return '$'+v.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function emptyH(i,t){return`<div class="empty"><div class="empty-i">${i}</div><div class="empty-t">${t}</div></div>`;}
@@ -3024,6 +3036,7 @@ function rBordados(){
       if(i.bordado&&i.bordado.trim()){
         rows.push({
           num:p.num,
+          numLabel:fmtPedNum(p),
           nombre:i.bordado.trim().toUpperCase(),
           producto:i.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2'),
           modelo:i.modelo||'',
@@ -3065,7 +3078,7 @@ function rBordados(){
         ${list.map(r=>{
           const estObj=ESTADOS.find(e=>e.k===r.estado)||ESTADOS[0];
           return `<tr>
-            <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${r.num}</td>
+            <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${r.numLabel||'#'+r.num}</td>
             <td><div class="bord-name">${r.nombre}</div></td>
             <td><div style="font-size:13px;font-weight:700">${r.producto}${r.modelo?' — '+r.modelo:''}</div></td>
             <td><span class="pt-talle">${r.talle||'—'}</span></td>
