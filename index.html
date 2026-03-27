@@ -1422,7 +1422,15 @@ function rTabla(){
           const largoExtra = item.largo&&item.largo!=='1.20mt'?' correa '+item.largo:'';
           const swapExtra = item.swap?` (${swapLabels[item.swap]||item.swap})`:'';
           const prod = `${item.cant>1?item.cant+'× ':''}${(item.tipo||'').replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
-          const envio = p.envio==='correo'?'CORREO':p.envio==='urquiza'?'URQUI':p.envio==='retira'?'RETIRA':(p.envio||'').toUpperCase().slice(0,8);
+          const envLabels = {
+            'a_definir':'A definir',
+            'Correo Arg Sucursal':'CORREO SUCURSAL',
+            'Correo Arg Domicilio':'CORREO DOMICILIO',
+            'Retira Urquiza':'URQUIZA',
+            'Motito CABA':'MOTITO CABA',
+            'Motito GBA':'MOTITO GBA',
+          };
+          const envio = envLabels[p.envio] || (p.envio||'').toUpperCase().slice(0,12);
           const sepStyle = first ? 'border-top:2.5px solid #9ca3af' : '';
           html += `<tr>
             <td style="${sepStyle}">${first?`<div class="pt-alias" style="font-size:12px">${p.cliente||''}</div>`:'&nbsp;'}</td>
@@ -1491,6 +1499,21 @@ function doEliminarTabla(id, reordenar){
   deleteFromDB('pedidos', id);
   renderAll();
   toast(`Pedido #${numEliminado} eliminado${reordenar?' · números reordenados':''}`);
+}
+
+function editarPedidoTabla(id){
+  // Switch to cards view temporarily to open modal, then back
+  const p = pedidos.find(x=>x.id===id);
+  if(!p) return;
+  openEditar(id);
+}
+
+function eliminarPedidoTabla(id, num){
+  if(!confirm(`¿Eliminar pedido #${num}?`)) return;
+  pedidos = pedidos.filter(p=>p.id!==id);
+  deleteFromDB('pedidos',id);
+  rTabla();
+  toast('Pedido eliminado');
 }
 
 function quickAccTabla(pedId, itemId, val){
