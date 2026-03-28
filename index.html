@@ -176,13 +176,14 @@ textarea{resize:vertical;min-height:55px}
 .pb-bl{background:var(--blue-bg);color:var(--blue)}
 
 /* Production tables */
-.prod-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.prod-table{width:100%;border-collapse:collapse;font-size:13px}
 .prod-table th{background:var(--black);color:var(--pink);font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.8px;padding:8px 10px;text-align:left;font-weight:400;white-space:nowrap}
 .prod-table th.center{text-align:center}
-.prod-table td{padding:8px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle;word-break:break-word}
+.prod-table td{padding:8px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle}
 .prod-table tr:last-child td{border-bottom:none}
 .prod-table tr:hover td{background:#fdf2f8}
-.prod-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.prod-table td:first-child{min-width:140px;max-width:160px}
+.prod-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
 .pt-num{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)}
 .pt-cli{font-weight:700;font-size:13px}
 .pt-sub{font-size:11px;color:var(--gray3);font-weight:600}
