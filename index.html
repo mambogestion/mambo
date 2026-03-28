@@ -1570,8 +1570,7 @@ function quickAccTabla(pedId, itemId, val){
   const item = p.items.find(i=>i.id===itemId);
   if(!item) return;
   item.accesorios = val;
-  savePedido(p);
-  // Just update the select color without re-rendering
+  saveOnePedido(p); // ← guarda en Supabase
   const ACC_COLORS = {pendiente:'#fef9c3',prep:'#fed7aa',ok:'#bbf7d0',prio:'#fecaca',prep_prio:'#fde68a',no:'#fee2e2',na:'#f3f4f6'};
   const sel = event.target;
   if(sel) sel.style.background = ACC_COLORS[val]||'#fff';
@@ -1581,12 +1580,10 @@ function quickEstadoTabla(pedId, val){
   const p = pedidos.find(p=>p.id===pedId);
   if(!p) return;
   p.estado = val;
-  savePedido(p);
-  // Just update the select color without re-rendering
+  saveOnePedido(p); // ← guarda en Supabase
   const ESTADO_COLORS = {shop:'#c4b5fd',nuevo:'#bfdbfe',marroquineria:'#fed7aa',listo:'#bbf7d0',enviado:'#e5e7eb'};
   const sel = event.target;
   if(sel) sel.style.background = ESTADO_COLORS[val]||'#f3f4f6';
-  // Update produccion badge
   const nue = pedidos.filter(p=>p.estado==='nuevo');
   const badge = document.getElementById('produccion-badge');
   if(badge){ badge.style.display=nue.length>0?'inline':'none'; badge.textContent=nue.length; }
@@ -2857,6 +2854,16 @@ function closeOv(id){document.getElementById(id).classList.remove('on');}
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o&&o.id!=='ov-form')o.classList.remove('on');}));
 
 // ══════════ HELPERS ══════════
+async function saveOnePedido(p){
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/pedidos`, {
+      method:'POST',
+      headers:{...supaHeaders,'Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id:p.id, data:p})
+    });
+  } catch(err){ toast('⚠️ Error al guardar'); }
+}
+
 async function save(){
   // Save all pedidos and egresos to Supabase
   try {
@@ -2961,9 +2968,7 @@ function updateUndoBtns(){
 }
 
 async function saveAllPedidos(){
-  for(const p of pedidos){
-    await savePedido(p);
-  }
+  for(const p of pedidos){ await saveOnePedido(p); }
 }
 
 function fmtPedNum(p){
