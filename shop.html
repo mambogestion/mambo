@@ -33,18 +33,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 .nav-cart:hover { background:var(--rose); }
 .cart-badge { background:var(--rose); color:#fff; border-radius:50%; width:17px; height:17px; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; }
 
-/* HERO CARRUSEL */
-.hero { margin-top:56px; position:relative; background:var(--black); overflow:hidden; }
-.hero-strip-wrap { overflow:hidden; cursor:grab; user-select:none; min-height:65vh; background:var(--black); }
+.hero { position:relative; overflow:hidden; }
+.hero-strip-wrap { overflow:hidden; cursor:grab; user-select:none; background:var(--cream); padding:4px 0; }
 .hero-strip-wrap:active { cursor:grabbing; }
-.hero-strip { display:flex; gap:0; transition:transform .05s linear; will-change:transform; }
-.hero-slide { flex:0 0 auto; position:relative; }
-.hero-slide img { height:82vh; width:auto; max-width:none; display:block; object-fit:cover; pointer-events:none; }
-.hero-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.7) 0%, rgba(0,0,0,.1) 50%, transparent 100%); }
-.hero-slide-info { position:absolute; bottom:32px; left:24px; color:#fff; }
-.hero-slide-model { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; font-style:italic; letter-spacing:.5px; margin-bottom:4px; }
-.hero-slide-sub { font-size:13px; font-weight:400; color:rgba(255,255,255,.7); margin-bottom:14px; }
-.hero-slide-btn { display:inline-flex; align-items:center; gap:8px; background:#fff; color:var(--black); padding:10px 20px; border-radius:50px; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all .2s; }
+.hero-strip { display:flex; gap:10px; padding:0 16px; transition:transform .05s linear; will-change:transform; }
+.hero-slide { flex:0 0 auto; position:relative; border-radius:16px; overflow:hidden; }
+.hero-slide img { height:52vw; max-height:340px; width:auto; min-width:120px; display:block; object-fit:cover; pointer-events:none; border-radius:16px; }
+.hero-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.45) 0%, transparent 55%); border-radius:16px; }
+.hero-slide-info { position:absolute; bottom:12px; left:12px; color:#fff; }
+.hero-slide-model { font-family:'Playfair Display',serif; font-size:16px; font-weight:900; font-style:italic; }
+.hero-slide-sub { font-size:10px; color:rgba(255,255,255,.7); margin-bottom:8px; }
+.hero-slide-btn { display:inline-flex; align-items:center; gap:5px; background:#fff; color:var(--black); padding:5px 12px; border-radius:50px; font-size:11px; font-weight:700; cursor:pointer; border:none; }
 .hero-slide-btn:hover { background:var(--rose); color:#fff; }
 
 /* Drag hint */
@@ -198,8 +197,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo">
-    <img src="https://mambogestion.github.io/mambo/logo.png" alt="MAMBO">
-    <img src="https://mambogestion.github.io/mambo/logoletras.png" alt="MAMBO Mascotas Exigentes" style="height:30px;object-fit:contain">
+    <img src="https://mambogestion.github.io/mambo/logo.png" alt="MAMBO" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">
+    <img src="https://mambogestion.github.io/mambo/logoletras.png" alt="MAMBO Mascotas Exigentes" style="height:26px;object-fit:contain">
   </div>
   <button class="nav-cart" onclick="showView('carrito')">
     🛒 Carrito <span class="cart-badge" id="cart-badge">0</span>
@@ -209,23 +208,31 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 <!-- SHOP VIEW -->
 <div class="view on" id="view-shop">
 
-  <!-- CARRUSEL HERO -->
-  <div class="hero">
-    <div class="hero-strip-wrap" id="strip-wrap">
-      <div class="hero-strip" id="hero-strip"></div>
-    </div>
-    <div class="drag-hint">← arrastrá →</div>
-  </div>
+  <div class="banner">📦 ENVÍO GRATIS a sucursal CORREO ARGENTINO de TODO EL PAÍS 🇦🇷 🥰</div>
 
-  <div class="banner">📦 ENVÍO GRATIS a sucursal Correo Argentino 🇦🇷 — llegamos a todo el país</div>
-
-  <!-- COMBOS -->
-  <div class="section">
+  <!-- TITULO SECCION -->
+  <div class="section" style="padding-bottom:0">
     <div class="section-eyebrow">Nuestros productos</div>
     <h2 class="section-title">Elegí tu combo</h2>
     <p class="section-sub">Personalizamos cada arnés con el nombre de tu perro</p>
+  </div>
+
+  <!-- CARRUSEL STORIES -->
+  <div style="background:var(--cream);padding:16px 0 28px">
+    <div class="hero">
+      <div class="hero-strip-wrap" id="strip-wrap">
+        <div class="hero-strip" id="hero-strip"></div>
+      </div>
+      <div class="drag-hint" style="color:rgba(0,0,0,.3)">← arrastrá →</div>
+    </div>
+  </div>
+
+  <!-- COMBOS GRID -->
+  <div class="section" style="padding-top:0">
     <div class="combos-grid" id="combos-grid"></div>
   </div>
+
+  <div class="banner">📦 ENVÍO GRATIS a sucursal CORREO ARGENTINO de TODO EL PAÍS 🇦🇷 🥰</div>
 
   <!-- HOW -->
   <div class="how">
@@ -371,23 +378,12 @@ const BASE_URL='https://mambogestion.github.io/mambo/';
 
 // Fotos del carrusel — agregar acá cada foto nueva
 const FOTOS_CARRUSEL = [
-  { archivo:'story2.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story3.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story4.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story5.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story6.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story7.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story8.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story9.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story10.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story11.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story12.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story13.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story14.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story15.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story16.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story17.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' },
-  { archivo:'story18.jpg', modelo:'MAMBO', combo:'Combo 1', prodId:'combo1' }
+  { archivo:'carru1.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru2.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru3.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru4.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru5.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru6.jpg', modelo:'', combo:'', prodId:'combo1' },
 ];
 
 const MODELOS=['Rojo','Sunset','Naranja','Amarillo','Verde Fluo','Bordeaux','Fucsia','Rosa','Rosa Brillito','Ojitos','Paris','Summer Rosa','Lila','Violeta','Rainbow','Jean','Azul','Van Gogh','Turquesa','Celeste','Rambo','Rambo Azul','Argentino','Summer Celeste','Rock!','Pu Negro','Rambo Negro','Pampa Bordeaux','Pampa'];
