@@ -21,13 +21,22 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html { scroll-behavior: smooth; }
-body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; padding-top:84px; }
+
+/* MODAL TALLE */
+#modal-talle { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:20px; }
+.talle-box { background:#fff; border-radius:20px; padding:24px; max-width:400px; width:100%; max-height:80vh; overflow-y:auto; }
+.talle-box h3 { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; margin-bottom:14px; }
+.talle-table { width:100%; border-collapse:collapse; font-size:13px; }
+.talle-table th { background:var(--black); color:#fff; padding:8px 10px; text-align:left; }
+.talle-table td { padding:8px 10px; border-bottom:1px solid var(--gray2); }
+.talle-table tr:hover td { background:var(--gray); }
 
 /* NAV */
-.nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:56px; background:rgba(250,248,245,.93); backdrop-filter:blur(16px); border-bottom:1px solid var(--gray2); }
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:84px; background:rgba(250,248,245,.93); backdrop-filter:blur(16px); border-bottom:1px solid var(--gray2); }
 .nav-logo { display:flex; align-items:center; gap:10px; }
-.nav-logo img.logo-round { width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; }
-.nav-logo img.logo-letras { height:26px; object-fit:contain; border-radius:0; }
+.nav-logo img.logo-round { width:68px; height:68px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+.nav-logo img.logo-letras { height:52px; object-fit:contain; border-radius:0; }
 .nav-brand { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; letter-spacing:3px; color:var(--black); }
 .nav-brand span { color:var(--rose); }
 .nav-cart { display:flex; align-items:center; gap:8px; background:var(--black); color:var(--white); border:none; border-radius:50px; padding:8px 16px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; }
@@ -209,13 +218,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 <!-- SHOP VIEW -->
 <div class="view on" id="view-shop">
 
-  <!-- TITULO SECCION -->
-  <div class="section" style="padding-bottom:8px">
-    <div class="section-eyebrow">Nuestros productos</div>
-    <h2 class="section-title">Elegí tu combo</h2>
-    <p class="section-sub">Personalizamos cada arnés con el nombre de tu perro</p>
-  </div>
-
   <!-- CARRUSEL STORIES -->
   <div style="background:var(--cream);padding:8px 0 20px">
     <div class="hero">
@@ -229,8 +231,19 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
   <!-- BANNER -->
   <div class="banner">📦 ENVÍO GRATIS a sucursal CORREO ARGENTINO de TODO EL PAÍS 🇦🇷 🥰</div>
 
-  <!-- COMBOS GRID -->
-  <div class="section">
+  <!-- NAV LINKS -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:0;border-bottom:1.5px solid var(--gray2);background:#fff">
+    <a href="#" onclick="showView('shop');return false" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid var(--rose)">INICIO</a>
+    <a href="#" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid transparent">PROMOS ❤️‍🔥</a>
+    <a href="#talle" onclick="document.getElementById('modal-talle').style.display='flex';return false" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid transparent">¿CUÁL ES MI TALLE?</a>
+  </div>
+
+  <!-- SECTION TITLE -->
+  <div class="section" style="padding-bottom:8px;padding-top:28px">
+    <h2 class="section-title">Elegí tu MAMBO</h2>
+  </div>
+
+
     <div class="combos-grid" id="combos-grid"></div>
   </div>
 
@@ -366,6 +379,29 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
   <span class="fab-price" id="fab-price">$0</span>
 </button>
 
+<!-- MODAL TALLE -->
+<div id="modal-talle" onclick="if(event.target===this)this.style.display='none'">
+  <div class="talle-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3>¿Cuál es el talle de mi perro?</h3>
+      <button onclick="document.getElementById('modal-talle').style.display='none'" style="background:var(--gray);border:none;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--gray3);margin-bottom:14px;line-height:1.5">Medí el <strong style="color:var(--text)">contorno de pecho</strong> de tu perro — la parte más ancha del tórax, justo detrás de las patas delanteras.</p>
+    <table class="talle-table">
+      <thead><tr><th>Talle</th><th>Pecho (cm)</th><th>Peso aprox.</th></tr></thead>
+      <tbody>
+        <tr><td><strong>XS</strong></td><td>35 – 45 cm</td><td>hasta 5 kg</td></tr>
+        <tr><td><strong>S</strong></td><td>45 – 55 cm</td><td>5 – 10 kg</td></tr>
+        <tr><td><strong>M</strong></td><td>55 – 65 cm</td><td>10 – 20 kg</td></tr>
+        <tr><td><strong>L</strong></td><td>65 – 75 cm</td><td>20 – 35 kg</td></tr>
+        <tr><td><strong>XL</strong></td><td>75 – 85 cm</td><td>35 – 50 kg</td></tr>
+        <tr><td><strong>XXL</strong></td><td>85 – 100 cm</td><td>más de 50 kg</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--gray3);margin-top:12px;line-height:1.5">💡 Si tu perro está en el límite entre dos talles, recomendamos el más grande. Ante cualquier duda te ayudamos por WhatsApp.</p>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -385,6 +421,12 @@ const FOTOS_CARRUSEL = [
   { archivo:'carru5.jpg', modelo:'', combo:'', prodId:'combo1' },
   { archivo:'carru6.jpg', modelo:'', combo:'', prodId:'combo1' },
 ];
+
+// Fotos para cada combo en la grilla y modal
+const FOTOS_COMBOS = {
+  combo1: 'combo1.jpg',
+  combo2: 'combo2.jpg',
+};
 
 const MODELOS=['Rojo','Sunset','Naranja','Amarillo','Verde Fluo','Bordeaux','Fucsia','Rosa','Rosa Brillito','Ojitos','Paris','Summer Rosa','Lila','Violeta','Rainbow','Jean','Azul','Van Gogh','Turquesa','Celeste','Rambo','Rambo Azul','Argentino','Summer Celeste','Rock!','Pu Negro','Rambo Negro','Pampa Bordeaux','Pampa'];
 const EMOJIS=['🐾','⭐','🌟','💜','💛','🩷','🩵','❤️','🔥','🌈','🦴','🐶','🐕','🌸','🌺','⚡','🎯','✨','🫶','🏆'];
@@ -506,10 +548,10 @@ function renderCombos(){
   document.getElementById('combos-grid').innerHTML=COMBOS.map(c=>{
     const p=getP(c,'1.20mt');const cu=p.xCuota||Math.round(p.mp/3)||0;
     // Check if has photo
-    const fotoCombo=FOTOS_CARRUSEL.find(f=>f.prodId===c.id);
-    const imgHtml=fotoCombo
-      ?`<img src="${BASE_URL}${fotoCombo.archivo}" alt="${c.name}" loading="lazy">`
-      :`<div class="combo-card-placeholder">${c.emoji}</div>`;
+    const fotoArchivo = FOTOS_COMBOS[c.id];
+    const imgHtml = fotoArchivo
+      ? `<img src="${BASE_URL}${fotoArchivo}" alt="${c.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
+      : `<div class="combo-card-placeholder">${c.emoji}</div>`;
     return`<div class="combo-card ${c.cc}" onclick="abrirModal('${c.id}')">
       ${imgHtml}
       <div class="combo-card-grad"></div>
@@ -545,13 +587,10 @@ function renderModal(){
   const hasColor=['collar','correa'].includes(c.id);
   const hasBord=!['correa','cinturon'].includes(c.id);
   const hasSwap=!c.isX2&&c.hasCorrea&&(c.id==='combo1'||c.id==='combo2');
-  const fotoModal=FOTOS_CARRUSEL.find(f=>f.prodId===c.id);
-  const imgHtml=fotoModal
-    ?`<img src="${BASE_URL}${fotoModal.archivo}" alt="${c.name}">`
-    :c.emoji;
+  const fotoModal = FOTOS_COMBOS[c.id];
 
   document.getElementById('modal-inner').innerHTML=`
-    <div class="modal-img">${fotoModal?`<img src="${BASE_URL}${fotoModal.archivo}" alt="${c.name}">`:c.emoji}</div>
+    <div class="modal-img" style="aspect-ratio:3/4">${fotoModal?`<img src="${BASE_URL}${fotoModal}" alt="${c.name}">`:c.emoji}</div>
     <div class="modal-tag">${c.badge||'MAMBO'}</div>
     <div class="modal-name">${c.name}</div>
     <div class="modal-desc">${c.desc}</div>
@@ -621,12 +660,12 @@ function agregarCarrito(){
       const bord=document.getElementById(`x2-bord${n}`)?.value||'';
       const sw=document.getElementById(`cx2-swap${n}`)?.value||'';
       const lg=document.getElementById(`x2-largo${n}`)?.value||'1.20mt';
-      carrito.push({id:Date.now()+n+'',prodId:c.id,nombre:c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo:lg,swap:sw,swapLabel:sw?swL[sw]:'',precio:pxU,tipo:mapTipo(c.id),fotoArchivo:FOTOS_CARRUSEL.find(f=>f.prodId===c.id)?.archivo});
+      carrito.push({id:Date.now()+n+'',prodId:c.id,nombre:c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo:lg,swap:sw,swapLabel:sw?swL[sw]:'',precio:pxU,tipo:mapTipo(c.id),});
     });
   }else{
     const mod=document.getElementById('m-mod')?.value||document.getElementById('m-color')?.value||'';
     const bord=document.getElementById('m-bord')?.value||'';
-    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf,tipo:mapTipo(c.id),fotoArchivo:FOTOS_CARRUSEL.find(f=>f.prodId===c.id)?.archivo});
+    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf,tipo:mapTipo(c.id),});
   }
   updateUI();cerrarModalBtn();toast(`✅ ${c.name} agregado`);
 }
@@ -648,7 +687,7 @@ function renderCarrito(){
   if(!carrito.length){list.innerHTML='';empty.style.display='block';bot.style.display='none';return;}
   empty.style.display='none';bot.style.display='block';
   list.innerHTML=carrito.map(i=>`<div class="cart-item-card">
-    <div class="cart-item-icon">${i.fotoArchivo?`<img src="${BASE_URL}${i.fotoArchivo}" alt="">`:i.emoji}</div>
+    <div class="cart-item-icon">${FOTOS_COMBOS[i.prodId]?`<img src="${BASE_URL}${FOTOS_COMBOS[i.prodId]}" alt="">`:i.emoji}</div>
     <div class="cart-item-info">
       <div class="cart-item-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}</div>
       <div class="cart-item-detail">${i.largo&&i.largo!=='1.20mt'?'Correa '+i.largo:''}${i.swapLabel?' ('+i.swapLabel+')':''}</div>
