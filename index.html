@@ -34,11 +34,11 @@ body{font-family:'Nunito',sans-serif;background:#fdf2f8;color:var(--text);font-s
 
 /* MAIN */
 .main{padding:14px;max-width:680px;margin:0 auto;padding-bottom:90px}
+.main.tabla-mode{max-width:100%;padding:14px}
 #p-tabla{
-  width: calc(100vw - 28px);
-  margin-left: calc(-1 * (50vw - 340px - 14px));
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
 }
 .sec{display:none}.sec.on{display:block}
 
@@ -131,7 +131,7 @@ textarea{resize:vertical;min-height:55px}
 .modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:680px;padding:6px 16px 30px;max-height:93vh;overflow-y:auto;animation:su .22s ease;position:relative}
 @keyframes su{from{transform:translateY(100%);opacity:.8}to{transform:translateY(0);opacity:1}}
 .mh{width:34px;height:4px;background:var(--gray2);border-radius:2px;margin:10px auto 16px}
-.mc{position:absolute;top:16px;right:14px;background:var(--gray);border:none;border-radius:50%;width:28px;height:28px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.mc{position:sticky;top:8px;float:right;margin-bottom:-28px;background:var(--gray);border:none;border-radius:50%;width:32px;height:32px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);z-index:10;flex-shrink:0}
 .mt{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1.5px;margin-bottom:16px}
 
 /* ITEMS in form */
@@ -736,7 +736,22 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
       <!-- Color field (for collar/correa - no arnés model) -->
       <div class="fg" id="i-color-wrap" style="display:none">
         <label>Color</label>
-        <input id="i-color" type="text" placeholder="ej: Negro, Rosa, Celeste…" autocomplete="off">
+        <select id="i-color">
+          <option value="">— Elegí un color —</option>
+          <option>Celeste</option>
+          <option>Fucsia</option>
+          <option>Verde Militar</option>
+          <option>Violeta</option>
+          <option>Azul</option>
+          <option>Rosa</option>
+          <option>Lila</option>
+          <option>Turquesa</option>
+          <option>Negro</option>
+          <option>Summer Rosa</option>
+          <option>Summer Celeste</option>
+          <option>Rock!</option>
+          <option>Paris</option>
+        </select>
       </div>
       <!-- Largo selector (for correa sola, combo 1, combo 2, combox2+correas) -->
       <div class="fg" id="i-largo-wrap" style="display:none">
@@ -1304,6 +1319,7 @@ function initVista(){
     if(cards) cards.style.display = 'none';
     if(tabla) tabla.style.display = 'block';
     if(btn){ btn.textContent='📋 Vista cards'; btn.style.background='var(--pink-light)'; btn.style.color='var(--pink-dark)'; btn.style.borderColor='var(--pink)';}
+    if(main) main.classList.add('tabla-mode');
     rTabla();
   }
 } // {mes: bool} — persisted in Supabase
@@ -1346,6 +1362,7 @@ function toggleVistaPedidos(){
     btn.style.background = 'var(--pink-light)';
     btn.style.color = 'var(--pink-dark)';
     btn.style.borderColor = 'var(--pink)';
+    if(main) main.classList.add('tabla-mode');
     rTabla();
   } else {
     localStorage.setItem('mambo_vista_tabla','false');
@@ -1355,6 +1372,7 @@ function toggleVistaPedidos(){
     btn.style.background = 'var(--gray)';
     btn.style.color = 'var(--text)';
     btn.style.borderColor = 'var(--gray2)';
+    if(main) main.classList.remove('tabla-mode');
     rPedidos();
   }
 }
@@ -1925,9 +1943,9 @@ function rProd(){
       return `<tr>
         ${pedidoArnesIdx===0?`<td rowspan="${pedidoArnesItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px">
           <div class="pt-num">#${i.pedidoNum}</div>
-          ${p?`<div style="display:flex;align-items:center;gap:5px;margin-top:5px">
-            <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;line-height:1" title="Revertir estado">↩</button>
-            <button onclick="setEstado('${p.id}','${nextEstado}')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:5px 8px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap">→ Enviar a Marroquinería</button>
+          ${p?`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:5px">
+            <button onclick="setEstado('${p.id}','${nextEstado}')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:4px 6px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;width:100%">→ Marro</button>
+            <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:3px 6px;font-size:10px;cursor:pointer;width:100%">↩ Revertir</button>
           </div>`:''}
         </td>`:''}
         <td style="padding:8px 10px">
@@ -1962,9 +1980,9 @@ function rProd(){
         <tr>
           ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:8px 6px">
             <div class="pt-num">#${p.num}</div>
-            <div style="display:flex;align-items:center;gap:4px;margin-top:5px;justify-content:center">
-              <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:3px 6px;font-size:11px;cursor:pointer;line-height:1" title="Revertir">↩</button>
-              <button onclick="setEstado('${p.id}','${nextEst}')" style="${btnStyle(btnC)};border:none;border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer">${btnL}</button>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:5px">
+              <button onclick="setEstado('${p.id}','${nextEst}')" style="${btnStyle(btnC)};border:none;border-radius:7px;padding:4px 6px;font-size:10px;font-weight:800;cursor:pointer;width:100%">${btnL}</button>
+              <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:3px 6px;font-size:10px;cursor:pointer;width:100%">↩ Revertir</button>
             </div>
           </td>`:''}
           <td style="padding:8px 10px"><div class="pt-model">${i.modelo?`<span style="color:var(--pink-dark);font-weight:800">${i.modelo}</span>`:'<span style="color:var(--gray3)">Sin modelo</span>'}</div></td>
@@ -2338,7 +2356,7 @@ const FALT_ITEMS = {
     {id:'med_4',    label:'Medialunas 4cm',                      unidad:'u'},
     {id:'pov_4',    label:'Pasadores ovales 4cm',                unidad:'u'},
     {id:'heb_4',    label:'Hebillas 4cm',                        unidad:'u'},
-    {id:'reg_4',    label:'Reguladores acetales 4cm',            unidad:'u'},
+    {id:'reg_4',    label:'Reguladores plásticos 4cm',            unidad:'u'},
     {id:'velc_38',  label:'Velcro negro 3.8cm',                  unidad:'m'},
     {id:'_sub3', label:'🏷️ Collares (3cm)', unidad:'', sub:true},
     {id:'med_3col', label:'Medialunas 3cm',                      unidad:'u'},
