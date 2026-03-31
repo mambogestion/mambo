@@ -1615,7 +1615,11 @@ function rPedidos(){
     return okF&&okQ;
   });
   // Cards: newest date first
-  list=[...list].sort((a,b)=>new Date(b.fecha||0)-new Date(a.fecha||0));
+  list=[...list].sort((a,b)=>{
+    const dateDiff = new Date(b.fecha||0) - new Date(a.fecha||0);
+    if(dateDiff !== 0) return dateDiff;
+    return (b.num||0) - (a.num||0); // mismo día → número más alto arriba
+  });
   document.getElementById('p-cnt').textContent=list.length;
   document.getElementById('p-list').innerHTML=list.length?list.map(p=>pedidoBlock(p,false)).join(''):emptyH('🐾','Sin pedidos en este filtro');
 }
