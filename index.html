@@ -1205,7 +1205,11 @@ function rDash(){
   document.getElementById('st-cob-s').textContent=mes.length+' pedidos';
   document.getElementById('st-ma').textContent=ma.length;
   document.getElementById('st-li').textContent=li.length;
-  const rec=[...pedidos].reverse().slice(0,5);
+  const rec=[...pedidos].sort((a,b)=>{
+    const dateDiff=new Date(b.fecha||0)-new Date(a.fecha||0);
+    if(dateDiff!==0)return dateDiff;
+    return (b.num||0)-(a.num||0);
+  }).slice(0,5);
   document.getElementById('d-recent').innerHTML=rec.length?rec.map(p=>pedidoBlock(p,true)).join(''):emptyH('📭','Sin pedidos aún');
   rMens('d-mens');
 }
@@ -1250,7 +1254,7 @@ function pedidoBlock(p, compact=false){
     const swapLabels={cinturon:'cambia correa por cinturón auto',collar:'cambia correa por collar'};
     const largoExtra=item.largo&&item.largo!=='1.20mt'?' correa '+item.largo:'';
     const swapExtra=item.swap?` (${swapLabels[item.swap]||item.swap})`:'';
-    const prodLine=`${item.cant>1?item.cant+'× ':''}${item.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
+    const prodLine=`${item.cant>1?item.cant+'× ':''}${item.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${noTalleItem(item)?'':item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
     const nombreVisible=item.bordado||'—';
     const hasMedidas=item.pecho||item.cuello;
     const medidasLine=hasMedidas?`<div class="pi-extras">📏 ${item.pecho?'Pecho '+item.pecho+'cm':'—'}  ·  ${item.cuello?'Cuello '+item.cuello+'cm':'—'}</div>`:'';
@@ -1487,7 +1491,7 @@ function rTabla(){
           const swapLabels = {cinturon:'cambia correa por cinturón auto', collar:'cambia correa por collar'};
           const largoExtra = item.largo&&item.largo!=='1.20mt'?' correa '+item.largo:'';
           const swapExtra = item.swap?` (${swapLabels[item.swap]||item.swap})`:'';
-          const prod = `${item.cant>1?item.cant+'× ':''}${(item.tipo||'').replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
+          const prod = `${item.cant>1?item.cant+'× ':''}${(item.tipo||'').replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${noTalleItem(item)?'':item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
           const envLabels = {
             'a_definir':'A definir',
             'Correo Arg Sucursal':'CORREO SUCURSAL',
@@ -2679,7 +2683,7 @@ function addItem(){
     color,
     largo,
     swap,
-    talle:document.getElementById('i-talle').value,
+    talle:(isCorrea||isCollar||tipo==='Cinturón auto')?'':document.getElementById('i-talle').value,
     precio:parseFloat(document.getElementById('i-prec').value)||0,
     cant:parseInt(document.getElementById('i-cant').value)||1,
     bordado:document.getElementById('i-bord').value.trim(),
@@ -2701,7 +2705,7 @@ function renderIL(){
     const swapLbls={cinturon:'cambia correa por cinturón auto',collar:'cambia correa por collar'};
     const largoE=i.largo&&i.largo!=='1.20mt'?' correa '+i.largo:'';
     const swapE=i.swap?` (${swapLbls[i.swap]||i.swap})`:'';
-    const prodL=`${i.cant>1?i.cant+'× ':''}${tipoLabel}${i.modelo?' — '+i.modelo:''}${largoE}${i.talle&&i.talle!=='Sin talle'?' '+i.talle:''}${swapE}`;
+    const prodL=`${i.cant>1?i.cant+'× ':''}${tipoLabel}${i.modelo?' — '+i.modelo:''}${largoE}${noTalleItem(i)?'':i.talle&&i.talle!=='Sin talle'?' '+i.talle:''}${swapE}`;
     const ex=[];
     if(i.pecho)ex.push('Pecho '+i.pecho+'cm');
     if(i.cuello)ex.push('Cuello '+i.cuello+'cm');
@@ -2727,7 +2731,7 @@ function editItem(id){
   renderMG();
   document.getElementById('i-mod').value=i.modelo||'';
   renderMG(); // re-render to highlight selected model
-  document.getElementById('i-talle').value=i.talle||'M';
+  document.getElementById('i-talle').value=noTalleItem(i)?'':i.talle||'M';
   document.getElementById('i-prec').value=i.precio||'';
   document.getElementById('i-cant').value=i.cant||1;
   document.getElementById('i-bord').value=i.bordado||'';
@@ -2776,7 +2780,7 @@ function calcPago(){
   if(itemRowsEl){
     itemRowsEl.innerHTML=tempItems.map(i=>`
       <div class="pr" style="padding:2px 0;font-size:13px;font-weight:600;color:var(--text)">
-        <span>${i.bordado||(i.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2'))}${i.modelo?' — '+i.modelo:''} ${i.talle!=='Sin talle'?i.talle:''}</span>
+        <span>${i.bordado||(i.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2'))}${i.modelo?' — '+i.modelo:''}${noTalleItem(i)?'':i.talle&&i.talle!=='Sin talle'?' '+i.talle:''}</span>
         <span>${fmt(i.precio*i.cant)}</span>
       </div>`).join('');
   }
@@ -2991,6 +2995,11 @@ function updateUndoBtns(){
 
 async function saveAllPedidos(){
   for(const p of pedidos){ await saveOnePedido(p); }
+}
+
+function noTalleItem(item){
+  const t=item.tipo||'';
+  return t==='Correa'||t==='Collar'||t==='Collar sublimado'||t==='Cinturón auto';
 }
 
 function fmtPedNum(p){
