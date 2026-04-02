@@ -1480,7 +1480,7 @@ function rTabla(){
 
   let html = `<table class="ptabla">
     <thead><tr>
-      <th>#</th><th>Cliente</th><th>Bordado</th><th>Descripción</th>
+      <th>#</th><th>$</th><th>Cliente</th><th>Bordado</th><th>Descripción</th>
       <th>Pecho</th><th>Cuello</th><th>Estado</th><th>Acc</th><th>Envío</th><th></th>
     </tr></thead><tbody>`;
 
@@ -1561,6 +1561,7 @@ function rTabla(){
             // Rowspan cells — only on first item
             if(first){
               html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};text-align:center;vertical-align:middle;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark);border-right:1px solid #e5e7eb">#${p.num}</td>`;
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};text-align:center;vertical-align:middle;font-size:11px;font-weight:800;color:var(--green);border-right:1px solid #e5e7eb;white-space:nowrap">${fmt(p.netoMambo||p.totalCobrado||0)}</td>`;
               html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};font-size:12px;vertical-align:middle;border-right:1px solid #e5e7eb">${p.cliente||''}</td>`;
             }
 
@@ -1912,7 +1913,7 @@ function rProd(){
 
   // Flatten all arnes items — store reference info, not copies
   const arnesItems=[];
-  paraProd.forEach(p=>{
+  pedidos.forEach(p=>{
     p.items.forEach(i=>{
       if(tieneArnes(i.tipo)){
         const estadoItem=i.estadoItem||(i.desdeStock?'listo':'nuevo');
@@ -1923,11 +1924,11 @@ function rProd(){
     });
   });
 
-  // Marroquineria items — read fresh from pedidos
+  // Marroquineria items — scan ALL pedidos
   const marroItemsRef=[];
-  pedidos.filter(p=>['nuevo','marroquineria'].includes(p.estado)).forEach(p=>{
+  pedidos.forEach(p=>{
     p.items.forEach(i=>{
-      if(tieneArnes(i.tipo)&&(i.estadoItem==='marroquineria')){
+      if(tieneArnes(i.tipo)&&i.estadoItem==='marroquineria'){
         marroItemsRef.push({...i, pedidoNum:p.num, pedidoId:p.id, estadoItem:'marroquineria'});
       }
     });
@@ -2098,22 +2099,16 @@ function rProd(){
   document.getElementById('pr-ma').innerHTML = marroItems.length ? buildProdTable(marroItems) : emptySmall('Sin arneses en marroquinería');
 
   // Listos para enviar — pedido completo en listo
-  const listosItems=[];
-  pedidos.filter(p=>p.estado==='listo').forEach(p=>{
-    p.items.filter(i=>tieneArnes(i.tipo)).forEach(i=>{
-      listosItems.push({...i,pedidoNum:p.num,pedidoId:p.id,estadoItem:'listo'});
-    });
-  });
+  // Listos — show pedidos where ALL arnes items are listo/stock
+  const pedidosListo=pedidos.filter(p=>p.estado==='listo');
   const liEl=document.getElementById('pr-li');
-  if(listosItems.length){
-    // Show with "Marcar enviado" at pedido level
-    const pedidosListo=pedidos.filter(p=>p.estado==='listo');
+  if(pedidosListo.length){
     const liRows=pedidosListo.map(p=>{
       const ai=p.items.filter(i=>tieneArnes(i.tipo));
       return ai.map((i,idx)=>`<tr>
         ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${p.num}<br>
-          <button onclick="setEstado('${p.id}','enviado')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-top:4px">📬 Enviar</button>
-          <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer;margin-top:3px">↩</button>
+          <button onclick="enviarPedido('${p.id}')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-top:4px">📬 Enviar</button>
+          <button onclick="revertirDeListo('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer;margin-top:3px">↩</button>
         </td>`:''}
         <td style="padding:8px 10px"><span style="font-weight:800;color:var(--pink-dark)">${i.modelo||'Sin modelo'}</span></td>
         <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
@@ -2169,6 +2164,29 @@ function setEstadoItem(pedidoId, itemId, nuevoEstado){
   saveOnePedido(p);
   rProd();
   rDash();
+}
+
+function enviarPedido(id){
+  const p=pedidos.find(x=>x.id===id);if(!p)return;
+  pushHistory();
+  p.estado='enviado';
+  // Mark all arnes items as enviado
+  p.items.forEach(i=>{ if(tieneArnes(i.tipo)) i.estadoItem='enviado'; });
+  saveOnePedido(p);
+  renderAll();
+  toast('📬 Pedido marcado como enviado');
+}
+
+function revertirDeListo(id){
+  const p=pedidos.find(x=>x.id===id);if(!p)return;
+  pushHistory();
+  p.estado='marroquineria';
+  // Revert all listo items to marroquineria
+  p.items.forEach(i=>{ if(tieneArnes(i.tipo)&&(i.estadoItem==='listo'||!i.estadoItem)) i.estadoItem='marroquineria'; });
+  saveOnePedido(p);
+  rProd();
+  rDash();
+  toast('↩ Revertido a Marroquinería');
 }
 
 function setEstado(id,est){
