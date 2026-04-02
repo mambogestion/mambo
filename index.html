@@ -279,7 +279,44 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 </head>
 <body>
 
-<header class="hdr">
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:fixed;inset:0;background:#0d0d0d;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:20px;display:flex">
+  <img src="https://mambogestion.github.io/mambo/logo.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover">
+  <img src="https://mambogestion.github.io/mambo/logoletras_blanco.png" style="height:28px;object-fit:contain">
+  <div style="color:rgba(255,255,255,.5);font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:8px">Gestión interna</div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:220px">
+    <input id="login-input" type="password" placeholder="Contraseña" maxlength="20"
+      style="padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:18px;text-align:center;font-family:'Nunito',sans-serif;letter-spacing:4px;outline:none"
+      onkeydown="if(event.key==='Enter')checkLogin()">
+    <button onclick="checkLogin()"
+      style="padding:13px;border-radius:12px;background:#db2777;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">
+      Entrar →
+    </button>
+    <div id="login-error" style="color:#f87171;font-size:12px;text-align:center;display:none">Contraseña incorrecta</div>
+  </div>
+</div>
+<script>
+(function(){
+  const PWD='4306',KEY='mambo_auth';
+  function checkLogin(){
+    const v=document.getElementById('login-input').value;
+    if(v===PWD){
+      localStorage.setItem(KEY,'1');
+      const s=document.getElementById('login-screen');
+      s.style.display='none';
+    } else {
+      document.getElementById('login-error').style.display='block';
+      document.getElementById('login-input').value='';
+      document.getElementById('login-input').focus();
+    }
+  }
+  window.checkLogin=checkLogin;
+  if(localStorage.getItem(KEY)==='1'){
+    // Hide immediately before render
+    document.getElementById('login-screen').style.display='none';
+  }
+})();
+</script>
   <div class="hdr-logo">
     <img src="https://mambogestion.github.io/mambo/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">
     <img src="https://mambogestion.github.io/mambo/logoletras_blanco.png" alt="MAMBO Mascotas Exigentes" style="height:26px;object-fit:contain">
@@ -1443,8 +1480,8 @@ function rTabla(){
 
   let html = `<table class="ptabla">
     <thead><tr>
-      <th>Cliente</th><th>Bordado</th><th>#</th><th>Descripción</th>
-      <th>Pecho</th><th>Cuello</th><th>Estado</th><th>Envío</th><th>Accesorios</th><th>Acciones</th>
+      <th>#</th><th>Cliente</th><th>Bordado</th><th>Descripción</th>
+      <th>Pecho</th><th>Cuello</th><th>Estado</th><th>Acc</th><th>Envío</th><th></th>
     </tr></thead><tbody>`;
 
   mesesOrder.forEach(mes => {
@@ -1469,7 +1506,11 @@ function rTabla(){
     const semanasOrdenadas = Object.keys(meses[mes]).sort();
 
     semanasOrdenadas.forEach(lunes => {
-      const pedSem = meses[mes][lunes].sort((a,b)=>(a.num||0)-(b.num||0));
+      const pedSem = meses[mes][lunes].sort((a,b)=>{
+        const fa=(a.fecha||'').slice(0,10);const fb=(b.fecha||'').slice(0,10);
+        if(fa!==fb)return fa>fb?1:-1;
+        return (a.num||0)-(b.num||0);
+      });
       const collapsed = mesesCollapsed[lunes] || false;
       const count = pedSem.length;
       const lunesLabel = lunes === 'sin-fecha' ? 'Sin fecha' :
@@ -1486,16 +1527,10 @@ function rTabla(){
 
     if(!collapsed){
       pedSem.forEach(p => {
-        p.items.forEach((item, idx) => {
-          const first = idx===0;
+        // Alternate colors per pedido (not per row)
+        pedSem.forEach((p, pedIdx) => {
+          const rowBg = pedIdx % 2 === 0 ? '#fff' : '#fdf2f8';
           const estColor = ESTADO_COLORS[p.estado]||'#f3f4f6';
-          const accColor = ACC_COLORS[item.accesorios||'pendiente']||'#fff';
-          const swapLabels = {cinturon:'cambia correa por cinturón auto', collar:'cambia correa por collar'};
-          const esCorrea=item.tipo==='Correa';
-          const esCollar=item.tipo==='Collar'||item.tipo==='Collar sublimado';
-          const largoExtra=item.largo&&item.largo!=='1.20mt'?(esCorrea?' '+item.largo:esCollar?'':' correa '+item.largo):'';
-          const swapExtra=item.swap?` (${swapLabels[item.swap]||item.swap})`:'';
-          const prod = `${item.cant>1?item.cant+'× ':''}${(item.tipo||'').replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${noTalleItem(item)?'':item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
           const envLabels = {
             'a_definir':'A definir',
             'Correo Arg Sucursal':'CORREO SUCURSAL',
@@ -1505,22 +1540,59 @@ function rTabla(){
             'Motito GBA':'MOTITO GBA',
           };
           const envio = envLabels[p.envio] || (p.envio||'').toUpperCase().slice(0,12);
-          const sepStyle = first ? 'border-top:2.5px solid #9ca3af' : '';
-          html += `<tr>
-            <td style="${sepStyle}">${first?`<div class="pt-alias" style="font-size:12px">${p.cliente||''}</div>`:'&nbsp;'}</td>
-            <td style="${sepStyle}"><div style="font-weight:800;font-size:13px;color:var(--pink-dark)">${item.bordado||item.alias||'—'}</div></td>
-            <td style="${sepStyle}" class="pt-num">${first?p.num||'':''}</td>
-            <td style="${sepStyle}" class="pt-prod">${prod}</td>
-            <td style="${sepStyle}" class="pt-medidas">${item.pecho||'—'}</td>
-            <td style="${sepStyle}" class="pt-medidas">${item.cuello||'—'}</td>
-            <td style="${sepStyle}" class="pt-estado">${first?`<select onchange="quickEstadoTabla('${p.id}',this.value)" style="background:${estColor}">${['shop','nuevo','marroquineria','listo','enviado'].map(v=>`<option value="${v}"${p.estado===v?' selected':''}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join('')}</select>`:'&nbsp;'}</td>
-            <td style="${sepStyle}" class="pt-envio">${first?envio:''}</td>
-            <td style="${sepStyle}" class="pt-acc"><select onchange="quickAccTabla('${p.id}','${item.id}',this.value)" style="background:${accColor}">${['pendiente','prep','ok','prio','prep_prio','no','na'].map(v=>`<option value="${v}"${(item.accesorios||'pendiente')===v?' selected':''}>${ACC_LABELS[v]}</option>`).join('')}</select></td>
-            <td style="${sepStyle};white-space:nowrap">${first?`
-              <button onclick="editarPedidoTabla('${p.id}')" style="background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-right:4px">✏️ Editar</button>
-              <button onclick="eliminarPedidoTabla('${p.id}',${p.num})" style="background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">🗑 Eliminar</button>
-            `:'&nbsp;'}</td>
-          </tr>`;
+          const ACC_LABELS = {pendiente:'PEND',prep:'PREP',ok:'OK ✓',prio:'PRIO',prep_prio:'PP',no:'NO',na:'N/A'};
+          const nItems = p.items.length;
+          const borderTop = 'border-top:2.5px solid #9ca3af';
+
+          p.items.forEach((item, idx) => {
+            const first = idx === 0;
+            const accColor = ACC_COLORS[item.accesorios||'pendiente']||'#fff';
+            const swapLabels = {cinturon:'cambia correa por cinturón auto', collar:'cambia correa por collar'};
+            const esCorrea=item.tipo==='Correa';
+            const esCollar=item.tipo==='Collar'||item.tipo==='Collar sublimado';
+            const largoExtra=item.largo&&item.largo!=='1.20mt'?(esCorrea?' '+item.largo:esCollar?'':' correa '+item.largo):'';
+            const swapExtra=item.swap?` (${swapLabels[item.swap]||item.swap})`:'';
+            const prod = `${item.cant>1?item.cant+'× ':''}${(item.tipo||'').replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2')}${item.modelo?' — '+item.modelo:''}${largoExtra}${noTalleItem(item)?'':item.talle&&item.talle!=='Sin talle'?' '+item.talle:''}${swapExtra}`;
+            const td = (content, extra='') => `<td style="background:${rowBg};${first?borderTop:''};${extra}">${content}</td>`;
+            // Per-item estado
+            const itemEstado = item.estadoItem||p.estado;
+            const itemEstColor = ESTADO_COLORS[itemEstado]||'#f3f4f6';
+
+            html += `<tr>`;
+
+            // Rowspan cells — only on first item
+            if(first){
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};text-align:center;vertical-align:middle;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark);border-right:1px solid #e5e7eb">#${p.num}</td>`;
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};font-size:12px;vertical-align:middle;border-right:1px solid #e5e7eb">${p.cliente||''}</td>`;
+            }
+
+            html += td(`<div style="font-weight:800;font-size:13px;color:var(--pink-dark)">${item.bordado||item.alias||'—'}</div>`);
+            html += td(prod, 'max-width:200px');
+            html += td(item.pecho||'—','text-align:center;font-size:12px');
+            html += td(item.cuello||'—','text-align:center;font-size:12px');
+            // Estado per item
+            html += `<td style="background:${rowBg};${first?borderTop:''}">
+              <select onchange="quickEstadoItem('${p.id}','${item.id}',this.value)" style="background:${itemEstColor};font-size:11px;padding:3px 4px;border-radius:7px;border:none;width:100%">
+                ${['shop','nuevo','marroquineria','listo','enviado'].map(v=>`<option value="${v}"${itemEstado===v?' selected':''}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join('')}
+              </select>
+            </td>`;
+            // Acc per item
+            html += `<td style="background:${rowBg};${first?borderTop:''}">
+              <select onchange="quickAccTabla('${p.id}','${item.id}',this.value)" style="background:${accColor};font-size:11px;padding:3px 4px;border-radius:7px;border:none;width:100%">
+                ${['pendiente','prep','ok','prio','prep_prio','no','na'].map(v=>`<option value="${v}"${(item.accesorios||'pendiente')===v?' selected':''}>${ACC_LABELS[v]}</option>`).join('')}
+              </select>
+            </td>`;
+
+            if(first){
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};vertical-align:middle;text-align:center;font-size:11px;font-weight:700;border-left:1px solid #e5e7eb">${envio}</td>`;
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};vertical-align:middle;border-left:1px solid #e5e7eb">
+                <button onclick="editarPedidoTabla('${p.id}')" style="background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue);border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;display:block;margin-bottom:4px">✏️</button>
+                <button onclick="eliminarPedidoTabla('${p.id}',${p.num})" style="background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;display:block">🗑</button>
+              </td>`;
+            }
+
+            html += `</tr>`;
+          });
         });
       });
     }
@@ -1588,6 +1660,28 @@ function eliminarPedidoTabla(id, num){
   deleteFromDB('pedidos',id);
   rTabla();
   toast('Pedido eliminado');
+}
+
+function quickEstadoItem(pedId, itemId, val){
+  const p = pedidos.find(p=>p.id===pedId);
+  if(!p) return;
+  const item = p.items.find(i=>i.id===itemId);
+  if(!item) return;
+  item.estadoItem = val;
+  // Sync pedido estado: take the "most advanced" state across all items
+  const orden = ['shop','nuevo','marroquineria','listo','enviado'];
+  const estados = p.items.map(i=>i.estadoItem||p.estado);
+  const minIdx = Math.min(...estados.map(e=>orden.indexOf(e)).filter(i=>i>=0));
+  p.estado = orden[minIdx] || val;
+  saveOnePedido(p);
+  // Update select color
+  const ESTADO_COLORS = {shop:'#c4b5fd',nuevo:'#bfdbfe',marroquineria:'#fed7aa',listo:'#bbf7d0',enviado:'#e5e7eb'};
+  const sel = event.target;
+  if(sel) sel.style.background = ESTADO_COLORS[val]||'#f3f4f6';
+  // Update produccion badge
+  const nue = pedidos.filter(p=>p.estado==='nuevo');
+  const badge = document.getElementById('produccion-badge');
+  if(badge){ badge.style.display=nue.length>0?'inline':'none'; badge.textContent=nue.length; }
 }
 
 function quickAccTabla(pedId, itemId, val){
@@ -1814,7 +1908,7 @@ function rProd(){
   const arnesItems=[];
   paraProd.forEach(p=>{
     p.items.forEach(i=>{
-      if(tieneArnes(i.tipo)) arnesItems.push({...i, pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado});
+      if(tieneArnes(i.tipo)) arnesItems.push({...i, pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado, estadoItem:i.estadoItem||(i.desdeStock?'stock':'nuevo')});
     });
   });
 
@@ -1948,23 +2042,37 @@ function rProd(){
       const pedidoArnesItems=arnesItems.filter(x=>x.pedidoNum===i.pedidoNum);
       const pedidoArnesIdx=pedidoArnesItems.indexOf(i);
       const p=pedidos.find(x=>x.num===i.pedidoNum);
-      const est=ESTADOS.find(e=>e.k===i.pedidoEstado)||ESTADOS[0];
-      // Next state button — nuevo goes straight to marroquineria now
-      const nextEstado='marroquineria';
-      const nextLabel='→ Marro';
-      return `<tr>
+      const esStock=i.estadoItem==='stock';
+      const esMarro=i.estadoItem==='marroquineria';
+      const esListo=i.estadoItem==='listo';
+      const rowStyle=esStock?'opacity:.45;background:#f9fafb':esListo?'background:#f0fdf4':'';
+
+      // Per-item action button
+      let btnHTML='';
+      if(esStock){
+        btnHTML=`<div style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:800;padding:3px 7px;border-radius:10px;margin-top:4px;letter-spacing:.5px">📦 STOCK</div>`;
+      } else if(esListo){
+        btnHTML=`<div style="background:#bbf7d0;color:#15803d;font-size:9px;font-weight:800;padding:3px 7px;border-radius:10px;margin-top:4px">✓ LISTO</div>`;
+      } else if(esMarro){
+        btnHTML=`<div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
+          <button onclick="setEstadoItem('${p?.id}','${i.id}','listo')" style="background:#bbf7d0;color:#15803d;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer">✓ Listo</button>
+          <button onclick="setEstadoItem('${p?.id}','${i.id}','nuevo')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer">↩</button>
+        </div>`;
+      } else {
+        btnHTML=`<div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
+          <button onclick="setEstadoItem('${p?.id}','${i.id}','marroquineria')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap">→ Marro</button>
+        </div>`;
+      }
+
+      return `<tr style="${rowStyle}">
         ${pedidoArnesIdx===0?`<td rowspan="${pedidoArnesItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px">
           <div class="pt-num">#${i.pedidoNum}</div>
-          ${p?`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:5px">
-            <button onclick="setEstado('${p.id}','${nextEstado}')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:4px 6px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;width:100%">→ Marro</button>
-            <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:3px 6px;font-size:10px;cursor:pointer;width:100%">↩ Revertir</button>
-          </div>`:''}
         </td>`:''}
         <td style="padding:8px 10px">
-          <div class="pt-model">${i.modelo?`<span style="color:var(--pink-dark);font-weight:800">${i.modelo}</span>`:'<span style="color:var(--gray3)">Sin modelo</span>'}</div>
+          <div class="pt-model"><span style="color:${esStock?'#9ca3af':'var(--pink-dark)'};font-weight:800">${i.modelo||'Sin modelo'}</span></div>
         </td>
         <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
-        <td style="text-align:center;font-weight:800;font-size:13px;padding:8px 6px">${i.cant>1?i.cant:1}</td>
+        <td style="text-align:center;padding:6px 4px">${btnHTML}</td>
       </tr>`;
     }).join('');
 
@@ -1974,7 +2082,7 @@ function rProd(){
           <th class="center">N°</th>
           <th>Modelo</th>
           <th class="center">Talle</th>
-          <th class="center">Cant</th>
+          <th class="center">Estado</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`;
@@ -2038,6 +2146,23 @@ function openEstadoPopup(ev,id){
 function closePopup(){document.getElementById('estado-popup').style.display='none';}
 ['click','touchstart'].forEach(evt=>document.addEventListener(evt,e=>{if(!e.target.closest('.estado-popup')&&!e.target.closest('.pb-estado-btn'))closePopup();}));
 
+function setEstadoItem(pedidoId, itemId, nuevoEstado){
+  const p=pedidos.find(x=>x.id===pedidoId);if(!p)return;
+  const item=p.items.find(i=>i.id===itemId);if(!item)return;
+  pushHistory();
+  item.estadoItem=nuevoEstado;
+  // Update pedido estado based on all arnes items
+  const arnesItems=p.items.filter(i=>tieneArnes(i.tipo));
+  const allListo=arnesItems.every(i=>i.estadoItem==='listo'||i.estadoItem==='stock');
+  const anyMarro=arnesItems.some(i=>i.estadoItem==='marroquineria');
+  if(allListo) p.estado='listo';
+  else if(anyMarro) p.estado='marroquineria';
+  else p.estado='nuevo';
+  saveOnePedido(p);
+  rProd();
+  toast('Estado actualizado');
+}
+
 function setEstado(id,est){
   const p=pedidos.find(x=>x.id===id);if(!p)return;
   pushHistory();
@@ -2093,6 +2218,7 @@ function openDetalle(pedidoId, itemIdx){
 // ══════════ NEW / EDIT PEDIDO ══════════
 function openNuevo(){
   editId=null;tempItems=[];
+  window._algunDesdeStock=false;
   document.getElementById('form-title').textContent='🐾 Nuevo Pedido';
   document.getElementById('f-save-btn').textContent='Guardar pedido ✓';
   ['f-cli','f-notas'].forEach(id=>document.getElementById(id).value='');
@@ -2679,22 +2805,70 @@ function addItem(){
   const swap=document.getElementById('i-swap')?.value||'';
   const modeloBase=document.getElementById('i-mod').value.trim();
   const modeloFinal=(isCollar||isCorrea)?color:modeloBase;
-  tempItems.push({
+  const talle=(isCorrea||isCollar||tipo==='Cinturón auto')?'':document.getElementById('i-talle').value;
+
+  const item={
     id:Date.now()+'',
     alias:document.getElementById('i-bord').value.trim(),
-    tipo,
-    modelo:modeloFinal,
-    color,
-    largo,
-    swap,
-    talle:(isCorrea||isCollar||tipo==='Cinturón auto')?'':document.getElementById('i-talle').value,
+    tipo, modelo:modeloFinal, color, largo, swap, talle,
     precio:parseFloat(document.getElementById('i-prec').value)||0,
     cant:parseInt(document.getElementById('i-cant').value)||1,
     bordado:document.getElementById('i-bord').value.trim(),
     pecho:document.getElementById('i-pecho').value.trim(),
     cuello:document.getElementById('i-cuello').value.trim(),
     accesorios:(tipo==='Solo bordado'||tipo==='Arnés')?'na':document.getElementById('i-acc').value||'pendiente',
-  });
+    desdeStock:false,
+  };
+
+  // Check if this item has stock available
+  const tieneArnes = tipo==='Arnés'||tipo==='Combo 1 — Arnés + Correa'||tipo==='Combo 2 — Arnés + Correa + Collar';
+  const stockDisp = tieneArnes && modeloFinal && talle ? (stockData[modeloFinal]?.[talle]||0) : 0;
+
+  if(stockDisp > 0){
+    // Show stock popup
+    const overlay = document.createElement('div');
+    overlay.classList.add('stock-confirm');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML=`
+      <div style="background:#fff;border-radius:18px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="font-size:36px;margin-bottom:10px">📦</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:8px">¡Hay stock disponible!</div>
+        <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:4px">${modeloFinal} — ${talle}</div>
+        <div style="font-size:13px;color:#9ca3af;margin-bottom:18px">Stock disponible: <strong style="color:var(--green)">${stockDisp} unidad${stockDisp!==1?'es':''}</strong></div>
+        <div style="font-size:13px;color:#374151;margin-bottom:20px">¿Querés usar una pieza del stock?<br><span style="font-size:11px;color:#9ca3af">El pedido pasará directo a Listo para enviar</span></div>
+        <div style="display:flex;gap:8px">
+          <button onclick="confirmarDesdeStock(false)" style="flex:1;padding:12px;border-radius:11px;border:1.5px solid #e5e7eb;background:#f7f7f7;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#374151">No, producir</button>
+          <button onclick="confirmarDesdeStock(true)" style="flex:1;padding:12px;border-radius:11px;border:none;background:var(--green);color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">✓ Sí, usar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    window._pendingStockItem = item;
+  } else {
+    doAddItem(item, false);
+  }
+}
+
+function confirmarDesdeStock(usarStock){
+  document.querySelectorAll('.stock-confirm').forEach(el=>el.remove());
+  const item = window._pendingStockItem;
+  if(!item) return;
+  delete window._pendingStockItem;
+  if(usarStock){
+    // Descontar del stock
+    if(!stockData[item.modelo]) stockData[item.modelo]={};
+    stockData[item.modelo][item.talle]=Math.max(0,(stockData[item.modelo][item.talle]||0)-1);
+    saveStock();
+    item.desdeStock=true;
+    toast('📦 Stock descontado');
+  }
+  doAddItem(item, usarStock);
+}
+
+function doAddItem(item, desdeStock){
+  item.desdeStock=desdeStock;
+  tempItems.push(item);
+  // If any item comes from stock, mark the pedido to start as listo
+  if(desdeStock) window._algunDesdeStock=true;
   resetItemForm();renderIL();calcPago();
 }
 
@@ -2846,7 +3020,9 @@ function savePedido(){
     }
   } else {
     pushHistory();
-    pedidos.push({id:Date.now()+'',num,cliente:cli,provincia,items:JSON.parse(JSON.stringify(tempItems)),pago,mpRecibido:pago==='mercadopago'?mpRecibido:0,linkTotal,envio:document.getElementById('f-env').value,envioCosto:env,notas:document.getElementById('f-notas').value.trim(),medidas:'',estado:'nuevo',fecha:fechaVal+'T12:00:00.000Z',totalCobrado,netoMambo:neto,facturaRealizada:false,nroFactura:''});
+    const estadoInicial = 'nuevo';
+    window._algunDesdeStock = false;
+    pedidos.push({id:Date.now()+'',num,cliente:cli,provincia,items:JSON.parse(JSON.stringify(tempItems)),pago,mpRecibido:pago==='mercadopago'?mpRecibido:0,linkTotal,envio:document.getElementById('f-env').value,envioCosto:env,notas:document.getElementById('f-notas').value.trim(),medidas:'',estado:estadoInicial,fecha:fechaVal+'T12:00:00.000Z',totalCobrado,netoMambo:neto,facturaRealizada:false,nroFactura:''});
     toast('Pedido #'+num+' guardado ✅');
   }
   save();closeOv('ov-form');renderAll();
