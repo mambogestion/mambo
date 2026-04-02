@@ -1915,7 +1915,7 @@ function rProd(){
   paraProd.forEach(p=>{
     p.items.forEach(i=>{
       if(tieneArnes(i.tipo)){
-        const estadoItem=i.estadoItem||(i.desdeStock?'stock':'nuevo');
+        const estadoItem=i.estadoItem||(i.desdeStock?'listo':'nuevo');
         if(estadoItem==='nuevo'||estadoItem==='stock'){
           arnesItems.push({...i, pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado, estadoItem});
         }
@@ -2862,11 +2862,11 @@ function confirmarDesdeStock(usarStock){
   if(!item) return;
   delete window._pendingStockItem;
   if(usarStock){
-    // Descontar del stock
     if(!stockData[item.modelo]) stockData[item.modelo]={};
     stockData[item.modelo][item.talle]=Math.max(0,(stockData[item.modelo][item.talle]||0)-1);
     saveStock();
     item.desdeStock=true;
+    item.estadoItem='listo';
     toast('📦 Stock descontado');
   }
   doAddItem(item, usarStock);
