@@ -1056,6 +1056,9 @@ function goTab(el){
 // ══════════ RENDER ══════════
 function renderAll(){rDash();rPedidos();rVentas();rProd();rFacturacion();rBordados();rStock();rPrecios();}
 
+// Global helper
+const tieneArnes=t=>t&&(t.includes('Arnés')||t.includes('Combo 1')||t.includes('Combo 2'));
+
 // ══════════ STOCK & PRECIOS DATA ══════════
 const TALLES_STOCK=['XS','S','M','L','XL','XXL'];
 
@@ -1903,7 +1906,6 @@ function deleteEgreso(id){
 
 function rProd(){
   const TALLES=['XS','S','M','L','XL','XXL'];
-  const tieneArnes=t=>t&&(t.includes('Arnés')||t.includes('Combo 1')||t.includes('Combo 2'));
 
   // ── PARA PRODUCIR = nuevo + en produccion ──
   const paraProd=pedidos.filter(p=>p.estado==='nuevo'||p.estado==='marroquineria'||p.estado==='produccion');
@@ -2154,23 +2156,16 @@ function closePopup(){document.getElementById('estado-popup').style.display='non
 ['click','touchstart'].forEach(evt=>document.addEventListener(evt,e=>{if(!e.target.closest('.estado-popup')&&!e.target.closest('.pb-estado-btn'))closePopup();}));
 
 function setEstadoItem(pedidoId, itemId, nuevoEstado){
-  console.log('setEstadoItem called:', pedidoId, itemId, nuevoEstado);
-  const p=pedidos.find(x=>x.id===pedidoId);
-  console.log('pedido found:', p ? p.num : 'NOT FOUND');
-  if(!p)return;
-  const item=p.items.find(i=>i.id===itemId);
-  console.log('item found:', item ? item.modelo : 'NOT FOUND');
-  if(!item)return;
+  const p=pedidos.find(x=>x.id===pedidoId);if(!p)return;
+  const item=p.items.find(i=>i.id===itemId);if(!item)return;
   pushHistory();
   item.estadoItem=nuevoEstado;
-  console.log('estadoItem set to:', nuevoEstado, 'on item:', item.modelo);
-  const arnesItems=p.items.filter(i=>tieneArnes(i.tipo));
-  const allListo=arnesItems.every(i=>i.estadoItem==='listo'||i.estadoItem==='stock');
-  const anyMarro=arnesItems.some(i=>i.estadoItem==='marroquineria');
+  const aitems=p.items.filter(i=>tieneArnes(i.tipo));
+  const allListo=aitems.every(i=>i.estadoItem==='listo'||i.estadoItem==='stock');
+  const anyMarro=aitems.some(i=>i.estadoItem==='marroquineria');
   if(allListo) p.estado='listo';
   else if(anyMarro) p.estado='marroquineria';
   else p.estado='nuevo';
-  console.log('pedido estado now:', p.estado);
   saveOnePedido(p);
   rProd();
   rDash();
