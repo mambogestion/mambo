@@ -228,9 +228,7 @@ textarea{resize:vertical;min-height:55px}
 /* TABLA PEDIDOS */
 .ptabla{width:100%;border-collapse:collapse;font-size:12px;min-width:700px}
 .ptabla th{background:var(--black);color:#fff;padding:8px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap;position:sticky;top:0;z-index:2}
-.ptabla td{padding:7px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle;white-space:nowrap}
-.ptabla tr:nth-child(even) td{background:#f9f9f9}
-.ptabla tr:hover td{background:var(--pink-light)}
+.ptabla td{padding:6px 10px;border-bottom:1px solid var(--gray2);vertical-align:middle;white-space:nowrap}
 .pt-alias{font-weight:800;font-size:13px;color:var(--black)}
 .pt-cliente{font-size:11px;color:var(--gray3)}
 .pt-num{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gray3)}
@@ -280,7 +278,7 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 <body>
 
 <!-- LOGIN SCREEN -->
-<div id="login-screen" style="position:fixed;inset:0;background:#0d0d0d;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:20px;display:flex">
+<div id="login-screen" style="position:fixed;inset:0;background:#0d0d0d;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:20px;display:none">
   <img src="https://mambogestion.github.io/mambo/logo.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover">
   <img src="https://mambogestion.github.io/mambo/logoletras_blanco.png" style="height:28px;object-fit:contain">
   <div style="color:rgba(255,255,255,.5);font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:8px">Gestión interna</div>
@@ -302,8 +300,7 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
     const v=document.getElementById('login-input').value;
     if(v===PWD){
       localStorage.setItem(KEY,'1');
-      const s=document.getElementById('login-screen');
-      s.style.display='none';
+      document.getElementById('login-screen').style.display='none';
     } else {
       document.getElementById('login-error').style.display='block';
       document.getElementById('login-input').value='';
@@ -311,12 +308,12 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
     }
   }
   window.checkLogin=checkLogin;
-  if(localStorage.getItem(KEY)==='1'){
-    // Hide immediately before render
-    document.getElementById('login-screen').style.display='none';
+  if(localStorage.getItem(KEY)!=='1'){
+    document.getElementById('login-screen').style.display='flex';
   }
 })();
 </script>
+<header class="hdr">
   <div class="hdr-logo">
     <img src="https://mambogestion.github.io/mambo/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">
     <img src="https://mambogestion.github.io/mambo/logoletras_blanco.png" alt="MAMBO Mascotas Exigentes" style="height:26px;object-fit:contain">
@@ -1526,9 +1523,7 @@ function rTabla(){
       </tr>`;
 
     if(!collapsed){
-      pedSem.forEach(p => {
-        // Alternate colors per pedido (not per row)
-        pedSem.forEach((p, pedIdx) => {
+      pedSem.forEach((p, pedIdx) => {
           const rowBg = pedIdx % 2 === 0 ? '#fff' : '#fdf2f8';
           const estColor = ESTADO_COLORS[p.estado]||'#f3f4f6';
           const envLabels = {
@@ -1593,7 +1588,6 @@ function rTabla(){
 
             html += `</tr>`;
           });
-        });
       });
     }
     }); // end semanasOrdenadas forEach
@@ -1656,6 +1650,16 @@ function editarPedidoTabla(id){
 
 function eliminarPedidoTabla(id, num){
   if(!confirm(`¿Eliminar pedido #${num}?`)) return;
+  const p=pedidos.find(x=>x.id===id);
+  if(p){
+    p.items.forEach(i=>{
+      if(i.desdeStock&&i.modelo&&i.talle){
+        if(!stockData[i.modelo])stockData[i.modelo]={};
+        stockData[i.modelo][i.talle]=(stockData[i.modelo][i.talle]||0)+1;
+        saveStock();
+      }
+    });
+  }
   pedidos = pedidos.filter(p=>p.id!==id);
   deleteFromDB('pedidos',id);
   rTabla();
@@ -1902,13 +1906,28 @@ function rProd(){
   const tieneArnes=t=>t&&(t.includes('Arnés')||t.includes('Combo 1')||t.includes('Combo 2'));
 
   // ── PARA PRODUCIR = nuevo + en produccion ──
-  const paraProd=pedidos.filter(p=>p.estado==='nuevo'||p.estado==='produccion');
+  const paraProd=pedidos.filter(p=>p.estado==='nuevo'||p.estado==='marroquineria'||p.estado==='produccion');
 
-  // Flatten all arnes items
+  // Flatten all arnes items — store reference info, not copies
   const arnesItems=[];
   paraProd.forEach(p=>{
     p.items.forEach(i=>{
-      if(tieneArnes(i.tipo)) arnesItems.push({...i, pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado, estadoItem:i.estadoItem||(i.desdeStock?'stock':'nuevo')});
+      if(tieneArnes(i.tipo)){
+        const estadoItem=i.estadoItem||(i.desdeStock?'stock':'nuevo');
+        if(estadoItem==='nuevo'||estadoItem==='stock'){
+          arnesItems.push({...i, pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado, estadoItem});
+        }
+      }
+    });
+  });
+
+  // Marroquineria items — read fresh from pedidos
+  const marroItemsRef=[];
+  pedidos.filter(p=>['nuevo','marroquineria'].includes(p.estado)).forEach(p=>{
+    p.items.forEach(i=>{
+      if(tieneArnes(i.tipo)&&(i.estadoItem==='marroquineria')){
+        marroItemsRef.push({...i, pedidoNum:p.num, pedidoId:p.id, estadoItem:'marroquineria'});
+      }
     });
   });
 
@@ -2032,92 +2051,80 @@ function rProd(){
     resEl.innerHTML='';
   }
 
-  // Nuevos table
-  const nuevosEl=document.getElementById('pr-nuevos');
-  if(!arnesItems.length){
-    nuevosEl.innerHTML=emptySmall('Sin arneses para producir');
-  } else {
-    const seenPedidos=new Set();
-    const rows=arnesItems.map(i=>{
-      const pedidoArnesItems=arnesItems.filter(x=>x.pedidoNum===i.pedidoNum);
-      const pedidoArnesIdx=pedidoArnesItems.indexOf(i);
-      const p=pedidos.find(x=>x.num===i.pedidoNum);
+  function buildProdTable(items){
+    if(!items.length) return emptySmall('Sin arneses');
+    const rows=items.map(i=>{
+      const grupoItems=items.filter(x=>x.pedidoNum===i.pedidoNum);
+      const idx=grupoItems.indexOf(i);
       const esStock=i.estadoItem==='stock';
-      const esMarro=i.estadoItem==='marroquineria';
-      const esListo=i.estadoItem==='listo';
-      const rowStyle=esStock?'opacity:.45;background:#f9fafb':esListo?'background:#f0fdf4':'';
-
-      // Per-item action button
-      let btnHTML='';
+      const rowStyle=esStock?'opacity:.45;background:#f9fafb':'';
+      let btn='';
       if(esStock){
-        btnHTML=`<div style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:800;padding:3px 7px;border-radius:10px;margin-top:4px;letter-spacing:.5px">📦 STOCK</div>`;
-      } else if(esListo){
-        btnHTML=`<div style="background:#bbf7d0;color:#15803d;font-size:9px;font-weight:800;padding:3px 7px;border-radius:10px;margin-top:4px">✓ LISTO</div>`;
-      } else if(esMarro){
-        btnHTML=`<div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
-          <button onclick="setEstadoItem('${p?.id}','${i.id}','listo')" style="background:#bbf7d0;color:#15803d;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer">✓ Listo</button>
-          <button onclick="setEstadoItem('${p?.id}','${i.id}','nuevo')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer">↩</button>
+        btn=`<span style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:800;padding:3px 7px;border-radius:10px">📦 STOCK</span>`;
+      } else if(i.estadoItem==='nuevo'){
+        btn=`<button class="prod-btn" data-pid="${i.pedidoId}" data-iid="${i.id}" data-est="marroquineria" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:4px 8px;font-size:10px;font-weight:800;cursor:pointer">→ Marro</button>`;
+      } else if(i.estadoItem==='marroquineria'){
+        btn=`<div style="display:flex;flex-direction:column;gap:3px">
+          <button class="prod-btn" data-pid="${i.pedidoId}" data-iid="${i.id}" data-est="listo" style="background:#dcfce7;color:#15803d;border:none;border-radius:7px;padding:3px 7px;font-size:10px;font-weight:800;cursor:pointer">✓ Listo</button>
+          <button class="prod-btn" data-pid="${i.pedidoId}" data-iid="${i.id}" data-est="nuevo" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 6px;font-size:9px;cursor:pointer">↩</button>
         </div>`;
-      } else {
-        btnHTML=`<div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
-          <button onclick="setEstadoItem('${p?.id}','${i.id}','marroquineria')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap">→ Marro</button>
+      } else if(i.estadoItem==='listo'){
+        btn=`<div style="display:flex;flex-direction:column;gap:3px">
+          <span style="background:#bbf7d0;color:#15803d;font-size:9px;font-weight:800;padding:3px 7px;border-radius:10px">✓ LISTO</span>
+          <button class="prod-btn" data-pid="${i.pedidoId}" data-iid="${i.id}" data-est="marroquineria" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 6px;font-size:9px;cursor:pointer">↩</button>
         </div>`;
       }
-
       return `<tr style="${rowStyle}">
-        ${pedidoArnesIdx===0?`<td rowspan="${pedidoArnesItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px">
-          <div class="pt-num">#${i.pedidoNum}</div>
-        </td>`:''}
-        <td style="padding:8px 10px">
-          <div class="pt-model"><span style="color:${esStock?'#9ca3af':'var(--pink-dark)'};font-weight:800">${i.modelo||'Sin modelo'}</span></div>
-        </td>
+        ${idx===0?`<td rowspan="${grupoItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${i.pedidoNum}</td>`:''}
+        <td style="padding:8px 10px"><span style="font-weight:800;color:${esStock?'#9ca3af':'var(--pink-dark)'}">${i.modelo||'Sin modelo'}</span></td>
         <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
-        <td style="text-align:center;padding:6px 4px">${btnHTML}</td>
+        <td style="text-align:center;padding:6px 4px">${btn}</td>
       </tr>`;
     }).join('');
-
-    nuevosEl.innerHTML=`
-      <div class="prod-wrap"><table class="prod-table">
-        <thead><tr>
-          <th class="center">N°</th>
-          <th>Modelo</th>
-          <th class="center">Talle</th>
-          <th class="center">Estado</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table></div>`;
-  }
-
-  // ── MARROQUINERIA / LISTOS ──
-  const btnStyle=c=>c==='pb-gn'?'background:#dcfce7;color:#16a34a':'background:#dbeafe;color:#2563eb';
-
-  const simpleTable=(arr,nextEst,btnL,btnC)=>{
-    if(!arr.length) return emptySmall('Sin piezas');
-    const rows=arr.map(p=>{
-      const ai=p.items.filter(i=>tieneArnes(i.tipo));
-      if(!ai.length) return '';
-      return ai.map((i,idx)=>`
-        <tr>
-          ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:8px 6px">
-            <div class="pt-num">#${p.num}</div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:5px">
-              <button onclick="setEstado('${p.id}','${nextEst}')" style="${btnStyle(btnC)};border:none;border-radius:7px;padding:4px 6px;font-size:10px;font-weight:800;cursor:pointer;width:100%">${btnL}</button>
-              <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:3px 6px;font-size:10px;cursor:pointer;width:100%">↩ Revertir</button>
-            </div>
-          </td>`:''}
-          <td style="padding:8px 10px"><div class="pt-model">${i.modelo?`<span style="color:var(--pink-dark);font-weight:800">${i.modelo}</span>`:'<span style="color:var(--gray3)">Sin modelo</span>'}</div></td>
-          <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
-        </tr>`).join('');
-    }).join('');
-    if(!rows.trim()) return emptySmall('Sin arneses');
-    return`<div class="prod-wrap"><table class="prod-table">
-      <thead><tr><th class="center">N°</th><th>Modelo</th><th class="center">Talle</th></tr></thead>
+    return `<div class="prod-wrap"><table class="prod-table">
+      <thead><tr><th class="center">N°</th><th>Modelo</th><th class="center">Talle</th><th class="center">Acción</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>`;
-  };
+  }
 
-  document.getElementById('pr-ma').innerHTML=simpleTable(pedidos.filter(p=>p.estado==='marroquineria'),'listo','✓ Listo para enviar','pb-gn');
-  document.getElementById('pr-li').innerHTML=simpleTable(pedidos.filter(p=>p.estado==='listo'),'enviado','📬 Marcar enviado','pb-bl');
+  // Para producir — estadoItem nuevo o stock
+  const nuevosEl=document.getElementById('pr-nuevos');
+  nuevosEl.innerHTML = arnesItems.length ? buildProdTable(arnesItems) : emptySmall('Sin arneses para producir');
+
+  // En marroquinería — usar marroItemsRef ya construido
+  const marroItems = marroItemsRef;
+  document.getElementById('pr-ma').innerHTML = marroItems.length ? buildProdTable(marroItems) : emptySmall('Sin arneses en marroquinería');
+
+  // Listos para enviar — pedido completo en listo
+  const listosItems=[];
+  pedidos.filter(p=>p.estado==='listo').forEach(p=>{
+    p.items.filter(i=>tieneArnes(i.tipo)).forEach(i=>{
+      listosItems.push({...i,pedidoNum:p.num,pedidoId:p.id,estadoItem:'listo'});
+    });
+  });
+  const liEl=document.getElementById('pr-li');
+  if(listosItems.length){
+    // Show with "Marcar enviado" at pedido level
+    const pedidosListo=pedidos.filter(p=>p.estado==='listo');
+    const liRows=pedidosListo.map(p=>{
+      const ai=p.items.filter(i=>tieneArnes(i.tipo));
+      return ai.map((i,idx)=>`<tr>
+        ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${p.num}<br>
+          <button onclick="setEstado('${p.id}','enviado')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-top:4px">📬 Enviar</button>
+          <button onclick="revertEstado('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer;margin-top:3px">↩</button>
+        </td>`:''}
+        <td style="padding:8px 10px"><span style="font-weight:800;color:var(--pink-dark)">${i.modelo||'Sin modelo'}</span></td>
+        <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
+        <td></td>
+      </tr>`).join('');
+    }).join('');
+    liEl.innerHTML=`<div class="prod-wrap"><table class="prod-table">
+      <thead><tr><th class="center">N°</th><th>Modelo</th><th class="center">Talle</th><th></th></tr></thead>
+      <tbody>${liRows}</tbody>
+    </table></div>`;
+  } else {
+    liEl.innerHTML=emptySmall('Sin arneses listos');
+  }
 }
 
 // ══════════ ESTADO POPUP ══════════
@@ -2147,20 +2154,26 @@ function closePopup(){document.getElementById('estado-popup').style.display='non
 ['click','touchstart'].forEach(evt=>document.addEventListener(evt,e=>{if(!e.target.closest('.estado-popup')&&!e.target.closest('.pb-estado-btn'))closePopup();}));
 
 function setEstadoItem(pedidoId, itemId, nuevoEstado){
-  const p=pedidos.find(x=>x.id===pedidoId);if(!p)return;
-  const item=p.items.find(i=>i.id===itemId);if(!item)return;
+  console.log('setEstadoItem called:', pedidoId, itemId, nuevoEstado);
+  const p=pedidos.find(x=>x.id===pedidoId);
+  console.log('pedido found:', p ? p.num : 'NOT FOUND');
+  if(!p)return;
+  const item=p.items.find(i=>i.id===itemId);
+  console.log('item found:', item ? item.modelo : 'NOT FOUND');
+  if(!item)return;
   pushHistory();
   item.estadoItem=nuevoEstado;
-  // Update pedido estado based on all arnes items
+  console.log('estadoItem set to:', nuevoEstado, 'on item:', item.modelo);
   const arnesItems=p.items.filter(i=>tieneArnes(i.tipo));
   const allListo=arnesItems.every(i=>i.estadoItem==='listo'||i.estadoItem==='stock');
   const anyMarro=arnesItems.some(i=>i.estadoItem==='marroquineria');
   if(allListo) p.estado='listo';
   else if(anyMarro) p.estado='marroquineria';
   else p.estado='nuevo';
+  console.log('pedido estado now:', p.estado);
   saveOnePedido(p);
   rProd();
-  toast('Estado actualizado');
+  rDash();
 }
 
 function setEstado(id,est){
@@ -3030,6 +3043,18 @@ function savePedido(){
 
 function confirmDelete(id){
   if(!confirm('¿Eliminar este pedido?'))return;
+  const p=pedidos.find(x=>x.id===id);
+  if(p){
+    // Restore stock for any items that came from stock
+    p.items.forEach(i=>{
+      if(i.desdeStock&&i.modelo&&i.talle){
+        if(!stockData[i.modelo])stockData[i.modelo]={};
+        stockData[i.modelo][i.talle]=(stockData[i.modelo][i.talle]||0)+1;
+        saveStock();
+        toast('📦 Stock restaurado: '+i.modelo+' '+i.talle);
+      }
+    });
+  }
   pushHistory();
   pedidos=pedidos.filter(p=>p.id!==id);
   deleteFromDB('pedidos',id);
@@ -3413,6 +3438,15 @@ function rBordados(){
 document.getElementById('hdrDate').textContent=new Date().toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
 const _today=new Date().toISOString().slice(0,10);
 if(document.getElementById('egr-fecha'))document.getElementById('egr-fecha').value=_today;
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.prod-btn');
+  if(!btn) return;
+  const pid = btn.dataset.pid;
+  const iid = btn.dataset.iid;
+  const est = btn.dataset.est;
+  if(pid && iid && est) setEstadoItem(pid, iid, est);
+});
+
 loadData();
 loadMesesCollapsed();
 initVista();
