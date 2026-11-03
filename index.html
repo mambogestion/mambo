@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<meta name="robots" content="noindex,nofollow">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <link rel="icon" type="image/png" href="https://mambogestion.github.io/mambo/logo.png">
@@ -346,6 +347,7 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
       <div class="sc yw"><div class="sc-ico">🏭</div><div class="sc-lbl">En marroquinería</div><div class="sc-val" id="st-ma">0</div><div class="sc-sub">en costura</div></div>
       <div class="sc bl"><div class="sc-ico">✅</div><div class="sc-lbl">Listos p/ enviar</div><div class="sc-val" id="st-li">0</div><div class="sc-sub">esperando</div></div>
     </div>
+    <div class="card"><div class="card-ttl">📋 Tareas pendientes</div><div id="d-tareas"></div></div>
     <div class="card"><div class="card-ttl">📬 Últimos pedidos</div><div id="d-recent"></div></div>
     <div class="card"><div class="card-ttl">📈 Por mes</div><div id="d-mens"></div></div>
   </section>
@@ -520,6 +522,8 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
     <div class="sh"><h2>Stock</h2></div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
       <div class="sw" style="flex:1;min-width:160px"><span class="si">🔍</span><input type="text" id="stock-search" placeholder="Buscar modelo…" oninput="rStock()"></div>
+      <button id="btn-stock-min" onclick="toggleStockMinEdit()" style="background:var(--gray);border:1.5px solid var(--gray2);border-radius:9px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer">⚙ Editar mínimos</button>
+      <button id="btn-stock-min-c" onclick="cancelarStockMin()" style="display:none;background:#fff;border:1.5px solid var(--gray2);border-radius:9px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer">✕ Cancelar</button>
       <div style="display:flex;gap:6px;flex-wrap:wrap" id="stock-talle-chips">
         <div class="chip on" onclick="setStockTalle('',this)">Todos</div>
         <div class="chip" onclick="setStockTalle('XS',this)">XS</div>
@@ -547,6 +551,7 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
         <tbody id="stock-tbody"></tbody>
       </table>
     </div>
+    <div class="card" id="stock-repos" style="padding:14px;margin-top:14px"></div>
   </section>
 
   <!-- ═══ PRECIOS ═══ -->
@@ -571,6 +576,12 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 
     <div class="divider"></div>
 
+    <!-- STOCK DE INSUMOS PARA PRODUCIR -->
+    <div class="card" id="falt-stock-ins" style="padding:14px;margin-bottom:16px"></div>
+
+    <!-- PANAL Y GOMA EVA: ESTIMACIÓN -->
+    <div class="card" id="falt-insumos" style="padding:14px;margin-bottom:16px"></div>
+
     <!-- BUSCADOR -->
     <div class="sw" style="margin-bottom:14px"><span class="si">🔍</span><input type="text" id="falt-search" placeholder="Buscar insumo…" oninput="renderFaltantes()"></div>
 
@@ -582,17 +593,33 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
     <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🔩 Herrajes</div>
     <div id="falt-grid-herrajes" style="margin-bottom:20px"></div>
 
-    <!-- CORDURAS TELAS PU -->
+    <!-- CINTAS PERRO PASE 30 -->
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🎀 Cintas perro pase 30 (x rollo)</div>
+    <div id="falt-grid-cintas_p30" style="margin-bottom:20px"></div>
+
+        <!-- CORDURAS TELAS PU -->
     <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🧵 Corduras, Telas y PU</div>
     <div id="falt-grid-telas" style="margin-bottom:20px"></div>
 
     <!-- CINTAS TITULO -->
-    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🎀 Cintas título (Persiantex)</div>
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🎀 Cintas e hilos</div>
     <div id="falt-grid-cintas_titulo" style="margin-bottom:20px"></div>
 
     <!-- CINTAS ESPECIALES -->
     <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">✨ Cintas especiales (Cintas Sublimadas)</div>
     <div id="falt-grid-cintas_esp" style="margin-bottom:20px"></div>
+
+    <!-- ETIQUETAS -->
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🏷️ Etiquetas</div>
+    <div id="falt-grid-etiquetas" style="margin-bottom:20px"></div>
+
+    <!-- ENVIOS -->
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">📮 Envíos</div>
+    <div id="falt-grid-envios" style="margin-bottom:20px"></div>
+
+    <!-- OTROS -->
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:10px">🔧 Otros</div>
+    <div id="falt-grid-otros" style="margin-bottom:20px"></div>
 
   </section>
 
@@ -794,6 +821,19 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
           <option value="">Elegir largo…</option>
         </select>
         <div style="font-size:11px;color:var(--pink-dark);font-weight:700;margin-top:4px" id="i-largo-precio-hint"></div>
+      </div>
+      <!-- Color de correa (se propone según el modelo) y mosquetón -->
+      <div class="fg" id="i-corr-wrap" style="display:none">
+        <div id="i-ccorr-row">
+          <label>🎀 Color de correa <span style="font-weight:600;color:var(--gray3)">(se propone según el modelo)</span></label>
+          <select id="i-ccorr" onchange="window._ccorrManual=true" style="font-weight:800"></select>
+        </div>
+        <label style="margin-top:8px">Mosquetón <span style="font-weight:600;color:var(--gray3)">(automático: XS/S/M chico · L/XL y correa suelta grande)</span></label>
+        <select id="i-mosq">
+          <option value="">Automático</option>
+          <option value="chico">Chico</option>
+          <option value="grande">Grande</option>
+        </select>
       </div>
       <!-- Cambiar correa 1.20mt por otro accesorio (solo Combo 1 con 1.20mt) -->
       <div class="fg" id="i-swap-wrap" style="display:none">
@@ -1054,7 +1094,9 @@ function goTab(el){
 }
 
 // ══════════ RENDER ══════════
-function renderAll(){rDash();rPedidos();rVentas();rProd();rFacturacion();rBordados();rStock();rPrecios();}
+const esRepo=p=>!!p&&p.origen==='stock';
+const pedReales=()=>pedidos.filter(p=>!esRepo(p));
+function renderAll(){try{procesarStockIngresos();}catch(e){}rDash();rPedidos();rVentas();rProd();rFacturacion();rBordados();rStock();rPrecios();try{rInsumos();}catch(e){}try{rStockIns();}catch(e){}}
 
 // Global helper
 const tieneArnes=t=>t&&(t.includes('Arnés')||t.includes('Combo 1')||t.includes('Combo 2'));
@@ -1164,7 +1206,133 @@ function setStockTalle(t, el){
   rStock();
 }
 
+// ── Mínimos de stock y reposición sugerida ──
+// (Rambo M: la imagen decía 4 pero los totales dan 3; se cargó 3. Rambo azul y Rock: 1 XS, fuera del total de 37)
+let stockMin={'Rambo Azul':{XS:1},'Rock!':{XS:1},'Rambo Negro':{XS:1,S:3,M:2,L:3},'Rambo':{S:3,M:3,L:1},
+  'Rosa Brillito':{XS:2,S:5,M:1},'Sunset':{XS:3,S:4,M:1,L:2},'Fucsia':{XS:1,S:2}};
+let stockMinEdit=false,stockMinDraft=null,reposSel={};
+async function saveStockMin(){
+  try{await fetch(`${SUPA_URL}/rest/v1/faltantes`,{method:'POST',headers:{...supaHeaders,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({id:'mambo_stock_min',data:stockMin})});}catch(e){}
+}
+async function loadStockMin(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/faltantes?select=data&id=eq.mambo_stock_min`,{headers:supaHeaders});
+    const d=await r.json();
+    if(d&&d[0]&&d[0].data)stockMin=d[0].data;
+    else saveStockMin();   // primera vez: guarda los mínimos iniciales
+  }catch(e){}
+  rStock();try{rTareas();}catch(e){}
+}
+function setStockMin(m,t,v){            // edita el borrador; se aplica recién al Guardar
+  v=parseInt(v);if(isNaN(v)||v<0)v=0;
+  if(!stockMinDraft)return;
+  if(!stockMinDraft[m])stockMinDraft[m]={};
+  stockMinDraft[m][t]=v;
+}
+function toggleStockMinEdit(){
+  stockMinEdit=true;stockMinDraft=JSON.parse(JSON.stringify(stockMin));rStock();
+}
+function guardarStockMin(){
+  if(!stockMinDraft)return;
+  stockMin=stockMinDraft;stockMinDraft=null;stockMinEdit=false;
+  saveStockMin();rStock();try{rTareas();}catch(e){}toast('✓ Mínimos guardados');
+}
+function cancelarStockMin(){stockMinDraft=null;stockMinEdit=false;rStock();}
+// arneses de reposición ya mandados a producción y todavía sin ingresar al stock
+function enColaRepo(m,t){
+  let n=0;
+  pedidos.forEach(p=>{if(!esRepo(p))return;p.items.forEach(i=>{if(i.paraStock&&!i.stockIngresado&&i.modelo===m&&i.talle===t)n+=(i.cant||1);});});
+  return n;
+}
+function procesarStockIngresos(){
+  let cambio=false;
+  pedidos.forEach(p=>{
+    if(!esRepo(p))return;
+    let tocado=false;
+    p.items.forEach(i=>{
+      if(!i.paraStock||i.stockIngresado)return;
+      if(i.estadoItem==='listo'||i.estadoItem==='enviado'){
+        if(!stockData[i.modelo])stockData[i.modelo]={};
+        stockData[i.modelo][i.talle]=(stockData[i.modelo][i.talle]||0)+(i.cant||1);
+        i.stockIngresado=true;i.estadoItem='enviado';tocado=true;cambio=true;
+      }
+    });
+    if(tocado){
+      if(p.items.every(i=>i.estadoItem==='enviado'))p.estado='enviado';
+      saveOnePedido(p);
+    }
+  });
+  if(cambio){saveStock();toast('📦 Reposición ingresada al stock');}
+}
+function reposToggle(k,falta){if(reposSel[k])delete reposSel[k];else reposSel[k]=falta;rRepos();}
+function reposQty(k,v){v=parseInt(v);if(isNaN(v)||v<1){delete reposSel[k];}else reposSel[k]=v;rRepos();}
+function reposTodos(){
+  const lst=reposSugerida();
+  if(lst.every(x=>reposSel[x.m+'|'+x.t]))reposSel={};else lst.forEach(x=>{reposSel[x.m+'|'+x.t]=x.falta;});
+  rRepos();
+}
+function enviarReposProduccion(){
+  const ks=Object.keys(reposSel);if(!ks.length){toast('Elegí qué arneses mandar');return;}
+  pushHistory();
+  const ts=Date.now(),hoy=new Date();
+  const fecha=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+  const items=ks.map((k,idx)=>{const [m,t]=k.split('|');return {id:(ts+idx)+'',tipo:'Arnés',modelo:m,talle:t,color:'',largo:'',swap:'',alias:'',bordado:'',pecho:'',cuello:'',
+    precio:0,cant:reposSel[k],accesorios:'na',estadoItem:'nuevo',paraStock:true};});
+  const p={id:'repo-'+ts,num:0,origen:'stock',cliente:'📦 Reposición de stock',provincia:'',items,pago:'efectivo',mpRecibido:0,linkTotal:'',envio:'a_definir',envioCosto:0,
+    notas:'Reposición interna de stock',medidas:'',estado:'nuevo',fecha:fecha+'T12:00:00.000Z',totalCobrado:0,netoMambo:0,facturaRealizada:false,nroFactura:''};
+  pedidos.push(p);saveOnePedido(p);
+  const n=items.reduce((a,i)=>a+i.cant,0);
+  reposSel={};renderAll();
+  toast('🏭 '+n+(n===1?' arnés enviado':' arneses enviados')+' a producción');
+}
+function reposSugerida(){
+  const out=[];
+  MODELOS.forEach(m=>TALLES_STOCK.forEach(t=>{
+    const mn=(stockMin[m]&&stockMin[m][t])||0;if(!mn)return;
+    const st=(stockData[m]&&stockData[m][t])||0;
+    const cola=enColaRepo(m,t);
+    if(st+cola<mn)out.push({m,t,falta:mn-st-cola,st,mn,cola});
+  }));
+  return out;
+}
+function rRepos(){
+  const el=document.getElementById('stock-repos');if(!el)return;
+  const btn=document.getElementById('btn-stock-min'),bc=document.getElementById('btn-stock-min-c');
+  if(btn){btn.textContent=stockMinEdit?'💾 Guardar mínimos':'⚙ Editar mínimos';btn.onclick=stockMinEdit?guardarStockMin:toggleStockMinEdit;
+    btn.style.background=stockMinEdit?'var(--pink)':'var(--gray)';btn.style.color=stockMinEdit?'#fff':'';}
+  if(bc)bc.style.display=stockMinEdit?'inline-block':'none';
+  const lst=reposSugerida();
+  const tot=lst.reduce((a,x)=>a+x.falta,0);
+  const totMin=MODELOS.reduce((a,m)=>a+TALLES_STOCK.reduce((b,t)=>b+((stockMin[m]&&stockMin[m][t])||0),0),0);
+  const enCola=pedidos.reduce((a,p)=>a+(esRepo(p)?p.items.reduce((b,i)=>b+((i.paraStock&&!i.stockIngresado)?(i.cant||1):0),0):0),0);
+  const selN=Object.keys(reposSel).reduce((a,k)=>a+reposSel[k],0);
+  const keys=new Set(lst.map(x=>x.m+'|'+x.t));
+  Object.keys(reposSel).forEach(k=>{if(!keys.has(k))delete reposSel[k];});
+  const porModelo={};
+  lst.forEach(x=>{(porModelo[x.m]=porModelo[x.m]||[]).push(x);});
+  const ib='width:46px;padding:3px;border:1.5px solid var(--gray2);border-radius:6px;font-weight:800;text-align:center;font-size:12px';
+  el.innerHTML=`
+    <div class="card-ttl" style="margin-bottom:6px">🔁 Reposición sugerida</div>
+    <div style="font-size:11px;color:var(--gray3);font-weight:600;margin-bottom:8px">Stock mínimo objetivo: ${totMin} arneses. Tildá los que quieras fabricar y mandalos a <b>Producción</b>: van a la cola, descuentan insumos y suman a faltantes, y cuando los marcás <b>Listos</b> entran solos al stock.</div>
+    ${enCola?`<div style="background:#eff6ff;color:#2563eb;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;margin-bottom:8px">🏭 ${enCola} ${enCola===1?'arnés':'arneses'} de reposición ya en producción</div>`:''}
+    ${lst.length?`
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--pink-dark)">${tot} ${tot===1?'arnés':'arneses'} por reponer</div>
+        <button onclick="reposTodos()" style="background:var(--gray);border:1.5px solid var(--gray2);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer">☑ Todos / ninguno</button>
+      </div>
+      ${Object.entries(porModelo).map(([m,arr])=>`<div style="padding:6px 0;border-bottom:1px solid var(--gray2)">
+        <div style="font-weight:800;font-size:13px;margin-bottom:4px">${m}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${arr.map(x=>{const k=m+'|'+x.t,on=!!reposSel[k];return `<div style="display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:8px;border:1.5px solid ${on?'var(--pink-dark)':'var(--gray2)'};background:${on?'#fdf2f8':'#fff'}">
+          <input type="checkbox" ${on?'checked':''} onchange="reposToggle('${k}',${x.falta})" style="width:16px;height:16px;cursor:pointer">
+          <b style="font-size:13px">${x.t}</b><span style="font-size:11px;color:var(--gray3);font-weight:700">faltan ${x.falta}${x.cola?' (+'+x.cola+' en prod.)':''}</span>
+          ${on?`<input type="number" min="1" value="${reposSel[k]}" onchange="reposQty('${k}',this.value)" style="${ib}">`:''}
+        </div>`;}).join('')}</div></div>`).join('')}
+      <button onclick="enviarReposProduccion()" ${selN?'':'disabled'} style="margin-top:10px;width:100%;background:${selN?'var(--pink)':'var(--gray2)'};color:${selN?'#fff':'var(--gray3)'};border:none;border-radius:10px;padding:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:${selN?'pointer':'default'}">🏭 Enviar a producción${selN?' ('+selN+' '+(selN===1?'arnés':'arneses')+')':''}</button>`
+    :`<div style="color:var(--green);font-weight:800;font-size:13px">✅ El stock está en el mínimo${enCola?' (con lo que está en producción)':''}, no hay nada por reponer</div>`}`;
+}
+
 function rStock(){
+  try{rRepos();}catch(e){}
   // Calculate sticky offset dynamically
   const hdr = document.querySelector('.hdr');
   const nav = document.querySelector('.nav');
@@ -1198,12 +1366,15 @@ function rStock(){
       ${TALLES_STOCK.map(t=>{
         const cant=stockData[modelo][t]||0;
         const dimmed=curStockTalle&&curStockTalle!==t;
+        const SM=(stockMinEdit&&stockMinDraft)?stockMinDraft:stockMin;
+        const mn=(SM[modelo]&&SM[modelo][t])||0;
         return `<td style="padding:5px 4px;text-align:center;min-width:60px;opacity:${dimmed?'0.25':'1'};border-left:2px solid var(--gray2)">
           <div style="display:flex;align-items:center;justify-content:center;gap:3px">
             <button onclick="adjStock('${modelo}','${t}',-1)" style="width:20px;height:20px;border-radius:50%;border:none;background:var(--gray2);font-size:13px;cursor:pointer;line-height:1;font-weight:800;flex-shrink:0">−</button>
             <span style="font-weight:800;font-size:14px;min-width:18px;text-align:center;color:${cant===0?'var(--gray3)':cant<=2?'var(--orange)':'var(--black)'}">${cant}</span>
             <button onclick="adjStock('${modelo}','${t}',1)" style="width:20px;height:20px;border-radius:50%;border:none;background:var(--pink);color:white;font-size:13px;cursor:pointer;line-height:1;font-weight:800;flex-shrink:0">+</button>
           </div>
+          ${stockMinEdit?`<input type="number" min="0" value="${mn}" onchange="setStockMin('${modelo}','${t}',this.value)" title="Mínimo" style="width:44px;margin-top:3px;padding:2px;border:1.5px solid #fbbf24;background:#fffbeb;border-radius:6px;font-size:11px;font-weight:800;text-align:center">`:(mn?`<div style="font-size:9px;font-weight:800;margin-top:1px;color:${cant<mn?'var(--red)':'var(--gray3)'}">mín ${mn}</div>`:'')}
         </td>`;
       }).join('')}
       <td style="padding:8px 4px;text-align:center;font-weight:800;font-size:15px;color:${total===0?'var(--gray3)':total<=3?'var(--orange)':'var(--green)'}">${total}</td>
@@ -1223,7 +1394,7 @@ function rDash(){
   const now=new Date(),m=now.getMonth(),y=now.getFullYear();
   const fechaEl=document.getElementById('dash-fecha');
   if(fechaEl)fechaEl.textContent=now.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const act=pedidos.filter(p=>p.estado!=='enviado');
+  const act=pedReales().filter(p=>p.estado!=='enviado');
   const nue=pedidos.filter(p=>p.estado==='nuevo');
   const ma=pedidos.filter(p=>p.estado==='marroquineria');
   const li=pedidos.filter(p=>p.estado==='listo');
@@ -1234,7 +1405,7 @@ function rDash(){
     prodBadge.style.display=nue.length>0?'inline':'none';
     prodBadge.textContent=nue.length;
   }
-  const mes=pedidos.filter(p=>{const d=new Date(p.fecha);return d.getMonth()===m&&d.getFullYear()===y;});
+  const mes=pedReales().filter(p=>{const d=new Date(p.fecha.slice(0,10)+'T12:00:00');return d.getMonth()===m&&d.getFullYear()===y;});
   const cob=mes.reduce((s,p)=>s+(p.totalCobrado||0),0);
   document.getElementById('st-act').textContent=act.length;
   document.getElementById('st-nue').textContent=nue.length;
@@ -1242,18 +1413,62 @@ function rDash(){
   document.getElementById('st-cob-s').textContent=mes.length+' pedidos';
   document.getElementById('st-ma').textContent=ma.length;
   document.getElementById('st-li').textContent=li.length;
-  const rec=[...pedidos].sort((a,b)=>{
+  const rec=[...pedReales()].sort((a,b)=>{
     const fa=(a.fecha||'').slice(0,10);const fb=(b.fecha||'').slice(0,10);
     if(fb!==fa)return fb>fa?1:-1;
     return (b.num||0)-(a.num||0);
   }).slice(0,5);
   document.getElementById('d-recent').innerHTML=rec.length?rec.map(p=>pedidoBlock(p,true)).join(''):emptyH('📭','Sin pedidos aún');
   rMens('d-mens');
+  rTareas();
+}
+
+function irATab(k){const t=document.querySelector('.nt[data-s="'+k+'"]');if(t)goTab(t);}
+
+function rTareas(){
+  const el=document.getElementById('d-tareas');if(!el)return;
+  syncFaltAuto();
+  const act=pedidos.filter(p=>p.estado!=='enviado');
+  const lab=p=>'#'+p.num+' '+String(p.cliente||'').replace(/[0-9\/\-\s]{6,}.*/,'').trim().slice(0,16);
+  const lista=(arr,max=5)=>arr.slice(0,max).join(' · ')+(arr.length>max?` · +${arr.length-max} más`:'');
+
+  const rot=act.filter(p=>(p.envio==='Correo Arg Sucursal'||p.envio==='Correo Arg Domicilio')&&!p.rotuloHecho);
+  const bord=[];
+  act.forEach(p=>p.items.forEach(i=>{if(i.bordado&&i.bordado.trim()&&!i.bordadoOk)bord.push('#'+p.num+' '+i.bordado.trim());}));
+  const accPend=act.filter(p=>p.items.some(i=>['pendiente','prep','prio','prep_prio','no'].includes(i.accesorios||'')&&i.estadoItem!=='enviado'));
+  const nuevos=act.filter(p=>p.estado==='nuevo');
+  const listos=act.filter(p=>p.estado==='listo');
+  const comprar=Object.entries(faltantes||{}).filter(([,v])=>v>0);
+  const todosItems=Object.values(FALT_ITEMS).flat();
+  const nombresComprar=comprar.map(([id,v])=>{const it=todosItems.find(x=>x.id===id);return it?it.label:id;}).concat(insumosAlertas());
+
+  const repL=(typeof reposSugerida==='function')?reposSugerida():[];
+  const repN=repL.reduce((a,x)=>a+x.falta,0);
+  const repD=lista(repL.map(x=>`${x.m} ${x.t}×${x.falta}`),6);
+  const filas=[
+    {ico:'🏷️',t:'Hacer rótulos',n:rot.length,d:lista(rot.map(lab)),go:'pedidos'},
+    {ico:'🪡',t:'Hacer bordados',n:bord.length,d:lista(bord),go:'bordados'},
+    {ico:'🧷',t:'Preparar accesorios',n:accPend.length,d:lista(accPend.map(lab)),go:'pedidos'},
+    {ico:'🏭',t:'Mandar a marroquinería',n:nuevos.length,d:lista(nuevos.map(lab)),go:'produccion'},
+    {ico:'📬',t:'Listos para enviar',n:listos.length,d:lista(listos.map(lab)),go:'produccion'},
+    {ico:'🔁',t:'Reponer stock de arneses',n:repN,d:repD,go:'stock'},
+    {ico:'🛒',t:'Comprar insumos',n:nombresComprar.length,d:lista(nombresComprar,4),go:'faltantes'},
+  ].filter(f=>f.n>0);
+
+  el.innerHTML=filas.length?filas.map(f=>`
+    <div onclick="irATab('${f.go}')" style="display:flex;gap:10px;align-items:flex-start;padding:9px 2px;border-bottom:1px solid var(--gray2);cursor:pointer">
+      <div style="font-size:20px;line-height:1.2">${f.ico}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;color:var(--text)">${f.t}</div>
+        <div style="font-size:12px;color:var(--gray3);font-weight:600;margin-top:2px;word-break:break-word">${f.d}</div>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--pink-dark);line-height:1">${f.n}</div>
+    </div>`).join(''):`<div style="text-align:center;padding:14px;color:var(--gray3);font-size:13px;font-weight:700">✅ Todo al día</div>`;
 }
 
 function rMens(id){
   const byM={};
-  pedidos.forEach(p=>{
+  pedReales().forEach(p=>{
     const d=new Date(p.fecha);
     const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     const lbl=d.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
@@ -1281,7 +1496,7 @@ function pedidoBlock(p, compact=false){
       <div class="pb-num">${p.num}</div>
       <div style="flex:1;min-width:0">
         <div class="pb-cliente">${p.cliente}</div>
-        <div style="font-size:11px;color:var(--gray3);font-weight:600;margin-top:1px">${envL}${p.provincia?' · '+p.provincia:''} · ${new Date(p.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'})}</div>
+        <div style="font-size:11px;color:var(--gray3);font-weight:600;margin-top:1px">${envL}${p.provincia?' · '+p.provincia:''} · ${new Date(p.fecha.slice(0,10)+'T12:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'})}</div>
       </div>
       <button class="badge ${est.c} pb-estado-btn" onclick="openEstadoPopup(event,'${p.id}')" style="cursor:pointer;-webkit-tap-highlight-color:transparent">${est.e} ${est.l} ▾</button>
     </div>`;
@@ -1429,6 +1644,7 @@ function rTabla(){
   if(cards) cards.style.display = 'none';
 
   let list = pedidos.filter(p=>{
+    if(esRepo(p)) return false;
     const okF = curF==='todos' || p.estado===curF;
     const okQ = !curQ || p.cliente.toLowerCase().includes(curQ) || p.items.some(i=>(i.alias||'').toLowerCase().includes(curQ));
     return okF && okQ;
@@ -1478,7 +1694,8 @@ function rTabla(){
   // Sort months oldest first
   mesesOrder.sort();
 
-  let html = `<table class="ptabla">
+  const _rotPend = pedidos.filter(p=>(p.envio==='Correo Arg Sucursal'||p.envio==='Correo Arg Domicilio')&&!p.rotuloHecho&&p.estado!=='enviado').length;
+  let html = `<div style="font-size:12px;font-weight:800;margin:0 0 8px;display:flex;gap:14px;flex-wrap:wrap"><span style="color:#111">🏷️ Rótulos por hacer: <b>${_rotPend}</b></span><span style="color:var(--gray3);font-weight:600">Texto negro = pendiente · fucsia = hecho</span></div><table class="ptabla">
     <thead><tr>
       <th>#</th><th>$</th><th>Cliente</th><th>Bordado</th><th>Descripción</th>
       <th>Pecho</th><th>Cuello</th><th>Estado</th><th>Acc</th><th>Envío</th><th></th>
@@ -1565,7 +1782,7 @@ function rTabla(){
               html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};font-size:12px;vertical-align:middle;border-right:1px solid #e5e7eb">${p.cliente||''}</td>`;
             }
 
-            html += td(`<div style="font-weight:800;font-size:13px;color:var(--pink-dark)">${item.bordado||item.alias||'—'}</div>`);
+            html += td(`<div style="font-weight:800;font-size:13px;color:${item.bordadoOk?'var(--pink-dark)':'#111'}">${item.bordado||item.alias||'—'}</div>`);
             html += td(prod, 'max-width:200px');
             html += td(item.pecho||'—','text-align:center;font-size:12px');
             html += td(item.cuello||'—','text-align:center;font-size:12px');
@@ -1583,7 +1800,13 @@ function rTabla(){
             </td>`;
 
             if(first){
-              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};vertical-align:middle;text-align:center;font-size:11px;font-weight:700;border-left:1px solid #e5e7eb">${envio}</td>`;
+              const esCorreo = p.envio==='Correo Arg Sucursal' || p.envio==='Correo Arg Domicilio';
+              const esDomic  = p.envio==='Correo Arg Domicilio';
+              const envColor = esCorreo ? (p.rotuloHecho ? 'var(--pink-dark)' : '#111') : '#111';
+              const btnBase  = 'display:block;margin:4px auto 0;border-radius:7px;padding:3px 7px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;';
+              const rotBtn = esCorreo ? `<button onclick="toggleRotulo('${p.id}')" title="Marcar si el rótulo ya está hecho" style="${btnBase}${p.rotuloHecho?'background:var(--pink-dark);color:#fff;border:1.5px solid var(--pink-dark)':'background:#fde047;color:#713f12;border:1.5px solid #eab308'}">${p.rotuloHecho?'✓ Rótulo hecho':'Rótulo pendiente'}</button>` : '';
+              const abBtn = esDomic ? `<button onclick="toggleEnvioAbonado('${p.id}')" title="Marcar si el envío ya fue abonado" style="${btnBase}${p.envioAbonado?'background:var(--green);color:#fff;border:1.5px solid var(--green)':'background:#fde047;color:#713f12;border:1.5px solid #eab308'}">${p.envioAbonado?'✓ Envío pagado':'Envío abonado'}</button>` : '';
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};vertical-align:middle;text-align:center;font-size:11px;font-weight:700;border-left:1px solid #e5e7eb;color:${envColor}">${envio}${rotBtn}${abBtn}</td>`;
               html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};vertical-align:middle;border-left:1px solid #e5e7eb">
                 <button onclick="editarPedidoTabla('${p.id}')" style="background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue);border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;display:block;margin-bottom:4px">✏️</button>
                 <button onclick="eliminarPedidoTabla('${p.id}',${p.num})" style="background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;display:block">🗑</button>
@@ -1599,6 +1822,21 @@ function rTabla(){
 
   html += '</tbody></table>';
   tabla.innerHTML = html;
+}
+
+function toggleRotulo(id){
+  const p=pedidos.find(x=>x.id===id);if(!p)return;
+  pushHistory();
+  p.rotuloHecho=!p.rotuloHecho;
+  saveOnePedido(p);renderAll();
+  toast(p.rotuloHecho?'🏷️ Rótulo hecho':'Rótulo pendiente');
+}
+function toggleEnvioAbonado(id){
+  const p=pedidos.find(x=>x.id===id);if(!p)return;
+  pushHistory();
+  p.envioAbonado=!p.envioAbonado;
+  saveOnePedido(p);renderAll();
+  toast(p.envioAbonado?'✓ Envío abonado':'Envío sin abonar');
 }
 
 function editarPedidoTabla(id){
@@ -1720,6 +1958,7 @@ function quickEstadoTabla(pedId, val){
 function rPedidos(){
   if(vistaTabla){ rTabla(); return; }
   let list=pedidos.filter(p=>{
+    if(esRepo(p))return false;
     const okF=curF==='todos'||p.estado===curF;
     const okQ=!curQ||p.cliente.toLowerCase().includes(curQ)||p.items.some(i=>(i.alias||'').toLowerCase().includes(curQ));
     return okF&&okQ;
@@ -1742,7 +1981,7 @@ function rVentas(){
   const mesSelect=document.getElementById('ing-mes');
   if(mesSelect){
     const meses=new Set();
-    pedidos.forEach(p=>{if(p.fecha)meses.add(p.fecha.slice(0,7));});
+    pedReales().forEach(p=>{if(p.fecha)meses.add(p.fecha.slice(0,7));});
     egresos.forEach(e=>{if(e.fecha)meses.add(e.fecha.slice(0,7));});
     const sorted=[...meses].sort((a,b)=>b.localeCompare(a));
     const curVal=mesSelect.value;
@@ -1755,7 +1994,7 @@ function rVentas(){
   }
 
   // Filter by mes
-  const filtPed=mesFiltro?pedidos.filter(p=>p.fecha&&p.fecha.startsWith(mesFiltro)):pedidos;
+  const filtPed=mesFiltro?pedReales().filter(p=>p.fecha&&p.fecha.startsWith(mesFiltro)):pedReales();
   const filtEgr=mesFiltro?egresos.filter(e=>e.fecha&&e.fecha.startsWith(mesFiltro)):egresos;
 
   const totalIng=filtPed.reduce((s,p)=>s+(p.totalCobrado||0),0);
@@ -1782,7 +2021,7 @@ function rVentas(){
   });
   filtEgr.forEach(e=>{
     if(!e.fecha)return;
-    const d=new Date(e.fecha);
+    const d=new Date(e.fecha.slice(0,10)+"T12:00:00");
     const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     const lbl=d.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
     if(!byM[k])byM[k]={lbl,ing:0,egr:0,count:0};
@@ -1837,7 +2076,7 @@ function rVentas(){
           ${items.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--yellow-bg);border-radius:9px;margin-bottom:5px;border:1.5px solid #fbbf24">
             <div style="flex:1;min-width:0">
               <div style="font-weight:700;font-size:13px">${e.concepto}</div>
-              <div style="font-size:11px;color:var(--gray3)">${new Date(e.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'short'})}</div>
+              <div style="font-size:11px;color:var(--gray3)">${new Date(e.fecha.slice(0,10)+"T12:00:00").toLocaleDateString('es-AR',{day:'numeric',month:'short'})}</div>
             </div>
             <div style="font-weight:800;font-size:14px;color:var(--yellow)">${fmt(e.monto)}</div>
             <button onclick="saldarEgreso('${e.id}')" style="background:var(--yellow-bg);color:var(--yellow);border:1.5px solid #fbbf24;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:'Nunito',sans-serif">⏳ PENDIENTE</button>
@@ -1858,7 +2097,7 @@ function rVentas(){
       return `<div class="egr-row">
         <div class="egr-info">
           <div class="egr-concepto">${e.concepto} ${quien}</div>
-          <div class="egr-meta">${new Date(e.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'})} · <span class="ecat ecat-${e.cat||'otro'}">${CAT_LABELS[e.cat||'otro']}</span></div>
+          <div class="egr-meta">${new Date(e.fecha.slice(0,10)+"T12:00:00").toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'})} · <span class="ecat ecat-${e.cat||'otro'}">${CAT_LABELS[e.cat||'otro']}</span></div>
         </div>
         <div class="egr-monto">-${fmt(e.monto)}</div>
         <button onclick="deleteEgreso('${e.id}')" style="background:none;border:none;color:var(--gray3);font-size:15px;cursor:pointer;padding:0 2px;flex-shrink:0">✕</button>
@@ -1918,7 +2157,7 @@ function rProd(){
       if(tieneArnes(i.tipo)){
         const estadoItem=i.estadoItem||(i.desdeStock?'listo':'nuevo');
         if(estadoItem==='nuevo'||estadoItem==='stock'){
-          arnesItems.push({...i, pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado, estadoItem});
+          arnesItems.push({...i, pedidoRepo:esRepo(p), pedidoNum:p.num, pedidoId:p.id, pedidoEstado:p.estado, estadoItem});
         }
       }
     });
@@ -1929,7 +2168,7 @@ function rProd(){
   pedidos.forEach(p=>{
     p.items.forEach(i=>{
       if(tieneArnes(i.tipo)&&i.estadoItem==='marroquineria'){
-        marroItemsRef.push({...i, pedidoNum:p.num, pedidoId:p.id, estadoItem:'marroquineria'});
+        marroItemsRef.push({...i, pedidoRepo:esRepo(p), pedidoNum:p.num, pedidoId:p.id, estadoItem:'marroquineria'});
       }
     });
   });
@@ -2057,7 +2296,7 @@ function rProd(){
   function buildProdTable(items){
     if(!items.length) return emptySmall('Sin arneses');
     const rows=items.map(i=>{
-      const grupoItems=items.filter(x=>x.pedidoNum===i.pedidoNum);
+      const grupoItems=items.filter(x=>x.pedidoId===i.pedidoId);
       const idx=grupoItems.indexOf(i);
       const esStock=i.estadoItem==='stock';
       const rowStyle=esStock?'opacity:.45;background:#f9fafb':'';
@@ -2078,7 +2317,7 @@ function rProd(){
         </div>`;
       }
       return `<tr style="${rowStyle}">
-        ${idx===0?`<td rowspan="${grupoItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${i.pedidoNum}</td>`:''}
+        ${idx===0?`<td rowspan="${grupoItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${i.pedidoRepo?'📦<br><span style="font-size:9px;font-family:Nunito,sans-serif;font-weight:800">REPOSICIÓN</span>':'#'+i.pedidoNum}</td>`:''}
         <td style="padding:8px 10px"><span style="font-weight:800;color:${esStock?'#9ca3af':'var(--pink-dark)'}">${i.modelo||'Sin modelo'}</span></td>
         <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
         <td style="text-align:center;padding:6px 4px">${btn}</td>
@@ -2106,7 +2345,7 @@ function rProd(){
     const liRows=pedidosListo.map(p=>{
       const ai=p.items.filter(i=>tieneArnes(i.tipo));
       return ai.map((i,idx)=>`<tr>
-        ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${p.num}<br>
+        ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${esRepo(p)?'📦':'#'+p.num}<br>
           <button onclick="enviarPedido('${p.id}')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-top:4px">📬 Enviar</button>
           <button onclick="revertirDeListo('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer;margin-top:3px">↩</button>
         </td>`:''}
@@ -2295,6 +2534,10 @@ function openEditar(id){
 }
 
 function resetItemForm(){
+  window._ccorrManual=false;
+  const _mq=document.getElementById('i-mosq');if(_mq)_mq.value='';
+  window._editandoItem=null;
+  const _ab=document.getElementById('i-add-btn');if(_ab)_ab.textContent='+ Agregar al pedido';
   document.getElementById('i-tipo').value='';
   document.getElementById('combox2-box').style.display='none';
   document.getElementById('combox2arnes-box').style.display='none';
@@ -2380,6 +2623,12 @@ function onTipo(){
     if(largoWrap){
       largoWrap.style.display=hasLargo?'block':'none';
       if(hasLargo) populateLargoSelect(t);
+    }
+    const corrWrap=document.getElementById('i-corr-wrap');
+    if(corrWrap){
+      corrWrap.style.display=hasLargo?'block':'none';
+      const row=document.getElementById('i-ccorr-row');if(row)row.style.display=isComboCorrea?'block':'none';
+      if(hasLargo)refreshCcorr();
     }
 
     // Swap option: for Combo 1 y Combo 2 cuando largo es 1.20mt
@@ -2477,13 +2726,32 @@ function renderMG(){
   const cur=document.getElementById('i-mod').value;
   document.getElementById('mg').innerHTML=MODELOS.map(m=>`<div class="mo${m===cur?' on':''}" onclick="selMod('${m}')">${m}</div>`).join('');
 }
-function selMod(m){document.getElementById('i-mod').value=m;renderMG();}
+function refreshCcorr(){
+  const sel=document.getElementById('i-ccorr');if(!sel)return;
+  const def=colorModelo(document.getElementById('i-mod').value.trim());
+  sel.innerHTML=`<option value="">— elegir color —</option>`+CINTA_COLORES.map(c=>`<option value="${c}">Color de correa: ${c}</option>`).join('');
+  if(!window._ccorrManual)sel.value=def;
+  sel.style.borderColor=sel.value?'':'#fbbf24';
+}
+function selMod(m){document.getElementById('i-mod').value=m;renderMG();if(!window._ccorrManual)refreshCcorr();}
 
 // ══════════ FALTANTES ══════════
 const FALT_ITEMS = {
   panal: [
     {id:'panal',   label:'Pique/Panal con respaldo negro', unidad:'m'},
     {id:'gomaeva', label:'Goma Eva 3/80',                  unidad:'planchas'},
+  ],
+  cintas_p30: [
+    {id:'cp30_negra',  label:'Cinta negra',         unidad:'rollos'},
+    {id:'cp30_fucsia', label:'Cinta fucsia',        unidad:'rollos'},
+    {id:'cp30_rosa',   label:'Cinta rosa',          unidad:'rollos'},
+    {id:'cp30_azul',   label:'Cinta azul',          unidad:'rollos'},
+    {id:'cp30_verde',  label:'Cinta verde militar', unidad:'rollos'},
+    {id:'cp30_turq',   label:'Cinta turquesa',      unidad:'rollos'},
+    {id:'cp30_cel',    label:'Cinta celeste',       unidad:'rollos'},
+    {id:'cp30_viol',   label:'Cinta violeta',       unidad:'rollos'},
+    {id:'cp30_lila',   label:'Cinta lila',          unidad:'rollos'},
+    {id:'cp30_roja',   label:'Cinta roja',          unidad:'rollos'},
   ],
   telas: [
     {id:'cord_blanca', label:'Cordura blanca sublimable',      unidad:'m'},
@@ -2530,26 +2798,444 @@ const FALT_ITEMS = {
     {id:'mosq_ch',  label:'Mosquetones perro chico pase 30',     unidad:'u'},
     {id:'mosq_gr',  label:'Mosquetones perro grande pase 30',    unidad:'u'},
     {id:'mosq_25',  label:'Mosquetones pase 25',                 unidad:'u'},
-    {id:'rem_10',   label:'Remaches 10cm tapados',               unidad:'u'},
   ],
   cintas_titulo: [
     {id:'cint_25', label:'Cinta título 2.5cm — rollo 50m', unidad:'rollos'},
     {id:'cint_4',  label:'Cinta título 4cm — rollo 50m',   unidad:'rollos'},
+    {id:'ribete_21', label:'Ribete de 21',                unidad:'rollos'},
+    {id:'hilo_ny40n', label:'Hilo de nylon 40 negro',      unidad:'u'},
   ],
   cintas_esp: [
     {id:'cint_srosa', label:'Cinta sublimada Summer Rosa',      unidad:'rollos'},
     {id:'cint_scel',  label:'Cinta sublimada Summer Celeste',   unidad:'rollos'},
     {id:'cint_ojit',  label:'Cinta sublimada Ojitos',           unidad:'rollos'},
     {id:'cint_gpam',  label:'Cinta guarda pampa 2cm (bordada)', unidad:'rollos'},
+  ],
+  etiquetas: [
+    {id:'etq_cuero',  label:'Etiqueta cuero marrón', unidad:'u', paso:100},
+    {id:'etq_plat',   label:'Etiqueta plateada',     unidad:'u', paso:100},
+  ],
+  envios: [
+    {id:'bol_xsml', label:'Bolsas XS, M y L',  unidad:'u', paso:25},
+    {id:'bol_xl',  label:'Bolsas XL',          unidad:'u', paso:25},
+    {id:'etq_red', label:'Etiquetas redondas', unidad:'u', paso:100},
+  ],
+  otros: [
+    {id:'rem_10nq', label:'Remaches 10mm tapados niquelados', unidad:'u', paso:1000},
+    {id:'rem_8nq',  label:'Remaches 8mm tapados niquelados',  unidad:'u', paso:1000},
   ]
 };
+
+
+// ══════════ INSUMOS: PANAL Y GOMA EVA (estimación) ══════════
+// Medidas reales de las pecheras (DXF pecheras_mambo, en cm). 1=XS · 2=S · 3=M y L · 4=XL (XXL usa la 4)
+const PECHERAS={XS:{w:11.65,h:13.24,n:1},S:{w:16.00,h:16.89,n:2},ML:{w:20.19,h:20.40,n:3},XL:{w:22.77,h:24.71,n:4}};
+const TALLE_PECH={XS:'XS',S:'S',M:'ML',L:'ML',XL:'XL',XXL:'XL'};
+const PECH_LBL={XS:'XS',S:'S',ML:'M y L',XL:'XL'};
+// Estadística histórica abr–oct 2026: ~276 arneses en ~30 semanas; talles L29% S25% M23% XS14% XL9%
+const HIST_ARN_SEM=9;
+const HIST_MIX={XS:.14,S:.25,ML:.52,XL:.09};
+const MARGEN_CORTE=1;      // cm de separación entre piezas
+const PLANCHA=[120,80];    // goma eva, cm
+const CINTA_COLORES=['negra','fucsia','rosa','azul','verde militar','turquesa','celeste','violeta','lila','roja'];
+const CP30_COLOR={cp30_negra:'negra',cp30_fucsia:'fucsia',cp30_rosa:'rosa',cp30_azul:'azul',cp30_verde:'verde militar',cp30_turq:'turquesa',cp30_cel:'celeste',cp30_viol:'violeta',cp30_lila:'lila',cp30_roja:'roja'};
+const ROLLO_M=25;   // metros por rollo de cinta
+let insumos={panal:{stock:0,desdeTs:null},goma:{stock:0,desdeTs:null},anchoPanal:140,ajuste:100,avisoSem:3,
+  obj:{chico:10,grande:10,correa:14,collar:5,cinturon:1},   // mínimo semanal de producción por tipo de producto
+  semCob:1,                                                 // semanas a cubrir con el stock
+  rec:{med_25:{g:'chico',q:1},med_4:{g:'grande',q:1},
+       mosq_ch:{g:'mosq_chico',q:1},mosq_gr:{g:'mosq_grande',q:1},mosq_25:{g:'cinturon',q:1},
+       ...Object.fromEntries(Object.entries(CP30_COLOR).map(([id,c])=>[id,{g:'cinta',q:1,color:c,auto:true}]))},
+  recV:3,
+  cmap:{},                                                  // color de correa por modelo (se completa/edita)
+  stk:{}};                                                  // stock de cada insumo: {id:{stock,desdeTs}}
+const GRUPOS={chico:'Arnés chico (XS, S)',grande:'Arnés grande (M, L, XL)',correa:'Correa',collar:'Collar',
+  mosq_chico:'Correa con mosquetón chico (arnés XS, S, M)',mosq_grande:'Correa con mosquetón grande (arnés L, XL)',cinturon:'Cinturón de seguridad'};
+const EDIT_GRUPOS=['grande','chico','correa','collar','cinturon'];
+function itemLabel(id){const it=Object.values(FALT_ITEMS).flat().find(x=>x.id===id);return it?it:{label:id,unidad:'u'};}
+function grupoSugerido(id){
+  if(CP30_COLOR[id])return 'cinta';
+  if(id==='mosq_25')return 'cinturon';
+  if(id==='mosq_ch')return 'mosq_chico';
+  if(id==='mosq_gr')return 'mosq_grande';
+  if(/mosq|correa/.test(id))return 'correa';
+  if(/_25$|_2col$|collar|^pov_25|^ppl_25/.test(id)&&!/^cint_25/.test(id))return 'chico';
+  return 'grande';
+}
+// ── color de correa ──
+function normColor(s){
+  const t=String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  if(!t)return '';
+  if(/negr/.test(t))return 'negra';
+  if(/fucs/.test(t))return 'fucsia';
+  if(/\bros/.test(t))return 'rosa';
+  if(/azul/.test(t))return 'azul';
+  if(/fluo/.test(t))return '';
+  if(/verde|militar/.test(t))return 'verde militar';
+  if(/turq/.test(t))return 'turquesa';
+  if(/cele/.test(t))return 'celeste';
+  if(/viol/.test(t))return 'violeta';
+  if(/lila/.test(t))return 'lila';
+  if(/roj/.test(t))return 'roja';
+  return '';
+}
+function defColorModelo(m){
+  m=String(m||'').trim();
+  if(!m)return '';
+  const c=normColor(m);
+  if(c)return c;
+  if(/^rambo$/i.test(m))return 'verde militar';
+  return 'negra';          // por defecto, el resto lleva cinta negra
+}
+function colorModelo(m){
+  if(insumos.cmap&&insumos.cmap[m]!==undefined)return insumos.cmap[m];
+  return defColorModelo(m);
+}
+function colorEfectivo(i){
+  if(i.colorCorrea)return normColor(i.colorCorrea);
+  if(i.tipo==='Correa')return normColor(i.modelo||i.color);
+  return colorModelo(i.modelo||'');
+}
+function metrosCorrea(largo){
+  const L=parseFloat(largo)||1.2;
+  return Math.abs(L-1.2)<0.01?1.42:L+0.25;
+}
+function mosqDe(i){
+  if(i.mosq==='chico'||i.mosq==='grande')return i.mosq;
+  return (!i.talle||i.talle==='Sin talle'||['L','XL','XXL'].includes(i.talle))?'grande':'chico';
+}
+function insumoCmap(m,v){insumos.cmap[m]=v;saveInsumos();rStockIns();}
+
+// Cuenta lo producido desde un momento: por grupo
+function contarGrupos(ts){
+  const a=arnesesDesde(ts);
+  const r={chico:a.XS+a.S,grande:a.ML+a.XL,correa:0,collar:0,mosq_chico:0,mosq_grande:0,cinturon:0,cinta:{}};
+  pedidos.forEach(p=>{
+    if(pedCreado(p)<ts)return;
+    p.items.forEach(i=>{
+      const t=i.tipo||'',n=i.cant||1,sw=i.swap||'';
+      if(t==='Cinturón auto')r.cinturon+=n;
+      if(t.includes('Collar'))r.collar+=n;
+      if(t.includes('Correa')){
+        if(sw==='cinturon'){r.cinturon+=n;}
+        else if(sw==='collar'){r.collar+=n;}
+        else{
+          r.correa+=n;
+          r['mosq_'+mosqDe(i)]+=n;
+          const c=colorEfectivo(i);
+          if(c)r.cinta[c]=(r.cinta[c]||0)+metrosCorrea(i.largo)*n;
+        }
+      }
+    });
+  });
+  return r;
+}
+function objGrupo(g){
+  const o=insumos.obj,c=o.correa||0,ch=Math.ceil(c*.62);
+  if(g==='mosq_chico')return ch;
+  if(g==='mosq_grande')return Math.max(0,c-ch);
+  return o[g]||0;
+}
+// ── Mínimo automático de cinta por color, según uso ──
+// Arneses vendidos por modelo (histórico). La correa va con el color de su modelo (se asume ~el mismo % de correas en todos).
+const HIST_MODELOS={'Rambo Negro':24,'Rambo':23,'Rambo Azul':13,'Fucsia':23,'Rosa Brillito':18,'Summer Rosa':10,'Summer Celeste':8,'Rojo':17,'Pu Negro':15,
+  'Violeta':13,'Rosa':12,'Paris':12,'Sunset':11,'Pampa':11,'Bordeaux':10,'Van Gogh':9,'Rock!':9,'Argentino':7,'Lila':6,'Rainbow':6,'Azul':6,'__otros':20};
+const CINTA_PISO_M=3;      // piso: aprox. 2 correas, ningún color baja de esto
+const M_CORREA_PROM=1.5;   // metros promedio por correa
+function cintaDemandaSem(){
+  // metros por semana de cada color: ritmo real de las últimas 4 semanas si hay datos; si no, histórico
+  const out={},rec=contarGrupos(Date.now()-28*864e5);
+  const nReal=rec.correa;
+  if(nReal>=8){
+    CINTA_COLORES.forEach(c=>{out[c]=(rec.cinta[c]||0)/4;});
+    return {d:out,fuente:'ventas de las últimas 4 semanas'};
+  }
+  const sh={};let tot=0;
+  Object.keys(HIST_MODELOS).forEach(m=>{const c=m==='__otros'?'negra':colorModelo(m);if(!c)return;sh[c]=(sh[c]||0)+HIST_MODELOS[m];tot+=HIST_MODELOS[m];});
+  CINTA_COLORES.forEach(c=>{out[c]=(insumos.obj.correa||0)*M_CORREA_PROM*((sh[c]||0)/(tot||1));});
+  return {d:out,fuente:'histórico de ventas por modelo'};
+}
+function cintaMinAuto(color){
+  const dm=cintaDemandaSem();
+  const m=Math.max(CINTA_PISO_M,(insumos.semCob||1)*(dm.d[color]||0));
+  return {min:Math.ceil(m),sem:dm.d[color]||0,fuente:dm.fuente};
+}
+function cintaMin(r){return r.auto===false?(+r.min||0):cintaMinAuto(r.color).min;}
+function stkInfo(id){
+  const r=insumos.rec[id];if(!r)return null;
+  const it=itemLabel(id),b=insumos.stk[id];
+  if(r.g==='cinta'){
+    const min=cintaMin(r);
+    let restante=0;
+    if(b)restante=b.stock-((contarGrupos(b.desdeTs).cinta[r.color])||0);
+    const falt=Math.ceil(Math.max(0,min-Math.max(0,restante))/ROLLO_M-1e-9);
+    return {g:'cinta',q:1,obj:min,restante,conBase:!!b,faltan:falt,color:r.color,min,auto:r.auto!==false,info:cintaMinAuto(r.color)};
+  }
+  const q=+r.q||0,g=r.g;
+  const obj=insumos.semCob*objGrupo(g)*q;
+  let restante=0;
+  if(b)restante=b.stock-contarGrupos(b.desdeTs)[g]*q;
+  let falt=Math.max(0,obj-Math.max(0,restante));
+  falt=it.paso?Math.ceil(falt/it.paso-1e-9)*it.paso:Math.ceil(falt-1e-9);
+  return {g,q,obj,restante,conBase:!!b,faltan:falt};
+}
+function usoGrupo(mat,g){
+  const ks=g==='chico'?['XS','S']:['ML','XL'];
+  const w=ks.reduce((a,k)=>a+HIST_MIX[k],0);
+  return ks.reduce((a,k)=>a+HIST_MIX[k]*usoArnes(mat,k),0)/w;
+}
+function insumoObjetivo(mat){return insumos.semCob*(insumos.obj.grande*usoGrupo(mat,'grande')+insumos.obj.chico*usoGrupo(mat,'chico'));}
+function insumoFaltan(mat){
+  const e=insumoEstado(mat);if(!e)return null;
+  return Math.max(0,Math.ceil(insumoObjetivo(mat)-Math.max(0,e.restante)-1e-9));
+}
+function trackedId(id){
+  if(id==='panal')return !!insumos.panal.desdeTs;
+  if(id==='gomaeva')return !!insumos.goma.desdeTs;
+  const e=stkInfo(id);return !!(e&&e.q>0);
+}
+function syncFaltAuto(){
+  try{
+    Object.keys(insumos.rec).forEach(id=>{
+      const e=stkInfo(id);
+      if(e.q>0&&e.faltan>0)faltantes[id]=e.faltan;else delete faltantes[id];
+    });
+    [['panal','panal'],['gomaeva','goma']].forEach(([fid,mat])=>{
+      const f=insumoFaltan(mat);if(f===null)return;
+      if(f>0)faltantes[fid]=f;else delete faltantes[fid];
+    });
+  }catch(e){}
+}
+function insumoStockSet(id,v){
+  v=parseFloat(v);if(isNaN(v)||v<0)return;
+  insumos.stk[id]={stock:v,desdeTs:Date.now()};
+  saveInsumos();renderFaltantes();renderAll();
+}
+function insumoLink(id){
+  const g=grupoSugerido(id);
+  insumos.rec[id]=g==='cinta'?{g,q:1,color:CP30_COLOR[id],auto:true}:{g,q:0};
+  saveInsumos();renderFaltantes();
+}
+function insumoUnlink(id){
+  delete insumos.rec[id];delete insumos.stk[id];delete faltantes[id];
+  saveInsumos();saveFaltantes();renderFaltantes();renderAll();
+}
+function insumoRecSet(id,campo,v){
+  const r=insumos.rec[id];if(!r)return;
+  const e=stkInfo(id);
+  if(campo==='q'){v=parseFloat(v);if(isNaN(v)||v<0)return;r.q=v;}
+  else if(campo==='min'){v=parseFloat(v);if(isNaN(v)||v<0)return;r.min=v;r.auto=false;}
+  else if(campo==='minauto'){r.auto=true;}
+  else if(campo==='color'){r.color=v;}
+  else r.g=v;
+  // re-fijar el stock actual para no alterar lo ya descontado
+  if(e&&e.conBase&&campo!=='min')insumos.stk[id]={stock:Math.max(0,e.restante),desdeTs:Date.now()};
+  saveInsumos();renderFaltantes();renderAll();
+}
+function insumoObj(g,v){
+  v=parseFloat(v);if(isNaN(v)||v<0)return;
+  insumos.obj[g]=v;saveInsumos();renderFaltantes();renderAll();
+}
+function aplicarCompraAuto(id,cant){
+  if(id==='panal'||id==='gomaeva'){
+    const mat=id==='panal'?'panal':'goma';
+    const e=insumoEstado(mat);
+    insumos[mat]={stock:(e?Math.max(0,e.restante):0)+cant,desdeTs:Date.now()};
+  } else {
+    const e=stkInfo(id);
+    if(insumos.rec[id].g==='cinta')cant*=ROLLO_M;   // se compra en rollos de 25 m
+    insumos.stk[id]={stock:Math.max(0,e.restante)+cant,desdeTs:Date.now()};
+  }
+  saveInsumos();
+}
+
+
+function piezasEn(W,L,p){
+  const m=MARGEN_CORTE;
+  const a=Math.floor(W/(p.w+m))*Math.floor(L/(p.h+m));
+  const b=Math.floor(W/(p.h+m))*Math.floor(L/(p.w+m));
+  return Math.max(a,b)*(insumos.ajuste/100);
+}
+// uso por arnés: panal en metros, goma en planchas
+function usoArnes(mat,k){
+  const p=PECHERAS[k];
+  const n=mat==='panal'?piezasEn(insumos.anchoPanal,100,p):piezasEn(PLANCHA[0],PLANCHA[1],p);
+  return n>0?1/n:0;
+}
+function pedCreado(p){
+  const n=parseInt(p.id);
+  if(n>1e12)return n;
+  if(p.num>1e12)return p.num;
+  return Date.parse(p.fecha)||0;
+}
+function arnesesDesde(ts){
+  const c={XS:0,S:0,ML:0,XL:0};
+  pedidos.forEach(p=>{
+    if(pedCreado(p)<ts)return;
+    p.items.forEach(i=>{
+      if(!tieneArnes(i.tipo)||i.desdeStock||i.estadoItem==='stock')return;
+      c[TALLE_PECH[i.talle]||'ML']+=(i.cant||1);
+    });
+  });
+  return c;
+}
+function consumoDe(mat,c){return Object.keys(c).reduce((s,k)=>s+c[k]*usoArnes(mat,k),0);}
+
+function insumoEstado(mat){
+  const cfg=insumos[mat];
+  if(!cfg.desdeTs)return null;
+  const restante=cfg.stock-consumoDe(mat,arnesesDesde(cfg.desdeTs));
+  // ritmo: últimas 4 semanas reales si hay datos suficientes; si no, el histórico
+  const rec=arnesesDesde(Date.now()-28*864e5);
+  const nRec=Object.values(rec).reduce((a,b)=>a+b,0);
+  let semCons,mix,fuente;
+  if(nRec>=8){semCons=consumoDe(mat,rec)/4;mix=rec;fuente='últimas 4 semanas';}
+  else{semCons=HIST_ARN_SEM*Object.keys(HIST_MIX).reduce((s,k)=>s+HIST_MIX[k]*usoArnes(mat,k),0);mix=HIST_MIX;fuente='ritmo histórico (~'+HIST_ARN_SEM+' arneses/semana)';}
+  const tot=Object.values(mix).reduce((a,b)=>a+b,0)||1;
+  const usoProm=Object.keys(mix).reduce((s,k)=>s+(mix[k]/tot)*usoArnes(mat,k),0);
+  const arn=usoProm>0?Math.max(0,restante)/usoProm:0;
+  const sem=semCons>0?Math.max(0,restante)/semCons:99;
+  const st=sem<insumos.avisoSem?'comprar':sem<insumos.avisoSem*2?'atento':'ok';
+  return {restante,arn,sem,st,fuente};
+}
+function insumosAlertas(){
+  const out=[];
+  [['panal','Panal','m'],['goma','Goma eva','planchas']].forEach(([m,n,u])=>{
+    const e=insumoEstado(m);
+    if(e&&e.st==='comprar')out.push(`${n} (quedan ≈${fmtN(Math.max(0,e.restante))} ${u})`);
+  });
+  return out;
+}
+function fmtN(x){return (Math.round(x*10)/10).toLocaleString('es-AR');}
+
+async function saveInsumos(){
+  try{await fetch(`${SUPA_URL}/rest/v1/faltantes`,{method:'POST',headers:{...supaHeaders,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({id:'mambo_insumos',data:insumos})});}catch(e){}
+}
+async function loadInsumos(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/faltantes?select=data&id=eq.mambo_insumos`,{headers:supaHeaders});
+    const d=await r.json();
+    if(d&&d[0]&&d[0].data){
+      const sv=d[0].data,base=JSON.parse(JSON.stringify(insumos));
+      insumos={...base,...sv};
+      insumos.obj={...base.obj,...(sv.obj||{})};
+      if(sv.objG!=null)insumos.obj.grande=sv.objG;
+      if(sv.objC!=null)insumos.obj.chico=sv.objC;
+      // migración del formato anterior {chico:{id:q},grande:{id:q}}
+      let rec=sv.rec||base.rec;
+      if(rec&&(rec.chico||rec.grande)&&typeof rec.chico==='object'){
+        const n={};
+        Object.entries(rec.chico||{}).forEach(([id,q])=>{if(q>0)n[id]={g:'chico',q};});
+        Object.entries(rec.grande||{}).forEach(([id,q])=>{if(q>0)n[id]={g:'grande',q};});
+        rec=n;
+      }
+      if(!sv.recV){const defs=JSON.parse(JSON.stringify(base.rec));Object.keys(defs).forEach(k=>{if(!(k in rec))rec[k]=defs[k];});}
+      if((sv.recV||0)<3&&!rec.cp30_rosa)rec.cp30_rosa={g:'cinta',q:1,color:'rosa',auto:true};
+      insumos.rec=rec;insumos.recV=3;
+      insumos.cmap=sv.cmap||{};
+      insumos.stk=sv.stk||{};
+    }
+  }catch(e){}
+  rInsumos();rTareas();
+}
+function insumoFijar(mat){
+  const v=parseFloat(document.getElementById('ins-'+mat).value);
+  if(isNaN(v)||v<0){toast('Ingresá un número');return;}
+  insumos[mat]={stock:v,desdeTs:Date.now()};
+  saveInsumos();rInsumos();rTareas();toast('📐 Stock fijado');
+}
+function insumoSumar(mat){
+  const v=parseFloat(document.getElementById('ins-'+mat).value);
+  if(isNaN(v)||v<=0){toast('Ingresá cuánto compraste');return;}
+  const e=insumoEstado(mat);
+  const base=e?Math.max(0,e.restante):0;
+  insumos[mat]={stock:base+v,desdeTs:Date.now()};
+  saveInsumos();rInsumos();rTareas();toast('🛒 Compra sumada');
+}
+function insumoCfg(k,v){
+  v=parseFloat(v);if(isNaN(v)||v<=0)return;
+  insumos[k]=v;saveInsumos();rInsumos();rTareas();
+}
+
+function rStockIns(){
+  const el=document.getElementById('falt-stock-ins');if(!el)return;
+  const inp='width:58px;padding:6px 6px;border:1.5px solid var(--gray2);border-radius:7px;font-family:\'Nunito\',sans-serif;font-size:13px;font-weight:800;text-align:center';
+  const lbl={grande:'Arnés grande (M, L, XL)',chico:'Arnés chico (XS, S)',correa:'Correas',collar:'Collares',cinturon:'Cinturones de seguridad'};
+  const c=(g)=>`<label style="display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--gray3)">${lbl[g]}<input type="number" min="0" value="${insumos.obj[g]}" onchange="insumoObj('${g}',this.value)" style="${inp}"></label>`;
+  const opts=sel=>`<option value=""${sel===''?' selected':''}>— elegir en cada pedido —</option>`+CINTA_COLORES.map(x=>`<option value="${x}"${sel===x?' selected':''}>${x}</option>`).join('');
+  const filasMod=MODELOS.map(m=>{const v=colorModelo(m);return `<label style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 0;border-bottom:1px solid var(--gray2)">${m}<select onchange="insumoCmap('${m.replace(/'/g,"\\'")}',this.value)" style="padding:4px;border:1.5px solid ${v?'var(--gray2)':'#fbbf24'};border-radius:7px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;${v?'':'background:#fffbeb'}">${opts(v)}</select></label>`;}).join('');
+  el.innerHTML=`
+    <div class="card-ttl" style="margin-bottom:8px">🎯 Mínimo semanal de producción</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
+      ${EDIT_GRUPOS.map(c).join('')}
+      <label style="display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--gray3)">Semanas a cubrir<input type="number" min="1" value="${insumos.semCob}" onchange="insumoCfg('semCob',this.value)" style="${inp}"></label>
+    </div>
+    <div style="font-size:11px;color:var(--gray3);font-weight:600;margin-top:8px">Es lo que querés poder producir por semana. Cada insumo de la lista de abajo se vincula con 📦 indicando cuánto lleva cada producto y cuánto stock tenés: el faltante sale solo (mínimo − stock) y el stock baja con cada pedido. Los mosquetones se reparten solos entre correas con arnés XS/S/M (chico) y L/XL (grande).</div>
+    <details style="margin-top:10px">
+      <summary style="font-size:12px;font-weight:800;cursor:pointer;color:var(--gray3)">🎀 Color de correa por modelo (se propone solo en cada pedido)</summary>
+      <div style="font-size:11px;color:var(--gray3);font-weight:600;margin:6px 0">Los modelos sin color propio llevan cinta negra por defecto; cambialo acá si alguno lleva otra. Cada correa gasta su largo + 0,25 m de cinta (la de 1,20 m gasta 1,42 m); los rollos son de ${ROLLO_M} m.</div>
+      <div style="columns:2 220px;column-gap:18px">${filasMod}</div>
+    </details>`;
+}
+
+function rInsumos(){
+  const el=document.getElementById('falt-insumos');if(!el)return;
+  const mats=[
+    {k:'panal',n:'Panal',u:'m',ico:'🧵',hint:'metros'},
+    {k:'goma', n:'Goma eva',u:'planchas',ico:'🟫',hint:'planchas (1,20 × 0,80)'}
+  ];
+  const chip={comprar:['#fee2e2','#b91c1c','🔴 Comprar pronto'],atento:['#fef9c3','#a16207','🟡 Ir pensando en comprar'],ok:['#dcfce7','#15803d','🟢 Alcanza']};
+  const bloque=m=>{
+    const e=insumoEstado(m.k);
+    const cab=e?`
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text)">${fmtN(Math.max(0,e.restante))} <span style="font-size:14px">${m.u}</span></div>
+        <span style="background:${chip[e.st][0]};color:${chip[e.st][1]};font-size:11px;font-weight:800;padding:4px 10px;border-radius:12px">${chip[e.st][2]}</span>
+      </div>
+      <div style="font-size:12px;color:var(--gray3);font-weight:600;margin:2px 0 4px">≈ ${Math.floor(e.arn)} arneses · dura ≈ ${e.sem>=99?'—':fmtN(e.sem)+' semanas'} <span style="opacity:.8">(según ${e.fuente})</span></div>
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin:0 0 8px">Objetivo ${insumos.semCob} sem: ${fmtN(insumoObjetivo(m.k))} ${m.u} → <span style="color:var(--pink-dark)">comprar ${insumoFaltan(m.k)} ${m.u}</span></div>`
+      :`<div style="font-size:12px;color:var(--gray3);font-weight:600;margin:4px 0 8px">Cargá cuánto tenés hoy para empezar a estimar.</div>`;
+    return `<div style="flex:1;min-width:260px;border:1.5px solid var(--gray2);border-radius:12px;padding:12px">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:6px">${m.ico} ${m.n}</div>
+      ${cab}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <input id="ins-${m.k}" type="number" min="0" step="0.1" placeholder="${m.hint}" style="width:110px;padding:8px 10px;border:1.5px solid var(--gray2);border-radius:9px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700">
+        <button onclick="insumoFijar('${m.k}')" style="background:var(--black);color:#fff;border:none;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer">Fijar stock</button>
+        <button onclick="insumoSumar('${m.k}')" style="background:var(--green);color:#fff;border:none;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer">+ Compré</button>
+      </div>
+    </div>`;
+  };
+  const filasRend=Object.keys(PECHERAS).map(k=>{
+    const p=PECHERAS[k];
+    return `<tr><td style="padding:3px 8px"><b>${PECH_LBL[k]}</b> (pechera ${p.n})</td><td style="padding:3px 8px">${p.w.toFixed(1)} × ${p.h.toFixed(1)} cm</td><td style="padding:3px 8px">${Math.floor(piezasEn(insumos.anchoPanal,100,p))} por metro</td><td style="padding:3px 8px">${Math.floor(piezasEn(PLANCHA[0],PLANCHA[1],p))} por plancha</td></tr>`;
+  }).join('');
+  const inp='width:64px;padding:5px 6px;border:1.5px solid var(--gray2);border-radius:7px;font-family:\'Nunito\',sans-serif;font-size:12px;font-weight:700';
+  el.innerHTML=`
+    <div class="card-ttl" style="margin-bottom:10px">📐 Panal y goma eva — estimación</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">${mats.map(bloque).join('')}</div>
+    <details style="margin-top:10px">
+      <summary style="font-size:12px;font-weight:800;cursor:pointer;color:var(--gray3)">Cómo se calcula y ajustes</summary>
+      <div style="font-size:12px;color:var(--gray3);font-weight:600;margin:8px 0">Cada arnés gasta 1 pieza de panal y 1 de goma eva del tamaño de su pechera. Se descuenta solo al cargar pedidos con arnés (los que salen de stock terminado no descuentan). Rendimiento (acomodo en grilla, ${MARGEN_CORTE} cm entre piezas — conservador):</div>
+      <table style="font-size:12px;border-collapse:collapse;margin-bottom:8px"><tbody>${filasRend}</tbody></table>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--text)">
+        <label>Ancho del panal (cm) <input type="number" value="${insumos.anchoPanal}" onchange="insumoCfg('anchoPanal',this.value)" style="${inp}"></label>
+        <label>Ajuste de rendimiento (%) <input type="number" value="${insumos.ajuste}" onchange="insumoCfg('ajuste',this.value)" style="${inp}"></label>
+        <label>Avisar con menos de (semanas) <input type="number" value="${insumos.avisoSem}" onchange="insumoCfg('avisoSem',this.value)" style="${inp}"></label>
+      </div>
+      <div style="font-size:11px;color:var(--gray3);margin-top:6px">Si en la práctica te rinde más (porque acomodás las piezas encastradas), subí el ajuste: 110 = un 10% más.</div>
+    </details>`;
+}
 
 const FALT_SECS = [
   {id:'panal',        label:'📦 Panal y Goma Eva'},
   {id:'herrajes',     label:'🔩 Herrajes'},
+  {id:'cintas_p30',   label:'🎀 Cintas perro pase 30 (x rollo)'},
   {id:'telas',        label:'🧵 Corduras, Telas y PU'},
-  {id:'cintas_titulo',label:'🎀 Cintas título (Persiantex)'},
+  {id:'cintas_titulo',label:'🎀 Cintas e hilos'},
   {id:'cintas_esp',   label:'✨ Cintas especiales (Cintas Sublimadas)'},
+  {id:'etiquetas',    label:'🏷️ Etiquetas'},
+  {id:'envios',       label:'📮 Envíos'},
+  {id:'otros',        label:'🔧 Otros'},
 ];
 
 let faltantes = {};
@@ -2570,7 +3256,7 @@ function confirmarComprado(id){
       <div style="font-size:12px;color:#9ca3af;margin-bottom:14px">Faltaban <strong style="color:var(--pink-dark)">${cant} ${item.unidad}</strong></div>
       <div style="margin-bottom:16px">
         <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;display:block;margin-bottom:6px">Cantidad comprada</label>
-        <input id="falt-compra-cant" type="number" min="0" max="${cant}" value="${cant}" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;text-align:center;outline:none;color:var(--green)">
+        <input id="falt-compra-cant" type="number" min="0" value="${cant}" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;text-align:center;outline:none;color:var(--green)">
         <div id="falt-compra-resto" style="font-size:12px;color:#9ca3af;margin-top:6px">Quedan pendientes: <strong id="falt-compra-resta" style="color:var(--pink-dark)">0 ${item.unidad}</strong></div>
       </div>
       <div style="display:flex;gap:8px">
@@ -2593,6 +3279,13 @@ function confirmarComprado(id){
 
 function marcarCompradoConfirmado(id, cantOriginal){
   const inp = document.querySelector('#falt-compra-cant');
+  if(trackedId(id)){
+    const c=inp?(parseFloat(inp.value)||0):cantOriginal;
+    document.querySelectorAll('.falt-confirm').forEach(el=>el.remove());
+    if(c>0){aplicarCompraAuto(id,c);toast('✅ Sumado al stock de insumos');}
+    renderFaltantes();renderAll();
+    return;
+  }
   const comprado = inp ? Math.min(parseInt(inp.value)||0, cantOriginal) : cantOriginal;
   const quedan = Math.max(0, cantOriginal - comprado);
   document.querySelectorAll('.falt-confirm').forEach(el=>el.remove());
@@ -2627,6 +3320,7 @@ async function saveFaltantes() {
 }
 
 function faltCambiar(id, delta) {
+  if(trackedId(id)){toast('Este insumo se calcula solo desde el stock');return;}
   const cur = faltantes[id] || 0;
   const nuevo = Math.max(0, cur + delta);
   if (nuevo === 0) delete faltantes[id];
@@ -2636,6 +3330,10 @@ function faltCambiar(id, delta) {
 }
 
 function renderFaltantes() {
+  syncFaltAuto();
+  try{rTareas();}catch(e){}
+  try{rInsumos();}catch(e){}
+  try{rStockIns();}catch(e){}
   const allItems = Object.values(FALT_ITEMS).flat();
   const total = Object.keys(faltantes).length;
 
@@ -2679,13 +3377,51 @@ function renderFaltantes() {
     grid.innerHTML = filtered.map(item => {
       if(item.sub) return `<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--pink-dark);padding:8px 0 4px;margin-top:4px">${item.label}</div>`;
       const cant = faltantes[item.id] || 0;
+      const lk = insumos.rec[item.id];
+      if(lk&&lk.g==='cinta'){
+        const e=stkInfo(item.id);
+        const mi='width:56px;padding:4px 5px;border:1.5px solid var(--gray2);border-radius:7px;font-family:\'Nunito\',sans-serif;font-size:12px;font-weight:800;text-align:center';
+        return `<div style="padding:10px 12px;margin-bottom:6px;background:#fff;border-radius:10px;border:1.5px solid ${e.faltan>0?'var(--pink-dark)':'var(--gray2)'}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span style="font-size:13px;font-weight:700;flex:1">${item.label}</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${e.faltan>0?'var(--pink-dark)':'var(--green)'};white-space:nowrap">${e.faltan>0?e.faltan+' '+item.unidad:'✓ OK'}</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11px;font-weight:700;color:var(--gray3)">
+            <label>Tengo <input type="number" min="0" step="1" value="${e.conBase?Math.round(Math.max(0,e.restante)*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}"> m</label>
+            <label>Mínimo <input type="number" min="0" step="1" value="${e.min}" onchange="insumoRecSet('${item.id}','min',this.value)" style="${mi}${e.auto?'':';border-color:#fbbf24;background:#fffbeb'}"> m</label>
+            <span title="${e.info.fuente}">≈ ${Math.floor(e.min/1.42)} correas · ${e.auto?'automático (uso ≈ '+fmtN(e.info.sem)+' m/sem)':'<a href=\'#\' onclick=\"insumoRecSet(\''+item.id+'\',\'minauto\');return false\" style=\"color:var(--pink-dark)\">↺ volver a automático</a>'}</span>
+            <span>${ROLLO_M} m/rollo · se descuenta solo</span>
+            <button onclick="insumoUnlink('${item.id}')" title="Desvincular" style="margin-left:auto;background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer">✕</button>
+          </div>
+        </div>`;
+      }
+      if(lk){
+        const e=stkInfo(item.id);
+        const sinR=e.q===0;
+        const mi='width:56px;padding:4px 5px;border:1.5px solid var(--gray2);border-radius:7px;font-family:\'Nunito\',sans-serif;font-size:12px;font-weight:800;text-align:center';
+        return `<div style="padding:10px 12px;margin-bottom:6px;background:#fff;border-radius:10px;border:1.5px solid ${e.faltan>0?'var(--pink-dark)':'var(--gray2)'}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span style="font-size:13px;font-weight:700;flex:1">${item.label}</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${sinR?'var(--gray3)':e.faltan>0?'var(--pink-dark)':'var(--green)'};white-space:nowrap">${sinR?'completar':e.faltan>0?e.faltan+' '+item.unidad:'✓ OK'}</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11px;font-weight:700;color:var(--gray3)">
+            <label>Lleva <input type="number" min="0" step="0.1" value="${e.q}" onchange="insumoRecSet('${item.id}','q',this.value)" style="${mi}${sinR?';border-color:#fbbf24;background:#fffbeb':''}"> por
+              <select onchange="insumoRecSet('${item.id}','g',this.value)" style="padding:4px;border:1.5px solid var(--gray2);border-radius:7px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700">${Object.keys(GRUPOS).map(g=>`<option value="${g}"${e.g===g?' selected':''}>${GRUPOS[g]}</option>`).join('')}</select></label>
+            <label>Stock <input type="number" min="0" step="1" value="${e.conBase?Math.round(Math.max(0,e.restante)*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}"></label>
+            <span>Mín. ${sinR?'—':fmtN(e.obj)}</span>
+            <button onclick="insumoUnlink('${item.id}')" title="Desvincular de la producción" style="margin-left:auto;background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer">✕</button>
+          </div>
+        </div>`;
+      }
+      const vinc = (item.id==='panal'||item.id==='gomaeva') ? '' :
+        `<button onclick="insumoLink('${item.id}')" title="Vincular a la producción (stock y mínimo automáticos)" style="margin-left:6px;width:30px;height:30px;border-radius:8px;border:1.5px dashed var(--gray2);background:#fff;cursor:pointer;font-size:14px">📦</button>`;
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:6px;background:#fff;border-radius:10px;border:1.5px solid ${cant>0?'var(--pink-dark)':'var(--gray2)'}">
         <span style="font-size:13px;font-weight:${cant>0?'700':'500'};color:${cant>0?'var(--text)':'var(--gray3)'};flex:1;padding-right:8px">${item.label}</span>
-        <div style="display:flex;align-items:center;flex-shrink:0">
-          <button onclick="faltCambiar('${item.id}',-1)" style="width:30px;height:30px;border-radius:8px 0 0 8px;border:1.5px solid var(--gray2);background:var(--gray);font-size:16px;cursor:pointer;font-weight:700;color:var(--text);line-height:1">−</button>
-          <div style="min-width:42px;height:30px;border-top:1.5px solid var(--gray2);border-bottom:1.5px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${cant>0?'var(--pink-dark)':'var(--gray3)'};background:#fff">${cant>0?cant+' '+item.unidad:'—'}</div>
-          <button onclick="faltCambiar('${item.id}',1)" style="width:30px;height:30px;border-radius:0 8px 8px 0;border:1.5px solid var(--gray2);background:${cant>0?'var(--pink-dark)':'var(--gray)'};color:${cant>0?'#fff':'var(--text)'};font-size:16px;cursor:pointer;font-weight:700;line-height:1">+</button>
-        </div>
+        <div style="display:flex;align-items:center;flex-shrink:0;${trackedId(item.id)?'opacity:.4':''}" title="${trackedId(item.id)?'Se calcula solo desde la tarjeta de panal y goma eva':''}">
+          <button onclick="faltCambiar('${item.id}',-${item.paso||1})" style="width:30px;height:30px;border-radius:8px 0 0 8px;border:1.5px solid var(--gray2);background:var(--gray);font-size:16px;cursor:pointer;font-weight:700;color:var(--text);line-height:1">−</button>
+          <div style="min-width:64px;padding:0 4px;height:30px;border-top:1.5px solid var(--gray2);border-bottom:1.5px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${cant>0?'var(--pink-dark)':'var(--gray3)'};background:#fff">${cant>0?cant+' '+item.unidad:'—'}</div>
+          <button onclick="faltCambiar('${item.id}',${item.paso||1})" style="width:30px;height:30px;border-radius:0 8px 8px 0;border:1.5px solid var(--gray2);background:${cant>0?'var(--pink-dark)':'var(--gray)'};color:${cant>0?'#fff':'var(--text)'};font-size:16px;cursor:pointer;font-weight:700;line-height:1">+</button>
+        </div>${vinc}
       </div>`;
     }).join('');
   });
@@ -2845,6 +3581,35 @@ function addItem(){
     accesorios:(tipo==='Solo bordado'||tipo==='Arnés')?'na':document.getElementById('i-acc').value||'pendiente',
     desdeStock:false,
   };
+  if(tipo.includes('Correa')){
+    const mq=document.getElementById('i-mosq')?.value||'';
+    if(mq)item.mosq=mq;
+    if(tipo!=='Correa'&&window._ccorrManual){const cc=document.getElementById('i-ccorr')?.value||'';if(cc)item.colorCorrea=cc;}
+  }
+
+  // ── Modo ACTUALIZAR: conserva id/estado/stock del ítem original ──
+  const orig=window._editandoItem;
+  if(orig){
+    const mismoProd = orig.modelo===item.modelo && orig.talle===item.talle && orig.tipo===item.tipo;
+    if(orig.desdeStock && !mismoProd){
+      // cambió modelo/talle/tipo de una pieza tomada de stock: devolver la pieza original
+      if(orig.modelo&&orig.talle){
+        if(!stockData[orig.modelo])stockData[orig.modelo]={};
+        stockData[orig.modelo][orig.talle]=(stockData[orig.modelo][orig.talle]||0)+1;
+        saveStock();
+        toast('📦 Pieza devuelta al stock: '+orig.modelo+' '+orig.talle);
+      }
+      // sigue como ítem nuevo (puede ofrecer stock del nuevo modelo)
+      window._editandoItem=null;
+    } else {
+      item.id=orig.id;
+      item.desdeStock=!!orig.desdeStock;
+      if(orig.estadoItem)item.estadoItem=orig.estadoItem;
+      window._editandoItem=null;
+      doAddItem(item, !!orig.desdeStock);
+      return;
+    }
+  }
 
   // Check if this item has stock available
   const tieneArnes = tipo==='Arnés'||tipo==='Combo 1 — Arnés + Correa'||tipo==='Combo 2 — Arnés + Correa + Collar';
@@ -2915,6 +3680,8 @@ function renderIL(){
     const ex=[];
     if(i.pecho)ex.push('Pecho '+i.pecho+'cm');
     if(i.cuello)ex.push('Cuello '+i.cuello+'cm');
+    if(i.colorCorrea)ex.push('Correa '+i.colorCorrea);
+    if(i.mosq)ex.push('Mosq. '+i.mosq);
     const combx2badge=i.esCombx2?`<span style="background:var(--pink);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-right:4px">x2</span>`:'';
     return `<div class="ir">
       <div class="ii">
@@ -2932,23 +3699,34 @@ function renderIL(){
 
 function editItem(id){
   const i=tempItems.find(x=>x.id===id);if(!i)return;
-  // Populate the add-item form with this item's data
   document.getElementById('i-tipo').value=i.tipo;
-  renderMG();
+  try{onTipo();}catch(e){}
   document.getElementById('i-mod').value=i.modelo||'';
-  renderMG(); // re-render to highlight selected model
+  const colEl=document.getElementById('i-color');if(colEl)colEl.value=i.color||'';
+  renderMG();
   document.getElementById('i-talle').value=noTalleItem(i)?'':i.talle||'M';
+  const lg=document.getElementById('i-largo');
+  if(lg&&i.largo){
+    if(![...lg.options].some(o=>o.value===i.largo)){const o=document.createElement('option');o.value=o.textContent=i.largo;lg.appendChild(o);}
+    lg.value=i.largo;
+  }
+  const sw=document.getElementById('i-swap');if(sw)sw.value=i.swap||'';
   document.getElementById('i-prec').value=i.precio||'';
   document.getElementById('i-cant').value=i.cant||1;
   document.getElementById('i-bord').value=i.bordado||'';
   document.getElementById('i-pecho').value=i.pecho||'';
   document.getElementById('i-cuello').value=i.cuello||'';
   document.getElementById('i-acc').value=i.accesorios||'prep';
-  // Remove from list so it can be re-added after editing
+  window._ccorrManual=!!i.colorCorrea;
+  refreshCcorr();
+  if(i.colorCorrea){const cs=document.getElementById('i-ccorr');if(cs)cs.value=normColor(i.colorCorrea);}
+  const mq=document.getElementById('i-mosq');if(mq)mq.value=i.mosq||'';
+  // Recordar el ítem original: al confirmar se ACTUALIZA, no se agrega uno nuevo
+  window._editandoItem=JSON.parse(JSON.stringify(i));
+  const _ab=document.getElementById('i-add-btn');if(_ab)_ab.textContent='✓ Actualizar ítem';
   removeItem(id);
-  // Scroll to the add-item form
   document.getElementById('i-tipo').closest('.aib').scrollIntoView({behavior:'smooth',block:'start'});
-  toast('✏️ Editá el ítem y volvé a agregarlo');
+  toast('✏️ Editá el ítem y tocá Actualizar ítem');
 }
 
 // ══════════ ENVIO / PAGO ══════════
@@ -3136,12 +3914,19 @@ async function save(){
 }
 
 async function deleteFromDB(table, id){
-  await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+  await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
     method:'DELETE',
     headers:supaHeaders
   });
 }
 
+// ── Seguridad: neutraliza HTML en cualquier dato que venga de la base ──
+function limpiar(v){
+  if(typeof v==='string') return v.replace(/[<>"`]/g,'');
+  if(Array.isArray(v)) return v.map(limpiar);
+  if(v&&typeof v==='object'){const o={};for(const k in v)o[k]=limpiar(v[k]);return o;}
+  return v;
+}
 async function loadData(){
   try {
     const [rPed, rEgr, rPre, rSto] = await Promise.all([
@@ -3154,8 +3939,8 @@ async function loadData(){
     const egrRaw = await rEgr.json();
     const preRaw = await rPre.json();
     const stoRaw = await rSto.json();
-    pedidos  = Array.isArray(pedRaw) ? pedRaw.map(r=>r.data) : [];
-    egresos  = Array.isArray(egrRaw) ? egrRaw.map(r=>r.data) : [];
+    pedidos  = Array.isArray(pedRaw) ? pedRaw.map(r=>limpiar(r.data)) : [];
+    egresos  = Array.isArray(egrRaw) ? egrRaw.map(r=>limpiar(r.data)) : [];
     if(Array.isArray(preRaw) && preRaw.length) preciosData = preRaw[0].data;
     if(Array.isArray(stoRaw) && stoRaw.length) stockData   = stoRaw[0].data;
   } catch(err){
@@ -3164,6 +3949,8 @@ async function loadData(){
   }
   renderAll();
   loadFaltantes();
+  loadInsumos();
+  loadStockMin();
   initVista(); // Re-apply vista after data loads so tabla renders with actual data
 }
 // ══════════ UNDO / REDO ══════════
@@ -3225,7 +4012,7 @@ function noTalleItem(item){
 function fmtPedNum(p){
   if(!p.fecha||!p.num) return p.num||'';
   const meses=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
-  const m = new Date(p.fecha).getMonth();
+  const m = new Date(p.fecha.slice(0,10)+'T12:00:00').getMonth();
   return `${meses[m]} #${p.num}`;
 }
 
@@ -3242,7 +4029,7 @@ function rFacturacion(){
   const ffDesde  = document.getElementById('ff-desde')?.value||'';
   const ffHasta  = document.getElementById('ff-hasta')?.value||'';
 
-  let filtered=[...pedidos].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+  let filtered=[...pedReales()].sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
 
   if(ffEstado==='pendiente') filtered=filtered.filter(p=>!p.facturaRealizada);
   if(ffEstado==='realizada')  filtered=filtered.filter(p=>p.facturaRealizada);
@@ -3262,7 +4049,7 @@ function rFacturacion(){
   const sorted=[...pendientes,...realizadas];
 
   const rows=sorted.map(p=>{
-    const fecha=new Date(p.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'});
+    const fecha=new Date(p.fecha.slice(0,10)+'T12:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'});
     const estadoBtn=p.facturaRealizada
       ?`<button class="fact-ok" onclick="toggleFactura('${p.id}')">✓ Realizada</button>`
       :`<button class="fact-pend" onclick="toggleFactura('${p.id}')">Pendiente</button>`;
@@ -3364,41 +4151,80 @@ function jumpToNuevos(){
   },100);
 }
 
+let bordSel = new Set();   // "pedidoId|itemId" tildados para producir
+
+function bordToggleSel(key,cb){
+  if(cb.checked) bordSel.add(key); else bordSel.delete(key);
+  const b=document.getElementById('bord-prod-btn');
+  if(b){b.textContent=`🪡 PRODUCIR (${bordSel.size})`;b.disabled=bordSel.size===0;b.style.opacity=bordSel.size?1:.45;}
+}
+function bordSelTodos(keys,on){
+  keys.forEach(k=>{on?bordSel.add(k):bordSel.delete(k);});
+  rBordados();
+}
+function bordProducir(){
+  if(!bordSel.size)return;
+  pushHistory();
+  const tocados=new Set();
+  bordSel.forEach(k=>{
+    const [pid,iid]=k.split('|');
+    const p=pedidos.find(x=>x.id===pid);if(!p)return;
+    const it=p.items.find(x=>x.id===iid);if(!it)return;
+    it.bordadoOk=true;tocados.add(p);
+  });
+  const n=bordSel.size;bordSel=new Set();
+  tocados.forEach(p=>saveOnePedido(p));
+  renderAll();
+  toast(`🪡 ${n} bordado${n!==1?'s':''} producido${n!==1?'s':''}`);
+}
+function bordDeshacer(pid,iid){
+  const p=pedidos.find(x=>x.id===pid);if(!p)return;
+  const it=p.items.find(x=>x.id===iid);if(!it)return;
+  pushHistory();
+  it.bordadoOk=false;
+  saveOnePedido(p);renderAll();
+  toast('↩ Vuelto a pendientes');
+}
+
 function rBordados(){
-  // Filter pedidos
   let filtPed;
   if(curBordF==='activos') filtPed=pedidos.filter(p=>p.estado!=='enviado');
   else if(curBordF==='todos') filtPed=pedidos;
   else filtPed=pedidos.filter(p=>p.estado===curBordF);
 
-  // Collect all items with bordado
   const rows=[];
   filtPed.forEach(p=>{
     p.items.forEach(i=>{
       if(i.bordado&&i.bordado.trim()){
         rows.push({
+          key:p.id+'|'+i.id,
+          pid:p.id, iid:i.id,
           num:p.num,
-          numLabel:fmtPedNum(p),
           nombre:i.bordado.trim().toUpperCase(),
           producto:i.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2'),
           modelo:i.modelo||'',
           talle:i.talle&&i.talle!=='Sin talle'?i.talle:'',
           estado:p.estado,
           esCollarSub: i.tipo==='Collar sublimado',
+          ok: !!i.bordadoOk,
         });
       }
     });
   });
 
-  // Split into arneses and collares sublimados
-  const rowsArnes = rows.filter(r=>!r.esCollarSub);
-  const rowsCollar = rows.filter(r=>r.esCollarSub);
+  const validos=new Set(rows.filter(r=>!r.ok).map(r=>r.key));
+  bordSel.forEach(k=>{if(!validos.has(k))bordSel.delete(k);});
+
+  const pend = rows.filter(r=>!r.ok);
+  const hechos = rows.filter(r=>r.ok);
+  const pendArnes = pend.filter(r=>!r.esCollarSub);
+  const pendCollar = pend.filter(r=>r.esCollarSub);
 
   const listEl=document.getElementById('bord-nombres-list');
   if(listEl){
-    listEl.innerHTML=rows.map(r=>r.nombre).join('<br>');
+    listEl.innerHTML=pend.map(r=>r.nombre).join('<br>');
     const titleEl=document.getElementById('bord-nombres-title');
-    if(titleEl) titleEl.textContent=`Solo nombres — ${rows.length} bordado${rows.length!==1?'s':''}`;
+    if(titleEl) titleEl.textContent=`Solo nombres — ${pend.length} pendiente${pend.length!==1?'s':''}`;
   }
 
   const el=document.getElementById('bord-content');
@@ -3408,8 +4234,11 @@ function rBordados(){
   }
 
   function buildTable(list){
-    return `<table class="bord-table">
+    const keys=JSON.stringify(list.map(r=>r.key)).replace(/"/g,'&quot;');
+    const todos=list.length&&list.every(r=>bordSel.has(r.key));
+    return `<table class="bord-table" id="bord-table">
       <thead><tr>
+        <th style="width:34px"><input type="checkbox" ${todos?'checked':''} onchange="bordSelTodos(${keys},this.checked)" title="Tildar todos" style="width:18px;height:18px;cursor:pointer"></th>
         <th>#</th>
         <th>Nombre / Bordado</th>
         <th>Producto</th>
@@ -3420,6 +4249,7 @@ function rBordados(){
         ${list.map(r=>{
           const estObj=ESTADOS.find(e=>e.k===r.estado)||ESTADOS[0];
           return `<tr>
+            <td><input type="checkbox" ${bordSel.has(r.key)?'checked':''} onchange="bordToggleSel('${r.key}',this)" style="width:20px;height:20px;cursor:pointer;accent-color:var(--pink-dark)"></td>
             <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${r.num}</td>
             <td><div class="bord-name">${r.nombre}</div></td>
             <td><div style="font-size:13px;font-weight:700">${r.producto}${r.modelo?' — '+r.modelo:''}</div></td>
@@ -3431,19 +4261,42 @@ function rBordados(){
     </table>`;
   }
 
-  el.innerHTML=`
-    ${rowsArnes.length?`
-    <div class="card" style="padding:0;overflow:hidden">
-      ${buildTable(rowsArnes)}
-    </div>
-    <div style="font-size:12px;color:var(--gray3);font-weight:600;margin-top:4px;margin-bottom:14px;text-align:right">${rowsArnes.length} bordado${rowsArnes.length!==1?'s':''}</div>`:''}
+  const tablaHechos = `<table class="bord-table">
+      <thead><tr><th>#</th><th>Nombre / Bordado</th><th>Producto</th><th>Talle</th><th></th></tr></thead>
+      <tbody>
+        ${hechos.map(r=>`<tr>
+          <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${r.num}</td>
+          <td><div class="bord-name" style="color:var(--pink-dark)">${r.nombre}</div></td>
+          <td><div style="font-size:13px;font-weight:700">${r.producto}${r.modelo?' — '+r.modelo:''}</div></td>
+          <td><span class="pt-talle">${r.talle||'—'}</span></td>
+          <td style="text-align:right"><button onclick="bordDeshacer('${r.pid}','${r.iid}')" title="Volver a pendientes" style="background:#fff;border:1.5px solid #9ca3af;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:800;cursor:pointer;color:#374151">↩ Pendiente</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
 
-    ${rowsCollar.length?`
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3)">⏳ Pendientes de bordar (${pend.length})</div>
+      <button id="bord-prod-btn" onclick="bordProducir()" ${bordSel.size?'':'disabled'} style="background:var(--pink-dark);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;opacity:${bordSel.size?1:.45}">🪡 PRODUCIR (${bordSel.size})</button>
+    </div>
+    ${pendArnes.length?`
+    <div class="card" style="padding:0;overflow:hidden">
+      ${buildTable(pendArnes)}
+    </div>
+    <div style="font-size:12px;color:var(--gray3);font-weight:600;margin-top:4px;margin-bottom:14px;text-align:right">${pendArnes.length} bordado${pendArnes.length!==1?'s':''}</div>`:''}
+
+    ${pendCollar.length?`
     <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:8px">🏷️ Collares sublimados</div>
     <div class="card" style="padding:0;overflow:hidden;border-top:3px solid var(--pink-dark)">
-      ${buildTable(rowsCollar)}
+      ${buildTable(pendCollar)}
     </div>
-    <div style="font-size:12px;color:var(--gray3);font-weight:600;margin-top:4px;text-align:right">${rowsCollar.length} collar${rowsCollar.length!==1?'es':''} sublimado${rowsCollar.length!==1?'s':''}</div>`:''}
+    <div style="font-size:12px;color:var(--gray3);font-weight:600;margin-top:4px;margin-bottom:14px;text-align:right">${pendCollar.length} collar${pendCollar.length!==1?'es':''} sublimado${pendCollar.length!==1?'s':''}</div>`:''}
+
+    ${!pend.length?`<div style="text-align:center;padding:14px;color:var(--gray3);font-size:13px;font-weight:700">✅ No quedan bordados pendientes</div>`:''}
+
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--pink-dark);margin:18px 0 8px">✅ Bordados producidos (${hechos.length})</div>
+    ${hechos.length?`<div class="card" style="padding:0;overflow:hidden;border-top:3px solid var(--green)">${tablaHechos}</div>`
+      :`<div style="font-size:12px;color:var(--gray3);font-weight:600;padding:8px 2px">Todavía no producís ninguno: tildá los que quieras y tocá PRODUCIR.</div>`}
   `;
 }
 
