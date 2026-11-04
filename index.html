@@ -1094,6 +1094,7 @@ function goTab(el){
 }
 
 // ══════════ RENDER ══════════
+const numShow=p=>(p.num>1e12?'🛍':p.num);   // pedidos de la tienda traen un número gigante (timestamp)
 const esRepo=p=>!!p&&p.origen==='stock';
 const pedReales=()=>pedidos.filter(p=>!esRepo(p));
 function renderAll(){try{procesarStockIngresos();}catch(e){}rDash();rPedidos();rVentas();rProd();rFacturacion();rBordados();rStock();rPrecios();try{rInsumos();}catch(e){}try{rStockIns();}catch(e){}}
@@ -1493,7 +1494,7 @@ function pedidoBlock(p, compact=false){
 
   const headerHTML=`
     <div class="pb-header">
-      <div class="pb-num">${p.num}</div>
+      <div class="pb-num">${numShow(p)}</div>
       <div style="flex:1;min-width:0">
         <div class="pb-cliente">${p.cliente}</div>
         <div style="font-size:11px;color:var(--gray3);font-weight:600;margin-top:1px">${envL}${p.provincia?' · '+p.provincia:''} · ${new Date(p.fecha.slice(0,10)+'T12:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'})}</div>
@@ -1777,7 +1778,7 @@ function rTabla(){
 
             // Rowspan cells — only on first item
             if(first){
-              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};text-align:center;vertical-align:middle;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark);border-right:1px solid #e5e7eb">#${p.num}</td>`;
+              html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};text-align:center;vertical-align:middle;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark);border-right:1px solid #e5e7eb">#${numShow(p)}</td>`;
               html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};text-align:center;vertical-align:middle;font-size:11px;font-weight:800;color:var(--green);border-right:1px solid #e5e7eb;white-space:nowrap">${fmt(p.netoMambo||p.totalCobrado||0)}</td>`;
               html += `<td rowspan="${nItems}" style="background:${rowBg};${borderTop};font-size:12px;vertical-align:middle;border-right:1px solid #e5e7eb">${p.cliente||''}</td>`;
             }
@@ -2317,7 +2318,7 @@ function rProd(){
         </div>`;
       }
       return `<tr style="${rowStyle}">
-        ${idx===0?`<td rowspan="${grupoItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${i.pedidoRepo?'📦<br><span style="font-size:9px;font-family:Nunito,sans-serif;font-weight:800">REPOSICIÓN</span>':'#'+i.pedidoNum}</td>`:''}
+        ${idx===0?`<td rowspan="${grupoItems.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${i.pedidoRepo?'📦<br><span style="font-size:9px;font-family:Nunito,sans-serif;font-weight:800">REPOSICIÓN</span>':'#'+(i.pedidoNum>1e12?'🛍':i.pedidoNum)}</td>`:''}
         <td style="padding:8px 10px"><span style="font-weight:800;color:${esStock?'#9ca3af':'var(--pink-dark)'}">${i.modelo||'Sin modelo'}</span></td>
         <td style="text-align:center;padding:8px 6px"><span class="pt-talle">${i.talle&&i.talle!=='Sin talle'?i.talle:'—'}</span></td>
         <td style="text-align:center;padding:6px 4px">${btn}</td>
@@ -2345,7 +2346,7 @@ function rProd(){
     const liRows=pedidosListo.map(p=>{
       const ai=p.items.filter(i=>tieneArnes(i.tipo));
       return ai.map((i,idx)=>`<tr>
-        ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${esRepo(p)?'📦':'#'+p.num}<br>
+        ${idx===0?`<td rowspan="${ai.length}" style="border-right:1px solid var(--gray2);vertical-align:middle;text-align:center;padding:6px 8px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">${esRepo(p)?'📦':'#'+numShow(p)}<br>
           <button onclick="enviarPedido('${p.id}')" style="background:#dbeafe;color:#2563eb;border:none;border-radius:7px;padding:3px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-top:4px">📬 Enviar</button>
           <button onclick="revertirDeListo('${p.id}')" style="background:#f3f4f6;color:#6b7280;border:1.5px solid #d1d5db;border-radius:6px;padding:2px 5px;font-size:9px;cursor:pointer;margin-top:3px">↩</button>
         </td>`:''}
@@ -2829,14 +2830,15 @@ const FALT_ITEMS = {
 
 // ══════════ INSUMOS: PANAL Y GOMA EVA (estimación) ══════════
 // Medidas reales de las pecheras (DXF pecheras_mambo, en cm). 1=XS · 2=S · 3=M y L · 4=XL (XXL usa la 4)
-const PECHERAS={XS:{w:11.65,h:13.24,n:1},S:{w:16.00,h:16.89,n:2},ML:{w:20.19,h:20.40,n:3},XL:{w:22.77,h:24.71,n:4}};
+// medidas completas de cada pechera (DXF) y perímetro en metros (para el ribete)
+const PECHERAS={XS:{w:23.29,h:13.24,n:1,per:0.649},S:{w:31.99,h:16.89,n:2,per:0.851},ML:{w:40.20,h:20.40,n:3,per:1.064},XL:{w:46.72,h:24.71,n:4,per:1.2985}};
 const TALLE_PECH={XS:'XS',S:'S',M:'ML',L:'ML',XL:'XL',XXL:'XL'};
 const PECH_LBL={XS:'XS',S:'S',ML:'M y L',XL:'XL'};
 // Estadística histórica abr–oct 2026: ~276 arneses en ~30 semanas; talles L29% S25% M23% XS14% XL9%
 const HIST_ARN_SEM=9;
 const HIST_MIX={XS:.14,S:.25,ML:.52,XL:.09};
 const MARGEN_CORTE=1;      // cm de separación entre piezas
-const PLANCHA=[120,80];    // goma eva, cm
+const PLANCHA=[160,80];    // goma eva, cm
 const CINTA_COLORES=['negra','fucsia','rosa','azul','verde militar','turquesa','celeste','violeta','lila','roja'];
 const CP30_COLOR={cp30_negra:'negra',cp30_fucsia:'fucsia',cp30_rosa:'rosa',cp30_azul:'azul',cp30_verde:'verde militar',cp30_turq:'turquesa',cp30_cel:'celeste',cp30_viol:'violeta',cp30_lila:'lila',cp30_roja:'roja'};
 const ROLLO_M=25;   // metros por rollo de cinta
@@ -2844,9 +2846,9 @@ let insumos={panal:{stock:0,desdeTs:null},goma:{stock:0,desdeTs:null},anchoPanal
   obj:{chico:10,grande:10,correa:14,collar:5,cinturon:1},   // mínimo semanal de producción por tipo de producto
   semCob:1,                                                 // semanas a cubrir con el stock
   rec:{med_25:{g:'chico',q:1},med_4:{g:'grande',q:1},
-       mosq_ch:{g:'mosq_chico',q:1},mosq_gr:{g:'mosq_grande',q:1},mosq_25:{g:'cinturon',q:1},
+       mosq_ch:{g:'mosq_chico',q:1},mosq_gr:{g:'mosq_grande',q:1},mosq_25:{g:'cinturon',q:1},ribete_21:{g:'ribete',q:1,auto:true},
        ...Object.fromEntries(Object.entries(CP30_COLOR).map(([id,c])=>[id,{g:'cinta',q:1,color:c,auto:true}]))},
-  recV:3,
+  recV:4,
   cmap:{},                                                  // color de correa por modelo (se completa/edita)
   stk:{}};                                                  // stock de cada insumo: {id:{stock,desdeTs}}
 const GRUPOS={chico:'Arnés chico (XS, S)',grande:'Arnés grande (M, L, XL)',correa:'Correa',collar:'Collar',
@@ -2855,6 +2857,7 @@ const EDIT_GRUPOS=['grande','chico','correa','collar','cinturon'];
 function itemLabel(id){const it=Object.values(FALT_ITEMS).flat().find(x=>x.id===id);return it?it:{label:id,unidad:'u'};}
 function grupoSugerido(id){
   if(CP30_COLOR[id])return 'cinta';
+  if(id==='ribete_21')return 'ribete';
   if(id==='mosq_25')return 'cinturon';
   if(id==='mosq_ch')return 'mosq_chico';
   if(id==='mosq_gr')return 'mosq_grande';
@@ -2961,15 +2964,34 @@ function cintaMinAuto(color){
   return {min:Math.ceil(m),sem:dm.d[color]||0,fuente:dm.fuente};
 }
 function cintaMin(r){return r.auto===false?(+r.min||0):cintaMinAuto(r.color).min;}
+// ── Ribete de 21 mm: rodea el perímetro de cada pechera; rollo de 100 m ──
+const RIBETE_ROLLO_M=100;
+function ribeteMetros(ts){
+  const a=arnesesDesde(ts);
+  return Object.keys(a).reduce((t,k)=>t+a[k]*PECHERAS[k].per,0);
+}
+function ribeteDemandaSem(){
+  // metros por semana: mínimo semanal de arneses chicos y grandes × perímetro promedio de su grupo
+  const prom=ks=>{const w=ks.reduce((a,k)=>a+HIST_MIX[k],0);return ks.reduce((a,k)=>a+HIST_MIX[k]*PECHERAS[k].per,0)/w;};
+  return insumos.obj.chico*prom(['XS','S'])+insumos.obj.grande*prom(['ML','XL']);
+}
 function stkInfo(id){
   const r=insumos.rec[id];if(!r)return null;
   const it=itemLabel(id),b=insumos.stk[id];
+  if(r.g==='ribete'){
+    const sem=ribeteDemandaSem();
+    const min=r.auto===false?(+r.min||0):Math.ceil((insumos.semCob||1)*sem);
+    let restante=0;
+    if(b)restante=b.stock-ribeteMetros(b.desdeTs);
+    const falt=Math.ceil(Math.max(0,min-Math.max(0,restante))/RIBETE_ROLLO_M-1e-9);
+    return {g:'ribete',q:1,obj:min,restante,conBase:!!b,faltan:falt,min,auto:r.auto!==false,rollo:RIBETE_ROLLO_M,info:{sem,fuente:'mínimo semanal de arneses × perímetro de la pechera'}};
+  }
   if(r.g==='cinta'){
     const min=cintaMin(r);
     let restante=0;
     if(b)restante=b.stock-((contarGrupos(b.desdeTs).cinta[r.color])||0);
     const falt=Math.ceil(Math.max(0,min-Math.max(0,restante))/ROLLO_M-1e-9);
-    return {g:'cinta',q:1,obj:min,restante,conBase:!!b,faltan:falt,color:r.color,min,auto:r.auto!==false,info:cintaMinAuto(r.color)};
+    return {g:'cinta',q:1,obj:min,restante,conBase:!!b,faltan:falt,color:r.color,min,auto:r.auto!==false,rollo:ROLLO_M,info:cintaMinAuto(r.color)};
   }
   const q=+r.q||0,g=r.g;
   const obj=insumos.semCob*objGrupo(g)*q;
@@ -3013,7 +3035,7 @@ function insumoStockSet(id,v){
 }
 function insumoLink(id){
   const g=grupoSugerido(id);
-  insumos.rec[id]=g==='cinta'?{g,q:1,color:CP30_COLOR[id],auto:true}:{g,q:0};
+  insumos.rec[id]=g==='cinta'?{g,q:1,color:CP30_COLOR[id],auto:true}:g==='ribete'?{g,q:1,auto:true}:{g,q:0};
   saveInsumos();renderFaltantes();
 }
 function insumoUnlink(id){
@@ -3044,6 +3066,7 @@ function aplicarCompraAuto(id,cant){
   } else {
     const e=stkInfo(id);
     if(insumos.rec[id].g==='cinta')cant*=ROLLO_M;   // se compra en rollos de 25 m
+    if(insumos.rec[id].g==='ribete')cant*=RIBETE_ROLLO_M;   // rollos de 100 m
     insumos.stk[id]={stock:Math.max(0,e.restante)+cant,desdeTs:Date.now()};
   }
   saveInsumos();
@@ -3131,9 +3154,14 @@ async function loadInsumos(){
       }
       if(!sv.recV){const defs=JSON.parse(JSON.stringify(base.rec));Object.keys(defs).forEach(k=>{if(!(k in rec))rec[k]=defs[k];});}
       if((sv.recV||0)<3&&!rec.cp30_rosa)rec.cp30_rosa={g:'cinta',q:1,color:'rosa',auto:true};
-      insumos.rec=rec;insumos.recV=3;
       insumos.cmap=sv.cmap||{};
       insumos.stk=sv.stk||{};
+      if((sv.recV||0)<4&&!rec.ribete_21){
+        rec.ribete_21={g:'ribete',q:1,auto:true};
+        if(!insumos.stk.ribete_21)insumos.stk.ribete_21={stock:100,desdeTs:Date.now()};   // rollo de 100 m recién comprado
+        setTimeout(()=>{try{saveInsumos();}catch(e){}},0);
+      }
+      insumos.rec=rec;insumos.recV=4;
     }
   }catch(e){}
   rInsumos();rTareas();
@@ -3182,7 +3210,7 @@ function rInsumos(){
   const el=document.getElementById('falt-insumos');if(!el)return;
   const mats=[
     {k:'panal',n:'Panal',u:'m',ico:'🧵',hint:'metros'},
-    {k:'goma', n:'Goma eva',u:'planchas',ico:'🟫',hint:'planchas (1,20 × 0,80)'}
+    {k:'goma', n:'Goma eva',u:'planchas',ico:'🟫',hint:'planchas (1,60 × 0,80)'}
   ];
   const chip={comprar:['#fee2e2','#b91c1c','🔴 Comprar pronto'],atento:['#fef9c3','#a16207','🟡 Ir pensando en comprar'],ok:['#dcfce7','#15803d','🟢 Alcanza']};
   const bloque=m=>{
@@ -3378,7 +3406,7 @@ function renderFaltantes() {
       if(item.sub) return `<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--pink-dark);padding:8px 0 4px;margin-top:4px">${item.label}</div>`;
       const cant = faltantes[item.id] || 0;
       const lk = insumos.rec[item.id];
-      if(lk&&lk.g==='cinta'){
+      if(lk&&(lk.g==='cinta'||lk.g==='ribete')){
         const e=stkInfo(item.id);
         const mi='width:56px;padding:4px 5px;border:1.5px solid var(--gray2);border-radius:7px;font-family:\'Nunito\',sans-serif;font-size:12px;font-weight:800;text-align:center';
         return `<div style="padding:10px 12px;margin-bottom:6px;background:#fff;border-radius:10px;border:1.5px solid ${e.faltan>0?'var(--pink-dark)':'var(--gray2)'}">
@@ -3389,8 +3417,8 @@ function renderFaltantes() {
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11px;font-weight:700;color:var(--gray3)">
             <label>Tengo <input type="number" min="0" step="1" value="${e.conBase?Math.round(Math.max(0,e.restante)*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}"> m</label>
             <label>Mínimo <input type="number" min="0" step="1" value="${e.min}" onchange="insumoRecSet('${item.id}','min',this.value)" style="${mi}${e.auto?'':';border-color:#fbbf24;background:#fffbeb'}"> m</label>
-            <span title="${e.info.fuente}">≈ ${Math.floor(e.min/1.42)} correas · ${e.auto?'automático (uso ≈ '+fmtN(e.info.sem)+' m/sem)':'<a href=\'#\' onclick=\"insumoRecSet(\''+item.id+'\',\'minauto\');return false\" style=\"color:var(--pink-dark)\">↺ volver a automático</a>'}</span>
-            <span>${ROLLO_M} m/rollo · se descuenta solo</span>
+            <span title="${e.info.fuente}">${e.g==='ribete'?'':'≈ '+Math.floor(e.min/1.42)+' correas · '}${e.auto?'automático (uso ≈ '+fmtN(e.info.sem)+' m/sem)':'<a href=\'#\' onclick=\"insumoRecSet(\''+item.id+'\',\'minauto\');return false\" style=\"color:var(--pink-dark)\">↺ volver a automático</a>'}</span>
+            <span>${e.rollo} m/rollo · se descuenta solo</span>
             <button onclick="insumoUnlink('${item.id}')" title="Desvincular" style="margin-left:auto;background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer">✕</button>
           </div>
         </div>`;
@@ -4013,7 +4041,7 @@ function fmtPedNum(p){
   if(!p.fecha||!p.num) return p.num||'';
   const meses=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
   const m = new Date(p.fecha.slice(0,10)+'T12:00:00').getMonth();
-  return `${meses[m]} #${p.num}`;
+  return `${meses[m]} #${numShow(p)}`;
 }
 
 function fmt(n){const v=parseFloat(n)||0;return '$'+v.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -4054,7 +4082,7 @@ function rFacturacion(){
       ?`<button class="fact-ok" onclick="toggleFactura('${p.id}')">✓ Realizada</button>`
       :`<button class="fact-pend" onclick="toggleFactura('${p.id}')">Pendiente</button>`;
     return `<tr style="${p.facturaRealizada?'opacity:.5':''}">
-      <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${p.num}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${numShow(p)}</td>
       <td style="white-space:nowrap;font-size:12px">${fecha}</td>
       <td style="font-size:12px;font-weight:600">${p.provincia||'<span style="color:var(--gray3)">—</span>'}</td>
       <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;white-space:nowrap">${fmt(p.totalCobrado||0)}</td>
