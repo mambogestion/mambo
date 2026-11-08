@@ -1802,7 +1802,7 @@ function rTabla(){
 
             if(first){
               const esCorreo = p.envio==='Correo Arg Sucursal' || p.envio==='Correo Arg Domicilio';
-              const esDomic  = p.envio==='Correo Arg Domicilio';
+              const esDomic  = p.envio==='Correo Arg Domicilio' || p.envio==='Motito CABA' || p.envio==='Motito GBA';
               const envColor = esCorreo ? (p.rotuloHecho ? 'var(--pink-dark)' : '#111') : '#111';
               const btnBase  = 'display:block;margin:4px auto 0;border-radius:7px;padding:3px 7px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;';
               const rotBtn = esCorreo ? `<button onclick="toggleRotulo('${p.id}')" title="Marcar si el rótulo ya está hecho" style="${btnBase}${p.rotuloHecho?'background:var(--pink-dark);color:#fff;border:1.5px solid var(--pink-dark)':'background:#fde047;color:#713f12;border:1.5px solid #eab308'}">${p.rotuloHecho?'✓ Rótulo hecho':'Rótulo pendiente'}</button>` : '';
@@ -2885,6 +2885,8 @@ function normColor(s){
 function defColorModelo(m){
   m=String(m||'').trim();
   if(!m)return '';
+  const fijo={'sunset':'fucsia','ojitos':'rosa','rainbow':'violeta','van gogh':'azul'}[m.toLowerCase()];
+  if(fijo)return fijo;
   const c=normColor(m);
   if(c)return c;
   if(/^rambo$/i.test(m))return 'verde militar';
@@ -2912,7 +2914,7 @@ function insumoCmap(m,v){insumos.cmap[m]=v;saveInsumos();rStockIns();}
 // Cuenta lo producido desde un momento: por grupo
 function contarGrupos(ts){
   const a=arnesesDesde(ts);
-  const r={chico:a.XS+a.S,grande:a.ML+a.XL,correa:0,collar:0,mosq_chico:0,mosq_grande:0,cinturon:0,cinta:{}};
+  const r={chico:a.XS+a.S,grande:a.ML+a.XL,correa:0,collar:0,mosq_chico:0,mosq_grande:0,cinturon:0,cinta:{},sinTalle:0};
   pedidos.forEach(p=>{
     if(pedCreado(p)<ts)return;
     p.items.forEach(i=>{
@@ -2925,6 +2927,7 @@ function contarGrupos(ts){
         else{
           r.correa+=n;
           r['mosq_'+mosqDe(i)]+=n;
+          if(t!=='Correa'&&(!i.talle||i.talle==='Sin talle'))r.sinTalle+=n;
           const c=colorEfectivo(i);
           if(c)r.cinta[c]=(r.cinta[c]||0)+metrosCorrea(i.largo)*n;
         }
@@ -2975,6 +2978,14 @@ function ribeteDemandaSem(){
   const prom=ks=>{const w=ks.reduce((a,k)=>a+HIST_MIX[k],0);return ks.reduce((a,k)=>a+HIST_MIX[k]*PECHERAS[k].per,0)/w;};
   return insumos.obj.chico*prom(['XS','S'])+insumos.obj.grande*prom(['ML','XL']);
 }
+// Línea de control: de dónde sale el número (stock fijado, fecha y consumo desde entonces)
+function auditoriaIns(id,e){
+  const b=insumos.stk[id];if(!b||!e||!e.q)return '';
+  const cg=contarGrupos(b.desdeTs),cons=cg[e.g]*e.q;
+  const f=b.desdeTs?new Date(b.desdeTs).toLocaleDateString('es-AR',{day:'numeric',month:'numeric'}):'?';
+  const st=(e.g==='mosq_chico'||e.g==='mosq_grande')&&cg.sinTalle?` · incluye ${cg.sinTalle} correa(s) sin talle contadas como "grande"`:'';
+  return `<div style="flex-basis:100%;font-size:10.5px;font-weight:600;color:var(--gray3)">Fijaste ${fmtN(b.stock)} el ${f} · consumido desde entonces: ${fmtN(cons)}${st}</div>`;
+}
 function stkInfo(id){
   const r=insumos.rec[id];if(!r)return null;
   const it=itemLabel(id),b=insumos.stk[id];
@@ -2983,21 +2994,21 @@ function stkInfo(id){
     const min=r.auto===false?(+r.min||0):Math.ceil((insumos.semCob||1)*sem);
     let restante=0;
     if(b)restante=b.stock-ribeteMetros(b.desdeTs);
-    const falt=Math.ceil(Math.max(0,min-Math.max(0,restante))/RIBETE_ROLLO_M-1e-9);
+    const falt=Math.ceil(Math.max(0,min-restante)/RIBETE_ROLLO_M-1e-9);
     return {g:'ribete',q:1,obj:min,restante,conBase:!!b,faltan:falt,min,auto:r.auto!==false,rollo:RIBETE_ROLLO_M,info:{sem,fuente:'mínimo semanal de arneses × perímetro de la pechera'}};
   }
   if(r.g==='cinta'){
     const min=cintaMin(r);
     let restante=0;
     if(b)restante=b.stock-((contarGrupos(b.desdeTs).cinta[r.color])||0);
-    const falt=Math.ceil(Math.max(0,min-Math.max(0,restante))/ROLLO_M-1e-9);
+    const falt=Math.ceil(Math.max(0,min-restante)/ROLLO_M-1e-9);
     return {g:'cinta',q:1,obj:min,restante,conBase:!!b,faltan:falt,color:r.color,min,auto:r.auto!==false,rollo:ROLLO_M,info:cintaMinAuto(r.color)};
   }
   const q=+r.q||0,g=r.g;
   const obj=insumos.semCob*objGrupo(g)*q;
   let restante=0;
   if(b)restante=b.stock-contarGrupos(b.desdeTs)[g]*q;
-  let falt=Math.max(0,obj-Math.max(0,restante));
+  let falt=Math.max(0,obj-restante);   // restante puede ser negativo: la deuda se suma al mínimo
   falt=it.paso?Math.ceil(falt/it.paso-1e-9)*it.paso:Math.ceil(falt-1e-9);
   return {g,q,obj,restante,conBase:!!b,faltan:falt};
 }
@@ -3009,7 +3020,7 @@ function usoGrupo(mat,g){
 function insumoObjetivo(mat){return insumos.semCob*(insumos.obj.grande*usoGrupo(mat,'grande')+insumos.obj.chico*usoGrupo(mat,'chico'));}
 function insumoFaltan(mat){
   const e=insumoEstado(mat);if(!e)return null;
-  return Math.max(0,Math.ceil(insumoObjetivo(mat)-Math.max(0,e.restante)-1e-9));
+  return Math.max(0,Math.ceil(insumoObjetivo(mat)-e.restante-1e-9));
 }
 function trackedId(id){
   if(id==='panal')return !!insumos.panal.desdeTs;
@@ -3051,7 +3062,7 @@ function insumoRecSet(id,campo,v){
   else if(campo==='color'){r.color=v;}
   else r.g=v;
   // re-fijar el stock actual para no alterar lo ya descontado
-  if(e&&e.conBase&&campo!=='min')insumos.stk[id]={stock:Math.max(0,e.restante),desdeTs:Date.now()};
+  if(e&&e.conBase&&campo!=='min')insumos.stk[id]={stock:e.restante,desdeTs:Date.now()};
   saveInsumos();renderFaltantes();renderAll();
 }
 function insumoObj(g,v){
@@ -3062,12 +3073,12 @@ function aplicarCompraAuto(id,cant){
   if(id==='panal'||id==='gomaeva'){
     const mat=id==='panal'?'panal':'goma';
     const e=insumoEstado(mat);
-    insumos[mat]={stock:(e?Math.max(0,e.restante):0)+cant,desdeTs:Date.now()};
+    insumos[mat]={stock:(e?e.restante:0)+cant,desdeTs:Date.now()};
   } else {
     const e=stkInfo(id);
     if(insumos.rec[id].g==='cinta')cant*=ROLLO_M;   // se compra en rollos de 25 m
     if(insumos.rec[id].g==='ribete')cant*=RIBETE_ROLLO_M;   // rollos de 100 m
-    insumos.stk[id]={stock:Math.max(0,e.restante)+cant,desdeTs:Date.now()};
+    insumos.stk[id]={stock:e.restante+cant,desdeTs:Date.now()};
   }
   saveInsumos();
 }
@@ -3176,7 +3187,7 @@ function insumoSumar(mat){
   const v=parseFloat(document.getElementById('ins-'+mat).value);
   if(isNaN(v)||v<=0){toast('Ingresá cuánto compraste');return;}
   const e=insumoEstado(mat);
-  const base=e?Math.max(0,e.restante):0;
+  const base=e?e.restante:0;
   insumos[mat]={stock:base+v,desdeTs:Date.now()};
   saveInsumos();rInsumos();rTareas();toast('🛒 Compra sumada');
 }
@@ -3217,7 +3228,7 @@ function rInsumos(){
     const e=insumoEstado(m.k);
     const cab=e?`
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text)">${fmtN(Math.max(0,e.restante))} <span style="font-size:14px">${m.u}</span></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text)"><span style="${e.restante<0?'color:#dc2626':''}">${fmtN(e.restante)}</span> <span style="font-size:14px">${m.u}</span></div>
         <span style="background:${chip[e.st][0]};color:${chip[e.st][1]};font-size:11px;font-weight:800;padding:4px 10px;border-radius:12px">${chip[e.st][2]}</span>
       </div>
       <div style="font-size:12px;color:var(--gray3);font-weight:600;margin:2px 0 4px">≈ ${Math.floor(e.arn)} arneses · dura ≈ ${e.sem>=99?'—':fmtN(e.sem)+' semanas'} <span style="opacity:.8">(según ${e.fuente})</span></div>
@@ -3415,7 +3426,7 @@ function renderFaltantes() {
             <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:${e.faltan>0?'var(--pink-dark)':'var(--green)'};white-space:nowrap">${e.faltan>0?e.faltan+' '+item.unidad:'✓ OK'}</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11px;font-weight:700;color:var(--gray3)">
-            <label>Tengo <input type="number" min="0" step="1" value="${e.conBase?Math.round(Math.max(0,e.restante)*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}"> m</label>
+            <label>Tengo <input type="number" step="1" value="${e.conBase?Math.round(e.restante*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}${e.conBase&&e.restante<0?';color:#dc2626;border-color:#dc2626;background:#fef2f2':''}"> m</label>
             <label>Mínimo <input type="number" min="0" step="1" value="${e.min}" onchange="insumoRecSet('${item.id}','min',this.value)" style="${mi}${e.auto?'':';border-color:#fbbf24;background:#fffbeb'}"> m</label>
             <span title="${e.info.fuente}">${e.g==='ribete'?'':'≈ '+Math.floor(e.min/1.42)+' correas · '}${e.auto?'automático (uso ≈ '+fmtN(e.info.sem)+' m/sem)':'<a href=\'#\' onclick=\"insumoRecSet(\''+item.id+'\',\'minauto\');return false\" style=\"color:var(--pink-dark)\">↺ volver a automático</a>'}</span>
             <span>${e.rollo} m/rollo · se descuenta solo</span>
@@ -3435,8 +3446,9 @@ function renderFaltantes() {
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11px;font-weight:700;color:var(--gray3)">
             <label>Lleva <input type="number" min="0" step="0.1" value="${e.q}" onchange="insumoRecSet('${item.id}','q',this.value)" style="${mi}${sinR?';border-color:#fbbf24;background:#fffbeb':''}"> por
               <select onchange="insumoRecSet('${item.id}','g',this.value)" style="padding:4px;border:1.5px solid var(--gray2);border-radius:7px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700">${Object.keys(GRUPOS).map(g=>`<option value="${g}"${e.g===g?' selected':''}>${GRUPOS[g]}</option>`).join('')}</select></label>
-            <label>Stock <input type="number" min="0" step="1" value="${e.conBase?Math.round(Math.max(0,e.restante)*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}"></label>
+            <label>Stock <input type="number" step="1" value="${e.conBase?Math.round(e.restante*10)/10:''}" placeholder="—" onchange="insumoStockSet('${item.id}',this.value)" style="${mi}${e.conBase&&e.restante<0?';color:#dc2626;border-color:#dc2626;background:#fef2f2':''}"></label>
             <span>Mín. ${sinR?'—':fmtN(e.obj)}</span>
+            ${auditoriaIns(item.id,e)}
             <button onclick="insumoUnlink('${item.id}')" title="Desvincular de la producción" style="margin-left:auto;background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer">✕</button>
           </div>
         </div>`;
@@ -3502,8 +3514,7 @@ function addCombx2Arnes(){
     accesorios:'na',
     esCombx2:true,
   });
-  tempItems.push(makeItem(1));
-  tempItems.push(makeItem(2));
+  const nuevos=[makeItem(1),makeItem(2)];
   ['cx2a-precio','cx2a-mod1','cx2a-bord1','cx2a-pecho1','cx2a-cuello1',
    'cx2a-mod2','cx2a-bord2','cx2a-pecho2','cx2a-cuello2'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
@@ -3511,8 +3522,7 @@ function addCombx2Arnes(){
   document.getElementById('cx2a-precio-hint').textContent='';
   document.getElementById('i-tipo').value='';
   onTipo();
-  renderIL();calcPago();
-  toast('✅ Mambo x2 arneses agregado');
+  agregarX2ConStock(nuevos,()=>{renderIL();calcPago();toast('✅ Mambo x2 arneses agregado');});
 }
 
 function onCx2Largo(num){
@@ -3565,8 +3575,7 @@ function addCombx2(){
     };
   };
 
-  tempItems.push(makeItem(1));
-  tempItems.push(makeItem(2));
+  const nuevos=[makeItem(1),makeItem(2)];
 
   ['cx2-precio','cx2-mod1','cx2-bord1','cx2-pecho1','cx2-cuello1',
    'cx2-mod2','cx2-bord2','cx2-pecho2','cx2-cuello2'].forEach(id=>{
@@ -3581,8 +3590,7 @@ function addCombx2(){
   document.getElementById('cx2-precio-hint').textContent='';
   document.getElementById('i-tipo').value='';
   onTipo();
-  renderIL();calcPago();
-  toast('✅ Combo x2 agregado — 2 ítems creados');
+  agregarX2ConStock(nuevos,()=>{renderIL();calcPago();toast('✅ Combo x2 agregado — 2 ítems creados');});
 }
 
 function addItem(){
@@ -3671,7 +3679,8 @@ function confirmarDesdeStock(usarStock){
   document.querySelectorAll('.stock-confirm').forEach(el=>el.remove());
   const item = window._pendingStockItem;
   if(!item) return;
-  delete window._pendingStockItem;
+  const cb = window._pendingStockCb;
+  delete window._pendingStockItem;delete window._pendingStockCb;
   if(usarStock){
     if(!stockData[item.modelo]) stockData[item.modelo]={};
     stockData[item.modelo][item.talle]=Math.max(0,(stockData[item.modelo][item.talle]||0)-1);
@@ -3680,7 +3689,42 @@ function confirmarDesdeStock(usarStock){
     item.estadoItem='listo';
     toast('📦 Stock descontado');
   }
+  if(cb){cb(item,usarStock);return;}
   doAddItem(item, usarStock);
+}
+
+// Combos x2: ofrece stock arnés por arnés (cada uno puede ser de stock o a fabricar)
+function pedirStockItem(item,cb){
+  const tieneA=tieneArnes(item.tipo);
+  const disp=tieneA&&item.modelo&&item.talle?(stockData[item.modelo]?.[item.talle]||0):0;
+  if(disp<=0){cb(item,false);return;}
+  const overlay=document.createElement('div');
+  overlay.classList.add('stock-confirm');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML=`
+    <div style="background:#fff;border-radius:18px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="font-size:36px;margin-bottom:10px">📦</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:8px">¡Hay stock disponible!</div>
+      <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:4px">${item.modelo} — ${item.talle}${item.bordado?' · '+item.bordado:''}</div>
+      <div style="font-size:13px;color:#9ca3af;margin-bottom:18px">Stock disponible: <strong style="color:var(--green)">${disp} unidad${disp!==1?'es':''}</strong></div>
+      <div style="font-size:13px;color:#374151;margin-bottom:20px">¿Usar una pieza del stock para este arnés?<br><span style="font-size:11px;color:#9ca3af">Ese arnés pasa directo a Listo (la correa se sigue fabricando)</span></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="confirmarDesdeStock(false)" style="flex:1;padding:12px;border-radius:11px;border:1.5px solid #e5e7eb;background:#f7f7f7;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#374151">No, producir</button>
+        <button onclick="confirmarDesdeStock(true)" style="flex:1;padding:12px;border-radius:11px;border:none;background:var(--green);color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">✓ Sí, usar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  window._pendingStockItem=item;window._pendingStockCb=cb;
+}
+function agregarX2ConStock(items,fin){
+  const it=items.shift();
+  if(!it){fin();return;}
+  pedirStockItem(it,(item,usar)=>{
+    item.desdeStock=!!usar;
+    tempItems.push(item);
+    if(usar)window._algunDesdeStock=true;
+    agregarX2ConStock(items,fin);
+  });
 }
 
 function doAddItem(item, desdeStock){
