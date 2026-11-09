@@ -2846,18 +2846,20 @@ let insumos={panal:{stock:0,desdeTs:null},goma:{stock:0,desdeTs:null},anchoPanal
   obj:{chico:10,grande:10,correa:14,collar:5,cinturon:1},   // mínimo semanal de producción por tipo de producto
   semCob:1,                                                 // semanas a cubrir con el stock
   rec:{med_25:{g:'chico',q:1},med_4:{g:'grande',q:1},
-       mosq_ch:{g:'mosq_chico',q:1},mosq_gr:{g:'mosq_grande',q:1},mosq_25:{g:'cinturon',q:1},ribete_21:{g:'ribete',q:1,auto:true},
+       mosq_ch:{g:'mosq_chico',q:1},mosq_gr:{g:'mosq_grande',q:1},mosq_25:{g:'cinturon',q:1},ribete_21:{g:'ribete',q:1,auto:true},etq_cuero:{g:'piezas',q:1},etq_plat:{g:'piezas_plata',q:1},
        ...Object.fromEntries(Object.entries(CP30_COLOR).map(([id,c])=>[id,{g:'cinta',q:1,color:c,auto:true}]))},
-  recV:4,
+  recV:5,
   cmap:{},                                                  // color de correa por modelo (se completa/edita)
   stk:{}};                                                  // stock de cada insumo: {id:{stock,desdeTs}}
 const GRUPOS={chico:'Arnés chico (XS, S)',grande:'Arnés grande (M, L, XL)',correa:'Correa',collar:'Collar',
-  mosq_chico:'Correa con mosquetón chico (arnés XS, S, M)',mosq_grande:'Correa con mosquetón grande (arnés L, XL)',cinturon:'Cinturón de seguridad'};
+  piezas:'Cada pieza (arnés, correa, collar, cinturón)',piezas_plata:'Cada pieza modelo Rock o Paris',mosq_chico:'Correa con mosquetón chico (arnés XS, S, M)',mosq_grande:'Correa con mosquetón grande (arnés L, XL)',cinturon:'Cinturón de seguridad'};
 const EDIT_GRUPOS=['grande','chico','correa','collar','cinturon'];
 function itemLabel(id){const it=Object.values(FALT_ITEMS).flat().find(x=>x.id===id);return it?it:{label:id,unidad:'u'};}
 function grupoSugerido(id){
   if(CP30_COLOR[id])return 'cinta';
   if(id==='ribete_21')return 'ribete';
+  if(id==='etq_cuero')return 'piezas';
+  if(id==='etq_plat')return 'piezas_plata';
   if(id==='mosq_25')return 'cinturon';
   if(id==='mosq_ch')return 'mosq_chico';
   if(id==='mosq_gr')return 'mosq_grande';
@@ -2905,6 +2907,16 @@ function metrosCorrea(largo){
   const L=parseFloat(largo)||1.2;
   return Math.abs(L-1.2)<0.01?1.42:L+0.25;
 }
+// Cinta por collar según talle (punto medio del rango): S 50/60, M 60/70, L 70/80, XL 75/85
+function metrosCollar(talle){
+  return {XS:.55,S:.55,M:.65,L:.75,XL:.80,XXL:.80}[talle]||.65;
+}
+function colorCollar(i){
+  if(i.colorCorrea)return normColor(i.colorCorrea);
+  if(i.tipo==='Collar')return normColor(i.color||i.modelo)||colorModelo(i.modelo||'');
+  return colorModelo(i.modelo||'');
+}
+const esPlata=m=>/^\s*(rock\b|paris\s*$)/i.test(String(m||''));   // Rock o Paris (no Pink Paris)
 function mosqDe(i){
   if(i.mosq==='chico'||i.mosq==='grande')return i.mosq;
   return (!i.talle||i.talle==='Sin talle'||['L','XL','XXL'].includes(i.talle))?'grande':'chico';
@@ -2914,16 +2926,20 @@ function insumoCmap(m,v){insumos.cmap[m]=v;saveInsumos();rStockIns();}
 // Cuenta lo producido desde un momento: por grupo
 function contarGrupos(ts){
   const a=arnesesDesde(ts);
-  const r={chico:a.XS+a.S,grande:a.ML+a.XL,correa:0,collar:0,mosq_chico:0,mosq_grande:0,cinturon:0,cinta:{},sinTalle:0};
+  const r={chico:a.XS+a.S,grande:a.ML+a.XL,correa:0,collar:0,mosq_chico:0,mosq_grande:0,cinturon:0,cinta:{},sinTalle:0,piezas:0,piezas_plata:0};
   pedidos.forEach(p=>{
     if(pedCreado(p)<ts)return;
     p.items.forEach(i=>{
       const t=i.tipo||'',n=i.cant||1,sw=i.swap||'';
       if(t==='Cinturón auto')r.cinturon+=n;
-      if(t.includes('Collar'))r.collar+=n;
+      if(t.includes('Collar')){r.collar+=n;const cc=colorCollar(i);if(cc)r.cinta[cc]=(r.cinta[cc]||0)+metrosCollar(i.talle)*n;}
+      // etiquetas: 1 por pieza (arnés, correa, collar, cinturón). El arnés tomado de stock ya la tiene.
+      {const arn=t.includes('Arnés')&&!i.desdeStock&&i.estadoItem!=='stock'?1:0;
+       const pz=n*(arn+(t.includes('Correa')?1:0)+(t.includes('Collar')?1:0)+(t==='Cinturón auto'?1:0));
+       r.piezas+=pz;if(esPlata(i.modelo))r.piezas_plata+=pz;}
       if(t.includes('Correa')){
         if(sw==='cinturon'){r.cinturon+=n;}
-        else if(sw==='collar'){r.collar+=n;}
+        else if(sw==='collar'){r.collar+=n;const cc=colorCollar(i);if(cc)r.cinta[cc]=(r.cinta[cc]||0)+metrosCollar(i.talle)*n;}
         else{
           r.correa+=n;
           r['mosq_'+mosqDe(i)]+=n;
@@ -2938,6 +2954,8 @@ function contarGrupos(ts){
 }
 function objGrupo(g){
   const o=insumos.obj,c=o.correa||0,ch=Math.ceil(c*.62);
+  if(g==='piezas')return (o.chico||0)+(o.grande||0)+(o.correa||0)+(o.collar||0)+(o.cinturon||0);
+  if(g==='piezas_plata'){const tot=Object.values(HIST_MODELOS).reduce((a,b)=>a+b,0)||1;return Math.ceil(objGrupo('piezas')*((HIST_MODELOS['Rock!']||0)+(HIST_MODELOS['Paris']||0))/tot);}
   if(g==='mosq_chico')return ch;
   if(g==='mosq_grande')return Math.max(0,c-ch);
   return o[g]||0;
@@ -2958,7 +2976,7 @@ function cintaDemandaSem(){
   }
   const sh={};let tot=0;
   Object.keys(HIST_MODELOS).forEach(m=>{const c=m==='__otros'?'negra':colorModelo(m);if(!c)return;sh[c]=(sh[c]||0)+HIST_MODELOS[m];tot+=HIST_MODELOS[m];});
-  CINTA_COLORES.forEach(c=>{out[c]=(insumos.obj.correa||0)*M_CORREA_PROM*((sh[c]||0)/(tot||1));});
+  CINTA_COLORES.forEach(c=>{out[c]=((insumos.obj.correa||0)*M_CORREA_PROM+(insumos.obj.collar||0)*0.68)*((sh[c]||0)/(tot||1));});
   return {d:out,fuente:'histórico de ventas por modelo'};
 }
 function cintaMinAuto(color){
@@ -3172,7 +3190,12 @@ async function loadInsumos(){
         if(!insumos.stk.ribete_21)insumos.stk.ribete_21={stock:100,desdeTs:Date.now()};   // rollo de 100 m recién comprado
         setTimeout(()=>{try{saveInsumos();}catch(e){}},0);
       }
-      insumos.rec=rec;insumos.recV=4;
+      if((sv.recV||0)<5){
+        if(!rec.etq_cuero)rec.etq_cuero={g:'piezas',q:1};
+        if(!rec.etq_plat)rec.etq_plat={g:'piezas_plata',q:1};
+        setTimeout(()=>{try{saveInsumos();}catch(e){}},0);
+      }
+      insumos.rec=rec;insumos.recV=5;
     }
   }catch(e){}
   rInsumos();rTareas();
