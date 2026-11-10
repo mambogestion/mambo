@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Arneses, correas y collares de diseño para perros, hechos en Buenos Aires. 29 modelos, nombre bordado incluido y envío gratis a sucursal de Correo Argentino.">
+<meta name="theme-color" content="#db2777">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MAMBO — Arneses de diseño para perros exigentes">
+<meta property="og:description" content="Diseño propio, duraderos y hermosos. Armá tu combo con nombre bordado. Envío gratis a sucursal.">
+<meta property="og:image" content="https://mambogestion.github.io/mambo/combo1.jpg">
+<meta property="og:url" content="https://mambogestion.github.io/mambo/shop.html">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[
+{"@type":"Organization","name":"MAMBO","url":"https://mambogestion.github.io/mambo/shop.html","logo":"https://mambogestion.github.io/mambo/logo.png","areaServed":"AR","contactPoint":{"@type":"ContactPoint","telephone":"+54-9-11-4097-2105","contactType":"customer service","availableLanguage":"es"}},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"¿Cómo sé qué talle necesita mi perro?","acceptedAnswer":{"@type":"Answer","text":"Usá la guía de talles de la tienda. Si dudás, te confirmamos el talle por WhatsApp."}},
+{"@type":"Question","name":"¿Cuánto tarda mi pedido?","acceptedAnswer":{"@type":"Answer","text":"Te contactamos por WhatsApp en el día para confirmar talle y coordinar el envío. Si tu modelo está en stock, sale enseguida; si no, se fabrica en aprox. 7 días hábiles."}},
+{"@type":"Question","name":"¿Cómo se paga?","acceptedAnswer":{"@type":"Answer","text":"Por transferencia al alias MAMBO.ARGENTINA. Confirmamos la recepción por WhatsApp."}},
+{"@type":"Question","name":"¿Tiene costo el envío?","acceptedAnswer":{"@type":"Answer","text":"El envío a sucursal de Correo Argentino es gratis a todo el país."}},
+{"@type":"Question","name":"¿El bordado del nombre tiene costo?","acceptedAnswer":{"@type":"Answer","text":"No. El nombre bordado y los emojis están incluidos."}}]}]}</script>
+<title>MAMBO — Arneses para perros exigentes</title>
+<link rel="icon" type="image/png" href="https://mambogestion.github.io/mambo/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose: #db2777;
+  --rose-light: #fce7f3;
+  --black: #0d0d0d;
+  --white: #ffffff;
+  --cream: #faf8f5;
+  --gray: #f5f5f3;
+  --gray2: #e8e6e1;
+  --gray3: #9a9690;
+  --text: #1a1916;
+  --green: #15803d;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior: smooth; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; padding-top:84px; }
+
+/* MODAL TALLE */
+#modal-talle { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:20px; }
+.talle-box { background:#fff; border-radius:20px; padding:24px; max-width:400px; width:100%; max-height:80vh; overflow-y:auto; }
+.talle-box h3 { font-family:'Cabin',sans-serif; font-size:22px; font-weight:900; margin-bottom:14px; }
+.talle-table { width:100%; border-collapse:collapse; font-size:13px; }
+.talle-table th { background:var(--black); color:#fff; padding:8px 10px; text-align:left; }
+.talle-table td { padding:8px 10px; border-bottom:1px solid var(--gray2); }
+.talle-table tr:hover td { background:var(--gray); }
+
+/* NAV */
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:84px; background:rgba(250,248,245,.93); backdrop-filter:blur(16px); border-bottom:1px solid var(--gray2); }
+.nav-logo { display:flex; align-items:center; gap:10px; }
+.nav-logo img.logo-round { width:68px; height:68px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+.nav-logo img.logo-letras { height:52px; object-fit:contain; border-radius:0; }
+.nav-brand { font-family:'Cabin',sans-serif; font-size:20px; font-weight:900; letter-spacing:3px; color:var(--black); }
+.nav-brand span { color:var(--rose); }
+.nav-cart { display:flex; align-items:center; gap:8px; background:var(--black); color:var(--white); border:none; border-radius:50px; padding:8px 16px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; }
+.nav-cart:hover { background:var(--rose); }
+.cart-badge { background:var(--rose); color:#fff; border-radius:50%; width:17px; height:17px; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+
+.hero { position:relative; overflow:hidden; }
+.hero-strip-wrap { overflow:hidden; cursor:grab; user-select:none; background:var(--cream); padding:4px 0; }
+.hero-strip-wrap:active { cursor:grabbing; }
+.hero-strip { display:flex; gap:10px; padding:0 16px; transition:transform .05s linear; will-change:transform; }
+.hero-slide { flex:0 0 auto; position:relative; overflow:hidden; height:min(47vw,380px); }
+.hero-slide img { height:100%; width:auto; display:block; object-fit:fill; pointer-events:none; }
+.hero-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.45) 0%, transparent 55%); }
+.hero-slide-info { position:absolute; bottom:12px; left:12px; color:#fff; }
+.hero-slide-model { font-family:'Cabin',sans-serif; font-size:16px; font-weight:700; }
+.hero-slide-sub { font-size:10px; color:rgba(255,255,255,.7); margin-bottom:8px; }
+.hero-slide-btn { display:inline-flex; align-items:center; gap:5px; background:#fff; color:var(--black); padding:5px 12px; border-radius:50px; font-size:11px; font-weight:700; cursor:pointer; border:none; }
+.hero-slide-btn:hover { background:var(--rose); color:#fff; }
+
+/* Drag hint */
+.drag-hint { position:absolute; bottom:20px; right:24px; color:rgba(255,255,255,.5); font-size:12px; display:flex; align-items:center; gap:6px; pointer-events:none; }
+
+/* BANNER */
+.banner { background:var(--rose); padding:10px 20px; text-align:center; font-size:12px; font-weight:600; color:#fff; letter-spacing:.3px; }
+
+/* SECTION */
+.section { padding:48px 20px; max-width:700px; margin:0 auto; }
+.section-eyebrow { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gray3); margin-bottom:8px; }
+.section-title { font-family:'Cabin',sans-serif; font-size:clamp(28px,6vw,42px); font-weight:900; line-height:1.1; margin-bottom:6px; }
+.section-sub { font-size:14px; color:var(--gray3); margin-bottom:32px; }
+
+/* COMBOS GRID */
+.combos-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+@media(min-width:600px){ .combos-grid { grid-template-columns:repeat(3,1fr); } }
+@media(min-width:1000px){ .combos-grid { grid-template-columns:repeat(4,1fr); } }
+.combo-card { container-type:inline-size; border-radius:16px; overflow:hidden; cursor:pointer; background:var(--black); position:relative; aspect-ratio:3/4; transition:transform .25s; }
+.combos-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+@media(min-width:600px){ .combos-grid { grid-template-columns:repeat(3,1fr); } }
+@media(min-width:1000px){ .combos-grid { grid-template-columns:repeat(4,1fr); } }
+.combo-card:hover .card-img-main { opacity:0; }
+.combo-card:hover .card-img-hover { opacity:1 !important; }
+.combo-card:active { transform:scale(.98); }
+.combo-card img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s; }
+.combo-card:hover img { transform:scale(1.03); }
+.combo-card-grad { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.72) 32%, rgba(0,0,0,.15) 62%, transparent 100%); }
+.combo-card-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; }
+.combo-info { position:absolute; bottom:0; left:0; right:0; padding:14px; color:#fff; }
+.combo-badge { display:inline-block; background:var(--rose); font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:2px 7px; border-radius:20px; margin-bottom:5px; }
+.combo-name { font-family:'Cabin',sans-serif; font-size:clamp(14px,5.6cqw,18px); font-weight:700; line-height:1.2; margin-bottom:5px; }
+.combo-desc { font-size:clamp(10.5px,3.6cqw,12px); font-weight:500; color:rgba(255,255,255,.78); line-height:1.35; margin-bottom:8px; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.combo-price { font-size:clamp(16px,6cqw,21px); font-weight:700; }
+.combo-price-mp { font-size:11px; color:rgba(255,255,255,.75); margin-top:1px; }
+.card-rosa .combo-card-placeholder { background:linear-gradient(135deg,#fce7f3,#f9a8d4); }
+.card-azul .combo-card-placeholder { background:linear-gradient(135deg,#dbeafe,#93c5fd); }
+.card-verde .combo-card-placeholder { background:linear-gradient(135deg,#d1fae5,#6ee7b7); }
+.card-arcoiris .combo-card-placeholder { background:linear-gradient(135deg,#fde68a,#f9a8d4,#93c5fd); }
+.card-violeta .combo-card-placeholder { background:linear-gradient(135deg,#ede9fe,#c4b5fd); }
+.card-naranja .combo-card-placeholder { background:linear-gradient(135deg,#fef3c7,#fbbf24); }
+.card-negro .combo-card-placeholder { background:linear-gradient(135deg,#374151,#111); }
+.card-bordo .combo-card-placeholder { background:linear-gradient(135deg,#ffe4e6,#9f1239); }
+
+/* HOW */
+.how { background:var(--black); padding:52px 20px; color:#fff; }
+.how-inner { max-width:700px; margin:0 auto; }
+.how-title { font-family:'Cabin',sans-serif; font-size:32px; font-weight:900; margin-bottom:32px; }
+.how-steps { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(min-width:600px){ .how-steps { grid-template-columns:repeat(4,1fr); } }
+.how-step { }
+.how-step-num { font-family:'Cabin',sans-serif; font-size:42px; font-weight:900; color:var(--rose); line-height:1; margin-bottom:8px; }
+.how-step-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+.how-step-desc { font-size:12px; color:rgba(255,255,255,.5); line-height:1.5; }
+
+/* MODAL */
+.overlay { position:fixed; inset:0; z-index:300; display:flex; align-items:flex-end; background:rgba(0,0,0,0); transition:background .3s; pointer-events:none; }
+.overlay.open { background:rgba(0,0,0,.6); pointer-events:all; }
+.modal { background:var(--cream); border-radius:24px 24px 0 0; width:100%; max-width:620px; margin:0 auto; max-height:92vh; overflow-y:auto; transform:translateY(100%); transition:transform .35s cubic-bezier(.4,0,.2,1); position:relative; }
+.overlay.open .modal { transform:translateY(0); }
+.modal-handle { width:34px; height:4px; background:var(--gray2); border-radius:2px; margin:12px auto 0; }
+.modal-close { position:absolute; top:14px; right:14px; background:var(--gray); border:none; width:30px; height:30px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.modal-inner { padding:16px 18px 32px; }
+.modal-img { border-radius:14px; overflow:hidden; aspect-ratio:3/4; margin-bottom:18px; background:var(--gray); display:flex; align-items:center; justify-content:center; font-size:64px; }
+.modal-img img { width:100%; height:100%; object-fit:contain; background:var(--gray); }
+.modal-tag { display:inline-block; background:var(--rose-light); color:var(--rose); font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:7px; }
+.modal-name { font-family:'Cabin',sans-serif; font-size:26px; font-weight:900; margin-bottom:5px; }
+.modal-desc { font-size:14px; line-height:1.5; color:var(--gray3); margin-bottom:16px; }
+.modal-price { font-family:'Cabin',sans-serif; font-size:30px; font-weight:900; color:var(--rose); margin-bottom:18px; }
+.modal-price-mp { font-size:12px; color:var(--gray3); margin-top:-14px; margin-bottom:16px; }
+
+/* FORM */
+.fg { margin-bottom:14px; }
+.fg label { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--gray3); margin-bottom:6px; }
+.fg select, .fg input { width:100%; padding:10px 13px; border:1.5px solid var(--gray2); border-radius:11px; font-family:'DM Sans',sans-serif; font-size:14px; background:var(--gray); outline:none; transition:border-color .15s; }
+.fg select:focus, .fg input:focus { border-color:var(--rose); background:#fff; }
+.mod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-top:7px; }
+.mod-pill { padding:5px 3px; border-radius:7px; border:1.5px solid var(--gray2); text-align:center; font-size:10px; font-weight:500; cursor:pointer; transition:all .15s; background:#fff; }
+.mod-pill:hover { border-color:var(--rose); }
+.mod-pill.on { background:var(--rose); color:#fff; border-color:var(--rose); font-weight:700; }
+.mod-sel{font-size:13px;color:var(--gray3);padding:2px 0 0}
+.mod-sel.ok{color:var(--rose);font-weight:700}
+.mod-pill{font-size:11px;padding:7px 3px}
+.emoji-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+.emoji-btn { font-size:17px; padding:4px 8px; border:1.5px solid var(--gray2); border-radius:7px; cursor:pointer; background:#fff; transition:all .15s; }
+.emoji-btn:hover { border-color:var(--rose); }
+.perro-card { background:var(--gray); border-radius:12px; padding:12px; margin-bottom:10px; }
+.perro-label { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--rose); margin-bottom:10px; }
+.btn-primary { width:100%; padding:15px; border-radius:13px; background:var(--black); color:#fff; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; border:none; cursor:pointer; transition:background .2s; }
+.btn-primary:hover { background:var(--rose); }
+.btn-secondary { width:100%; padding:12px; border-radius:13px; background:transparent; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; border:1.5px solid var(--gray2); cursor:pointer; margin-top:8px; }
+.divider { height:1px; background:var(--gray2); margin:18px 0; }
+
+/* VIEWS */
+.view { display:none; }
+.view.on { display:block; }
+.page-wrap { padding:72px 18px 100px; max-width:540px; margin:0 auto; }
+.page-title { font-family:'Cabin',sans-serif; font-size:28px; font-weight:900; margin-bottom:20px; }
+
+/* CART */
+.cart-item-card { background:var(--gray); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+.cart-item-icon { width:44px; height:44px; border-radius:9px; background:var(--rose-light); font-size:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.cart-item-icon img { width:100%; height:100%; object-fit:cover; }
+.cart-item-info { flex:1; min-width:0; }
+.cart-item-name { font-weight:700; font-size:13px; }
+.cart-item-detail { font-size:11px; color:var(--gray3); margin-top:2px; }
+.cart-item-price { font-weight:700; font-size:15px; white-space:nowrap; }
+.cart-item-remove { background:none; border:none; color:var(--gray3); font-size:17px; cursor:pointer; padding:4px; flex-shrink:0; }
+
+/* ENVIO */
+.envio-opt { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px; border:1.5px solid var(--gray2); cursor:pointer; transition:all .15s; background:#fff; margin-bottom:8px; }
+.envio-opt.on { border-color:var(--rose); background:var(--rose-light); }
+.envio-opt-icon { font-size:20px; }
+.envio-opt-info { flex:1; }
+.envio-opt-name { font-weight:700; font-size:13px; }
+.envio-opt-desc { font-size:11px; color:var(--gray3); margin-top:1px; }
+.envio-free { color:var(--green); font-size:10px; font-weight:800; margin-left:5px; }
+.envio-price { font-weight:700; font-size:13px; white-space:nowrap; }
+
+/* TOTAL */
+.total-box { background:var(--black); border-radius:18px; padding:18px; color:#fff; margin-top:14px; }
+.total-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:7px; color:rgba(255,255,255,.6); }
+.total-final { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid rgba(255,255,255,.1); margin-top:4px; }
+.total-final-label { font-size:15px; font-weight:600; }
+.total-final-amount { font-family:'Cabin',sans-serif; font-size:30px; font-weight:900; color:var(--rose); }
+.btn-cart { width:100%; padding:16px; border-radius:14px; background:var(--rose); color:#fff; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; border:none; cursor:pointer; margin-top:12px; box-shadow:0 6px 20px rgba(219,39,119,.3); transition:transform .15s; }
+.btn-cart:hover { transform:translateY(-1px); }
+
+/* PAGO */
+.pago-box { background:var(--gray); border-radius:18px; padding:18px; margin-bottom:14px; }
+.pago-alias { font-family:'Cabin',sans-serif; font-size:26px; font-weight:900; letter-spacing:2px; text-align:center; background:#fff; border-radius:10px; padding:14px; margin:10px 0; border:2px dashed var(--rose); }
+.copy-btn { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:9px; background:var(--rose-light); color:var(--rose); border:none; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* CONFIRM */
+.confirm-page { padding:76px 18px 100px; text-align:center; max-width:480px; margin:0 auto; }
+.confirm-icon { font-size:64px; margin-bottom:14px; }
+.confirm-title { font-family:'Cabin',sans-serif; font-size:34px; font-weight:900; margin-bottom:10px; }
+.confirm-box { background:var(--black); color:#fff; border-radius:20px; padding:22px; margin:20px 0; }
+.confirm-alias { font-family:'Cabin',sans-serif; font-size:26px; font-weight:900; letter-spacing:2px; color:var(--rose); }
+
+/* FAB */
+.fab { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px); z-index:199; background:var(--black); color:#fff; border:none; border-radius:50px; padding:13px 22px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 8px 28px rgba(0,0,0,.25); display:flex; align-items:center; gap:8px; transition:transform .4s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; }
+.fab.show { transform:translateX(-50%) translateY(0); }
+.fab-sep { width:1px; height:14px; background:rgba(255,255,255,.2); }
+.fab-price { color:var(--rose); font-weight:800; }
+
+/* NOTICE */
+.notice { background:var(--rose-light); border-left:3px solid var(--rose); border-radius:11px; padding:11px 13px; font-size:13px; line-height:1.5; margin-bottom:14px; }
+.notice strong { color:var(--rose); }
+
+/* TOAST */
+.toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(8px); background:var(--black); color:#fff; padding:9px 18px; border-radius:50px; font-size:13px; font-weight:600; opacity:0; transition:all .25s; z-index:500; white-space:nowrap; pointer-events:none; }
+.toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* V2: marca, FAQ, mayoristas, WhatsApp */
+.why{padding:56px 20px 48px;background:var(--cream)}
+.why-inner,.faq-inner,.trade-inner{max-width:860px;margin:0 auto}
+.why h2,.faq h2{font-family:'Cabin',sans-serif;font-size:clamp(28px,6vw,40px);font-weight:900;line-height:1.1;text-align:center;margin-bottom:10px}
+.why-sub{text-align:center;color:var(--gray3);font-size:15px;line-height:1.5;margin:0 auto 30px;max-width:520px}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.why-card{background:#fff;border:1.5px solid var(--gray2);border-radius:16px;padding:22px 20px}
+.why-card h3{font-family:'Cabin',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.why-card p{font-size:14px;line-height:1.55;color:#4b4843}
+.faq{padding:48px 20px;background:#fff}
+.faq details{border-bottom:1.5px solid var(--gray2);padding:16px 2px}
+.faq summary{cursor:pointer;font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';color:var(--rose);font-size:22px;line-height:1}
+.faq details[open] summary::after{content:'–'}
+.faq details p{margin-top:10px;font-size:14px;line-height:1.6;color:#4b4843}
+.faq details a{color:var(--rose);font-weight:700}
+.trade{padding:44px 20px;background:var(--rose-light)}
+.trade-inner{text-align:center}
+.trade h2{font-family:'Cabin',sans-serif;font-size:26px;font-weight:900;margin-bottom:8px}
+.trade p{font-size:14px;line-height:1.55;max-width:480px;margin:0 auto 16px;color:#4b4843}
+.trade a{display:inline-block;background:var(--black);color:#fff;text-decoration:none;border-radius:50px;padding:12px 22px;font-weight:700;font-size:14px}
+.foot{padding:30px 20px 110px;background:var(--black);color:#c9c5be;text-align:center;font-size:13px;line-height:1.7}
+.foot a{color:#fff;font-weight:700}
+.wa-float{position:fixed;right:16px;bottom:24px;z-index:190;width:60px;height:60px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:transform .2s}
+.wa-float:hover{transform:scale(1.08)}
+.wa-float img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.28))}
+.wa-float.fb{width:54px;height:54px;border-radius:50%;background:#15803d;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.wa-float.fb::after{content:'💬';font-size:26px}
+.wa-float svg{width:28px;height:28px;fill:#fff}
+
+/* V2: tipografía de títulos */
+.section-title,.modal-name,.how-title,.page-title,.confirm-title,.why h2,.faq h2,.trade h2,.why-card h3{letter-spacing:-.02em}
+
+/* V2: ventana de producto — imagen acotada y botón siempre visible */
+.modal-inner{padding-bottom:0}
+.modal-img{aspect-ratio:auto;height:min(34vh,300px)}
+.m-cta{position:sticky;bottom:0;background:var(--cream);padding:12px 0 16px;margin-top:8px;border-top:1px solid var(--gray2)}
+@media(min-width:900px){
+  .overlay{align-items:center;justify-content:center;padding:24px}
+  .modal{max-width:980px;border-radius:22px;overflow:hidden;transform:translateY(24px) scale(.98);opacity:0;transition:transform .25s,opacity .25s}
+  .overlay.open .modal{transform:none;opacity:1}
+  .modal-handle{display:none}
+  .modal-inner{padding:0}
+  .m-grid{display:grid;grid-template-columns:1fr 1fr;max-height:90vh}
+  .m-left{background:var(--gray);display:flex;align-items:center;justify-content:center;padding:20px}
+  .m-left .modal-img{height:auto;aspect-ratio:3/4;max-height:78vh;width:100%;margin:0}
+  .m-right{padding:30px 28px 0;overflow-y:auto;max-height:90vh}
+  .m-cta{margin:0 -28px;padding:14px 28px 20px}
+}
+
+/* V2: carrito lateral */
+.drw-back{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;opacity:0;pointer-events:none;transition:opacity .25s}
+.drw-back.open{opacity:1;pointer-events:all}
+.drw{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:#fff;z-index:401;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.15)}
+.drw.open{transform:none}
+.drw-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--gray2)}
+.drw-head h2{font-family:'Cabin',sans-serif;font-size:22px;font-weight:700}
+.drw-head button{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:8px 22px}
+.drw-item{display:flex;gap:12px;padding:16px 0;border-bottom:1px solid var(--gray2);align-items:flex-start}
+.drw-thumb{width:64px;height:64px;border-radius:10px;background:var(--gray);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px}
+.drw-thumb img{width:100%;height:100%;object-fit:cover}
+.drw-info{flex:1;min-width:0}
+.drw-name{font-size:14px;font-weight:600;line-height:1.35}
+.drw-det{font-size:12px;color:var(--gray3);margin-top:3px}
+.drw-price{font-weight:700;color:var(--rose);font-size:14px;margin-top:5px}
+.drw-x{background:none;border:none;color:var(--gray3);font-size:16px;cursor:pointer;padding:2px 4px}
+.drw-empty{text-align:center;color:var(--gray3);padding:60px 10px;font-size:14px}
+.drw-foot{padding:16px 22px 22px;border-top:1px solid var(--gray2)}
+.drw-sub{display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-bottom:6px}
+.drw-note{font-size:12px;color:var(--gray3);margin-bottom:14px}
+.drw-foot .btn-primary{margin-bottom:8px}
+
+/* V2: banners deslizables */
+.bnr{position:relative;background:var(--cream);max-width:1584px;margin:0 auto;padding:10px 10px 0}
+.bnr-view{overflow:hidden;border-radius:14px;aspect-ratio:1584/396;touch-action:pan-y;cursor:pointer;user-select:none;-webkit-user-select:none}
+.bnr-view.drag{cursor:grabbing}
+.bnr-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.bnr-track.nodrag{transition:none}
+.bnr-slide{flex:0 0 100%;height:100%}
+.bnr-slide img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.bnr-arrow{position:absolute;top:50%;transform:translateY(-50%);margin-top:5px;width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#111;font-size:26px;line-height:1;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding-bottom:3px;z-index:2}
+.bnr-arrow:hover{background:#fff}
+.bnr-arrow.l{left:22px}.bnr-arrow.r{right:22px}
+.bnr-dots{display:flex;justify-content:center;gap:7px;padding:9px 0 0}
+.bnr-dots i{width:8px;height:8px;border-radius:50%;background:var(--gray2);cursor:pointer;transition:all .25s}
+.bnr-dots i.on{background:var(--rose);width:22px;border-radius:6px}
+@media(max-width:600px){.bnr{padding:8px 8px 0}.bnr-arrow{width:32px;height:32px;font-size:20px}.bnr-arrow.l{left:14px}.bnr-arrow.r{right:14px}}
+
+/* V2: tarjetas de producto estilo tienda (texto fuera de la foto) */
+.combos-grid{gap:26px 16px !important}
+.pc{cursor:pointer;display:flex;flex-direction:column}
+.pc-img{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#fff}
+.pc-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .4s,transform .4s}
+.pc-img .card-img-hover{opacity:0}
+.pc:hover .card-img-main{opacity:0}
+.pc:hover .card-img-hover{opacity:1}
+.pc-img .combo-card-placeholder{position:absolute;inset:0}
+.pc-badge{position:absolute;top:10px;left:10px;background:#fff;color:var(--rose);font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.pc-body{padding:14px 2px 0;display:flex;flex-direction:column;flex:1}
+.pc-name{font-family:'Cabin',sans-serif;font-size:17px;font-weight:700;line-height:1.25;color:var(--text);margin-bottom:5px}
+.pc-desc{font-size:13px;color:var(--gray3);line-height:1.45;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.pc-price b{font-size:21px;font-weight:700;color:var(--text)}
+.pc-tr{color:#dc2626;font-size:13px;font-weight:700;margin-left:6px}
+.pc-mp{font-size:12.5px;color:var(--gray3);margin-top:3px}
+.pc-btn{margin-top:auto;width:100%;background:var(--black);color:#fff;border:none;border-radius:8px;padding:11px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;letter-spacing:1.2px;cursor:pointer;transition:background .2s}
+.pc-btn{margin-top:12px}
+.pc:hover .pc-btn{background:var(--rose)}
+@media(max-width:600px){.pc-name{font-size:15px}.pc-desc{font-size:12px}.pc-price b{font-size:18px}.pc-tr{display:block;margin:1px 0 0}.pc-mp{font-size:11.5px}}
+
+/* ── Selector de modelos en cuadrícula + modal en una sola ventana ── */
+.modal-img{position:relative}
+.modal-cap{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.92);color:var(--dark,#222);font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px;display:none;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.m-grid{display:flex;flex-direction:column;max-height:92vh;min-height:0}
+.m-left{flex:none;padding:0 16px}
+.m-left .modal-img{height:min(30vh,260px);margin:0 0 8px}
+.m-right{display:flex;flex-direction:column;min-height:0;flex:1;padding:0 16px}
+.m-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:2px}
+.m-head .modal-name{font-size:21px;margin-bottom:0}
+.m-head .modal-tag{margin-bottom:4px}
+.m-pr{text-align:right;flex:none}
+.m-head .modal-price{font-size:22px;margin:0}
+.m-head .modal-price-mp{margin:0;font-size:11px}
+.modal-desc{font-size:13px;margin:4px 0 8px}
+.m-body{overflow-y:auto;flex:1;min-height:0;padding-bottom:6px}
+.m-cta{position:static;margin:0 -16px;padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--gray2)}
+.modal-inner{padding-top:4px}
+.mod-grid{display:flex;gap:6px;overflow-x:auto;margin-top:4px;padding-bottom:4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.mt{flex:none;width:68px;position:relative;border-radius:10px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;background:#fff;scroll-snap-align:start;transition:border-color .12s,transform .12s}
+.mt:active{transform:scale(.96)}
+.mt.on{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
+.mt-i{aspect-ratio:1;background:var(--gray);display:block}
+.mt-i img{width:100%;height:100%;object-fit:cover;display:block}
+.mt-ph{display:block;width:100%;height:100%;background:linear-gradient(135deg,var(--c,#e7e2dc),#fff 140%)}
+.mt span{position:absolute;left:0;right:0;bottom:0;padding:9px 2px 2px;text-align:center;font-size:9.5px;font-weight:700;line-height:1.1;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.mod-sel{display:inline;font-size:12px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--gray3)}
+.mod-sel.ok{color:var(--rose);font-weight:800}
+.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt-row:empty,.opt-row:not(:has(.fg)){display:none}
+.opt-row .fg{margin-bottom:10px}
+.opt-row .fg:only-child{grid-column:1/-1}
+.fg select,.fg input{padding:8px 12px}
+.emoji-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+.emoji-btn{flex:none;font-size:16px;padding:3px 7px}
+.perro-card .mod-grid{margin-top:4px}
+@media(min-width:900px){
+  .modal{max-width:1120px;overflow:hidden}
+  .modal-inner{padding:0}
+  .m-grid{display:grid;grid-template-columns:5fr 6fr;height:min(90vh,690px);max-height:none}
+  .m-left{padding:16px;background:var(--gray);display:flex;align-items:center;justify-content:center;min-height:0}
+  .m-left .modal-img{height:100%;width:100%;aspect-ratio:auto;max-height:none;margin:0}
+  .m-right{padding:22px 24px 0}
+  .m-head .modal-name{font-size:26px}
+  .m-head .modal-price{font-size:28px}
+  .modal-desc{font-size:13.5px}
+  .mod-grid{display:grid;grid-template-columns:repeat(8,1fr);overflow:visible;gap:6px;margin-top:6px}
+  .is-x2 .mod-grid{grid-template-columns:repeat(10,1fr);gap:4px}
+  .mt{width:auto}
+  .is-x2 .mt span{font-size:8px}
+  .m-cta{margin:0 -24px;padding:12px 24px 18px}
+  .modal-close{background:rgba(255,255,255,.9);z-index:3}
+}
+@media(min-width:900px) and (max-height:760px){.modal-desc{display:none}}
+@media(max-width:899px){.modal{max-height:94vh}.m-grid{max-height:94vh}}
+
+/* ── ajustes: nombres bajo miniatura, cartel, talle, bandera ── */
+.fl-ar{display:inline-block;width:20px;height:14px;border-radius:2px;vertical-align:-2px;background:radial-gradient(circle at 50% 50%,#f6b40e 0 1.7px,transparent 2.2px),linear-gradient(#74acdf 0 33.3%,#fff 33.3% 66.6%,#74acdf 66.6%);box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.mt{overflow:visible;border:0;background:transparent;width:70px}
+.mt-i{border-radius:10px;overflow:hidden;border:2.5px solid transparent}
+.mt.on .mt-i{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
+.mt span{position:static;display:block;background:none;text-shadow:none;color:var(--text);padding:3px 1px 0;font-size:10.5px;font-weight:700;line-height:1.15;white-space:normal;overflow:visible;text-align:center}
+.mt.on span{color:var(--rose)}
+.is-x2 .mt span{font-size:9px}
+.modal-cap{left:50%;top:12px;bottom:auto;transform:translateX(-50%);white-space:nowrap;text-align:center;padding:7px 20px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.modal-cap b{font-family:'Cabin',sans-serif;font-size:20px;font-weight:800;display:block;line-height:1.15}
+.modal-cap small{display:block;font-size:11px;font-weight:600;color:var(--gray3)}
+.fg label{color:var(--text)}
+.fg label .lnk-talle{float:right;font-weight:700;color:var(--rose);text-transform:none;letter-spacing:0;font-size:12px;text-decoration:underline}
+.lbl-s{font-weight:400;color:var(--gray3);text-transform:none;letter-spacing:0;font-size:12px}
+.bord-note{font-size:12px;color:var(--text);background:var(--rose-light);border-radius:8px;padding:6px 9px;margin-bottom:7px;font-weight:600}
+.talle-img{display:block;width:100%;max-width:260px;margin:0 auto 14px;border-radius:12px}
+.ed-title{font-weight:800;font-size:15px;margin:6px 0 10px}
+.ed-opts{display:grid;gap:8px;margin-bottom:14px}
+.ed-opt{text-align:left;border:1.5px solid var(--gray2);background:#fff;border-radius:12px;padding:11px 13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.ed-opt b{display:block;font-size:14px;color:var(--text)}.ed-opt span{font-size:12px;color:var(--gray3)}
+.ed-opt.on{border-color:var(--rose);background:var(--rose-light)}
+@media(min-width:900px){.m-grid{height:min(92vh,800px)}.mt{width:auto}.mod-grid{grid-template-columns:repeat(10,1fr);gap:5px}.modal-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.m-head .modal-name{font-size:23px}.modal-cap b{font-size:24px}}
+@media(max-width:899px){.modal-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.modal-cap b{font-size:17px}.modal-cap{top:8px;padding:5px 16px}}
+.lbl-inc{float:right;background:var(--rose-light);color:var(--rose);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px}
+.bord-hint{font-size:12px;color:var(--gray3);margin-bottom:6px;line-height:1.4}.bord-hint strong{color:var(--text)}
+.mt.stk .mt-i{border-color:#16a34a;box-shadow:0 0 0 1px #16a34a}
+.mt.stk.on .mt-i{border-color:#16a34a;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--rose)}
+.stk-info{font-size:12px;color:var(--gray3);margin-top:4px;line-height:1.4}
+.stk-info.ok{color:#15803d}
+.stk-info b{color:var(--text)}.stk-info.ok b{color:#15803d}
+.stk-sq{display:inline-block;width:11px;height:11px;border:2px solid #16a34a;border-radius:3px;vertical-align:-1px}
+.stk-tag{display:none;font-style:normal;font-size:10.5px;font-weight:800;color:#16a34a;text-align:center;line-height:1;margin-top:3px;white-space:nowrap}
+.mt.stk .stk-tag{display:flex;align-items:center;justify-content:center;gap:3px}
+.stk-tag img{height:1em;width:auto;display:block}
+.stk-info b.g{color:#16a34a}
+.stk-info .stk-sq{margin-right:2px}
+.opt-row .fg label,.fg label .lbl-b{font-weight:800;color:#111}
+.is-x2 .stk-tag{font-size:8.5px}
+.pc-envio{display:flex;align-items:center;gap:7px;color:#16a34a;font-weight:800;font-size:12px;line-height:1.25;margin:0 0 10px}
+.pc-envio img{width:22px;height:22px;flex:none;display:block}
+@media(max-width:600px){.pc-envio{font-size:11px;gap:5px}.pc-envio img{width:18px;height:18px}}
+.pc-badge{max-width:calc(100% - 20px);line-height:1.2}
+.why-head{text-align:center;padding:0 20px 18px}
+.why-head h2{font-family:'Cabin',sans-serif;font-size:clamp(26px,5.5vw,38px);font-weight:900;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px}
+.why-head p{color:var(--gray3);font-size:15px}
+.hero-slide{border-radius:12px;background:#fff}
+.hero-slide img{border-radius:12px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <img class="logo-round" src="https://mambogestion.github.io/mambo/logo.png" alt="MAMBO">
+    <img class="logo-letras" src="https://mambogestion.github.io/mambo/logoletras.png" alt="MAMBO Mascotas Exigentes">
+  </div>
+  <button class="nav-cart" onclick="abrirDrawer()">
+    🛒 Carrito <span class="cart-badge" id="cart-badge">0</span>
+  </button>
+</nav>
+
+<!-- SHOP VIEW -->
+<div class="view on" id="view-shop">
+
+  <!-- BANNERS (promos) -->
+  <section class="bnr" id="bnr" style="display:none" aria-label="Promociones">
+    <div class="bnr-view" id="bnr-view"><div class="bnr-track" id="bnr-track"></div></div>
+    <button class="bnr-arrow l" id="bnr-l" onclick="bnrIr(-1)" aria-label="Anterior">‹</button>
+    <button class="bnr-arrow r" id="bnr-r" onclick="bnrIr(1)" aria-label="Siguiente">›</button>
+    <div class="bnr-dots" id="bnr-dots"></div>
+  </section>
+
+  <!-- BANNER -->
+  <div class="banner">📦 ENVÍO GRATIS a sucursal CORREO ARGENTINO de TODO EL PAÍS <span class="fl-ar" role="img" aria-label="Argentina"></span> 🥰</div>
+
+  <!-- NAV LINKS -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:0;border-bottom:1.5px solid var(--gray2);background:#fff">
+    <a href="#" onclick="showView('shop');return false" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid var(--rose)">INICIO</a>
+    <a href="#" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid transparent">PROMOS ❤️‍🔥</a>
+    <a href="#por-que" onclick="document.getElementById('por-que').scrollIntoView({behavior:'smooth'});return false" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid transparent">POR QUÉ MAMBO</a>
+    <a href="#talle" onclick="document.getElementById('modal-talle').style.display='flex';return false" style="padding:13px 20px;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2.5px solid transparent">¿CUÁL ES MI TALLE?</a>
+  </div>
+
+  <!-- SECTION TITLE -->
+  <div class="section" style="padding-bottom:8px;padding-top:28px">
+    <div style="text-align:center;padding:8px 0 4px;font-size:32px;font-weight:900;font-family:'Cabin',sans-serif;color:var(--text)">Armá el combo que quieras 🐾</div>
+  </div>
+
+
+    <div class="combos-grid" id="combos-grid"></div>
+
+  <!-- ¿POR QUÉ MAMBO? — testimonios de clientes -->
+  <div id="por-que" style="background:var(--cream);padding:34px 0 34px">
+    <div class="why-head"><h2>¿Por qué MAMBO?</h2><p>Lo dicen quienes ya tienen su MAMBO</p></div>
+    <div class="hero">
+      <div class="hero-strip-wrap" id="strip-wrap">
+        <div class="hero-strip" id="hero-strip"></div>
+      </div>
+      <div class="drag-hint" style="color:rgba(0,0,0,.3)">← arrastrá →</div>
+    </div>
+  </div>
+
+  <!-- HOW -->
+  <div class="how">
+    <div class="how-inner">
+      <div class="how-title">¿Cómo funciona?</div>
+      <div class="how-steps">
+        <div class="how-step"><div class="how-step-num">01</div><div class="how-step-title">Elegí tu combo</div><div class="how-step-desc">29 modelos y colores únicos para tu perro</div></div>
+        <div class="how-step"><div class="how-step-num">02</div><div class="how-step-title">Personalizá</div><div class="how-step-desc">Nombre bordado y emojis incluidos</div></div>
+        <div class="how-step"><div class="how-step-num">03</div><div class="how-step-title">Transferí</div><div class="how-step-desc">Confirmamos recepción por WhatsApp</div></div>
+        <div class="how-step"><div class="how-step-num">04</div><div class="how-step-title">En el día</div><div class="how-step-desc">Te contactamos para confirmar talle y coordinar envío</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREGUNTAS FRECUENTES -->
+  <section class="faq" id="preguntas">
+    <div class="faq-inner">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿Cómo sé qué talle necesita mi perro?</summary><p>Usá la <a href="#talle" onclick="document.getElementById('modal-talle').style.display='flex';return false">guía de talles</a>. Si dudás, te lo confirmamos por WhatsApp antes de avanzar.</p></details>
+      <details><summary>¿Cuánto tarda mi pedido?</summary><p>Te contactamos por WhatsApp en el día para confirmar talle y coordinar el envío. Si tu modelo está en stock, sale enseguida; si no, se fabrica en aprox. 7 días hábiles.</p></details>
+      <details><summary>¿Cómo se paga?</summary><p>Por transferencia al alias <b>MAMBO.ARGENTINA</b> (a nombre de Mariano Nahuel Arbotto). Confirmamos la recepción por WhatsApp.</p></details>
+      <details><summary>¿Tiene costo el envío?</summary><p>El envío a sucursal de Correo Argentino es gratis a todo el país.</p></details>
+      <details><summary>¿El bordado del nombre tiene costo?</summary><p>No, el nombre bordado y los emojis están incluidos.</p></details>
+    </div>
+  </section>
+
+  <!-- MAYORISTAS -->
+  <section class="trade" id="mayoristas">
+    <div class="trade-inner">
+      <h2>¿Tenés un pet shop?</h2>
+      <p>Si vendés productos para mascotas, escribinos y te pasamos las condiciones para revender MAMBO.</p>
+      <a href="https://wa.me/5491140972105?text=Hola!%20Tengo%20un%20pet%20shop%20y%20quiero%20revender%20MAMBO" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <b style="color:#fff;letter-spacing:3px">MAMBO</b><br>
+    Mascotas exigentes · Buenos Aires, Argentina<br>
+    <a href="https://wa.me/5491140972105" target="_blank" rel="noopener">WhatsApp +54 9 11 4097-2105</a>
+  </footer>
+
+</div>
+
+<!-- WHATSAPP -->
+<a class="wa-float" href="https://wa.me/5491140972105?text=Hola!%20Quiero%20consultar%20por%20un%20arn%C3%A9s" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
+  <img src="https://mambogestion.github.io/mambo/LogoWhatsapp.png" alt="WhatsApp" onerror="this.parentNode.classList.add('fb');this.remove()">
+</a>
+
+<!-- CARRITO -->
+<div class="view" id="view-carrito">
+  <div class="page-wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="showView('shop')" style="background:var(--gray);border:none;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
+      <h1 class="page-title" style="margin-bottom:0">Tu carrito</h1>
+    </div>
+    <div id="cart-items-list"></div>
+    <div id="cart-empty" style="text-align:center;padding:50px 0;display:none">
+      <div style="font-size:52px;margin-bottom:10px">🛒</div>
+      <div style="font-family:'Cabin',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px">Carrito vacío</div>
+      <div style="color:var(--gray3);font-size:13px;margin-bottom:18px">Todavía no agregaste productos</div>
+      <button class="btn-secondary" style="max-width:180px;margin:0 auto" onclick="showView('shop')">Ver productos</button>
+    </div>
+    <div id="cart-bottom" style="display:none">
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray3);margin-bottom:10px">Tipo de envío</div>
+      <div class="envio-opt on" onclick="selEnvio('sucursal',0,this)"><div class="envio-opt-icon">📦</div><div class="envio-opt-info"><div class="envio-opt-name">Envío gratis a sucursal <span class="fl-ar" role="img" aria-label="Argentina"></span><span class="envio-free">GRATIS</span></div><div class="envio-opt-desc">Correo Argentino — llegamos a todo el país</div></div><div class="envio-price">$0</div></div>
+      <div class="envio-opt" onclick="selEnvio('domicilio',envioDom(),this)"><div class="envio-opt-icon">🏠</div><div class="envio-opt-info"><div class="envio-opt-name">Envío a domicilio <span class="fl-ar" role="img" aria-label="Argentina"></span></div><div class="envio-opt-desc">Correo Argentino — llegamos a tu casa en todo el país</div></div><div class="envio-price" id="envio-dom-precio">+$7.000</div></div>
+      <div class="envio-opt" onclick="selEnvio('urquiza',0,this)"><div class="envio-opt-icon">📍</div><div class="envio-opt-info"><div class="envio-opt-name">Retiro en Urquiza<span class="envio-free">GRATIS</span></div><div class="envio-opt-desc">CABA — coordinar por WhatsApp</div></div><div class="envio-price">$0</div></div>
+      <div class="envio-opt" onclick="selEnvio('moto',0,this)"><div class="envio-opt-icon">🏍️</div><div class="envio-opt-info"><div class="envio-opt-name">Motito CABA</div><div class="envio-opt-desc">Costo aparte — lo coordinamos por WhatsApp</div></div><div class="envio-price">A coordinar</div></div>
+      <div class="envio-opt" onclick="selEnvio('motogba',0,this)"><div class="envio-opt-icon">🏍️</div><div class="envio-opt-info"><div class="envio-opt-name">Motito GBA</div><div class="envio-opt-desc">Costo aparte — lo coordinamos por WhatsApp</div></div><div class="envio-price">A coordinar</div></div>
+      <div class="total-box">
+        <div class="total-row"><span>Subtotal</span><span id="subtotal-val">$0</span></div>
+        <div class="total-row"><span>Envío</span><span id="envio-val">Gratis</span></div>
+        <div class="total-final"><span class="total-final-label">Total</span><span class="total-final-amount" id="total-val">$0</span></div>
+      </div>
+      <button class="btn-cart" onclick="showView('datos')">Continuar →</button>
+      <button class="btn-secondary" onclick="showView('shop')">← Seguir comprando</button>
+    </div>
+  </div>
+</div>
+
+<!-- DATOS -->
+<div class="view" id="view-datos">
+  <div class="page-wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="showView('carrito')" style="background:var(--gray);border:none;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
+      <h1 class="page-title" style="margin-bottom:0">Tus datos</h1>
+    </div>
+    <div class="notice">🐾 <strong>¿No sabés el talle?</strong> No hay problema: lo confirmamos por WhatsApp antes de fabricar.</div>
+    <div class="fg"><label>Nombre completo *</label><input type="text" id="d-nombre" placeholder="Tu nombre"></div>
+    <div class="fg"><label>WhatsApp *</label><input type="tel" id="d-ig" placeholder="ej: +54 9 11 2345 6789"></div>
+    <div class="fg"><label>Provincia *</label>
+      <select id="d-prov">
+        <option value="">— Seleccioná tu provincia —</option>
+        <option>Buenos Aires</option><option>CABA</option><option>Catamarca</option><option>Chaco</option><option>Chubut</option><option>Córdoba</option><option>Corrientes</option><option>Entre Ríos</option><option>Formosa</option><option>Jujuy</option><option>La Pampa</option><option>La Rioja</option><option>Mendoza</option><option>Misiones</option><option>Neuquén</option><option>Río Negro</option><option>Salta</option><option>San Juan</option><option>San Luis</option><option>Santa Cruz</option><option>Santa Fe</option><option>Santiago del Estero</option><option>Tierra del Fuego</option><option>Tucumán</option>
+      </select>
+    </div>
+    <div id="envio-datos"></div>
+    <button class="btn-primary" onclick="irAPago()">Ir al pago →</button>
+    <button class="btn-secondary" onclick="showView('carrito')">← Volver</button>
+  </div>
+</div>
+
+<!-- PAGO -->
+<div class="view" id="view-pago">
+  <div class="page-wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="showView('datos')" style="background:var(--gray);border:none;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
+      <h1 class="page-title" style="margin-bottom:0">Pago</h1>
+    </div>
+    <div class="pago-box">
+      <div style="font-size:12px;font-weight:700;color:var(--gray3);margin-bottom:6px">Resumen</div>
+      <div id="pago-resumen-items"></div>
+      <div class="divider" style="margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700">Total a transferir</span>
+        <span style="font-family:'Cabin',sans-serif;font-size:24px;font-weight:900;color:var(--rose)" id="pago-total">$0</span>
+      </div>
+    </div>
+    <div id="pago-metodos" style="display:none"></div>
+    <div class="pago-box" id="pago-transf-box">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px">Transferí al alias:</div>
+      <div class="pago-alias" id="alias-show">MAMBO.ARGENTINA</div>
+      <div style="text-align:center;font-size:13px;color:var(--gray3);margin:-2px 0 10px">A nombre de <strong style="color:var(--text)">Mariano Nahuel Arbotto</strong></div>
+      <button class="copy-btn" onclick="copiarAlias()">📋 Copiar alias</button>
+    </div>
+    <div class="notice" id="pago-notice">💡 Por ahora solo aceptamos <strong>transferencia bancaria</strong>. Próximamente MercadoPago.</div>
+    <button class="btn-primary" id="btn-confirmar" onclick="confirmarPedido()">✅ Confirmar pedido y finalizar compra</button>
+    <button class="btn-secondary" onclick="showView('datos')">← Volver</button>
+  </div>
+</div>
+
+<!-- CONFIRMADO -->
+<div class="view" id="view-confirmado">
+  <div class="confirm-page">
+    <div class="confirm-icon">🎉</div>
+    <h1 class="confirm-title">¡Pedido<br>confirmado!</h1>
+    <p style="color:var(--gray3);font-size:14px;line-height:1.6;margin-bottom:14px"><strong style="color:var(--text)">En el día</strong> te contactamos por WhatsApp para confirmar talle y coordinar el envío.</p>
+    <div class="confirm-box">
+      <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:5px">No olvides transferir al alias</div>
+      <div class="confirm-alias" id="confirm-alias">MAMBO.ARGENTINA</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:3px">a nombre de Mariano Nahuel Arbotto</div>
+      <div style="font-size:15px;color:rgba(255,255,255,.7);margin-top:7px" id="confirm-total-val"></div>
+    </div>
+    <div style="background:#dcfce7;border-radius:16px;padding:18px;margin-bottom:20px;text-align:left">
+      <div style="font-size:14px;font-weight:700;color:#15803d;margin-bottom:8px">📲 ¡Un paso más!</div>
+      <div style="font-size:13px;color:#166534;line-height:1.6;margin-bottom:12px">Envianos el <strong>comprobante de transferencia</strong> por WhatsApp para que podamos procesar tu pedido.</div>
+      <a id="confirm-comprobante" href="https://wa.me/5491140972105?text=Hola!!%20Realic%C3%A9%20un%20pedido%20de%20MAMBO%20y%20te%20escribo%20para%20dejar%20el%20comprobante%20de%20la%20transferencia%20%F0%9F%98%8A" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#15803d;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:700">💬 Enviar comprobante al +54 9 11 4097-2105</a>
+    </div>
+    <div id="confirm-envio" style="display:none;background:#eff6ff;border-radius:16px;padding:18px;margin-bottom:20px;text-align:left">
+      <div style="font-size:14px;font-weight:700;color:#1d4ed8;margin-bottom:8px">📦 Datos para el envío</div>
+      <div style="font-size:13px;color:#1e3a8a;line-height:1.6;margin-bottom:12px">Pasanos los datos de envío por WhatsApp (te dejamos el mensaje armado, solo completás lo que falta).</div>
+      <a id="confirm-envio-a" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:700">💬 Enviar datos de envío</a>
+    </div>
+    <button class="btn-primary" onclick="reiniciar()">🐾 Hacer otro pedido</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="cerrarModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="cerrarModalBtn()">✕</button>
+    <div class="modal-inner" id="modal-inner"></div>
+  </div>
+</div>
+
+<!-- CARRITO LATERAL -->
+<div class="drw-back" id="drw-back" onclick="cerrarDrawer()"></div>
+<aside class="drw" id="drw" aria-label="Carrito">
+  <div class="drw-head"><h2>Carrito</h2><button onclick="cerrarDrawer()">✕ Cerrar</button></div>
+  <div class="drw-body" id="drw-body"></div>
+  <div class="drw-foot" id="drw-foot"></div>
+</aside>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="abrirDrawer()">
+  🛒 <span class="fab-sep"></span>
+  <span id="fab-label">0 items</span>
+  <span class="fab-sep"></span>
+  <span class="fab-price" id="fab-price">$0</span>
+</button>
+
+<!-- MODAL TALLE -->
+<div id="modal-talle" onclick="if(event.target===this)this.style.display='none'">
+  <div class="talle-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3>Guía de talles y cómo medir</h3>
+      <button onclick="document.getElementById('modal-talle').style.display='none'" style="background:var(--gray);border:none;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--gray3);margin-bottom:14px;line-height:1.5">Acá te explicamos <strong style="color:var(--text)">cómo medir</strong> a tu perro (mirá la imagen) y qué talle le corresponde. Medí el <strong style="color:var(--text)">contorno de pecho</strong> de tu perro — la parte más ancha del tórax, justo detrás de las patas delanteras.</p>
+    <img class="talle-img" src="https://mambogestion.github.io/mambo/como-medir.jpg" alt="Cómo medir a tu perro" loading="lazy" onerror="this.style.display='none'">
+    <table class="talle-table">
+      <thead><tr><th>Talle</th><th>Pecho (cm)</th><th>Peso aprox.</th></tr></thead>
+      <tbody>
+        <tr><td><strong>XS</strong></td><td>35 – 45 cm</td><td>hasta 5 kg</td></tr>
+        <tr><td><strong>S</strong></td><td>45 – 55 cm</td><td>5 – 10 kg</td></tr>
+        <tr><td><strong>M</strong></td><td>55 – 65 cm</td><td>10 – 20 kg</td></tr>
+        <tr><td><strong>L</strong></td><td>65 – 75 cm</td><td>20 – 35 kg</td></tr>
+        <tr><td><strong>XL</strong></td><td>75 – 85 cm</td><td>35 – 50 kg</td></tr>
+        <tr><td><strong>XXL</strong></td><td>85 – 100 cm</td><td>más de 50 kg</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--gray3);margin-top:12px;line-height:1.5">🤷 ¿No sabés el talle? Elegí <strong>“A confirmar”</strong> y lo definimos juntos por WhatsApp.<br>💡 Si tu perro está en el límite entre dos talles, recomendamos el más grande. Ante cualquier duda te ayudamos por WhatsApp.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const SUPA_URL='https://fllkkrgsibuizxoerkel.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsbGtrcmdzaWJ1aXp4b2Vya2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzOTQwMDgsImV4cCI6MjA4OTk3MDAwOH0.5JoH8xyx6iroGpM5cMKn4_RaCvbuN29TDVQEkld4l4o';
+const SUPA_H={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+const ALIAS='MAMBO.ARGENTINA';
+// Mercado Pago: poner en true recién cuando las funciones crear-pago y mp-webhook estén publicadas en Supabase (ver mercadopago/GUIA.md)
+const MP_ACTIVO=true;
+const MP_FN=SUPA_URL+'/functions/v1/crear-pago';
+const BASE_URL='https://mambogestion.github.io/mambo/';
+
+// Fotos del carrusel — agregar acá cada foto nueva
+const FOTOS_CARRUSEL = [
+  { archivo:'carru4.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru3.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru2.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru9.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru7.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru8.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru6.jpg', modelo:'', combo:'', prodId:'combo1' },
+  { archivo:'carru5.jpg', modelo:'', combo:'', prodId:'combo1' },
+];
+
+// Fotos para cada combo en la grilla y modal
+// Imagen secundaria (hover image) por combo
+const FOTOS_COMBOS_HOVER = {
+  combo1: 'combo1_1.jpg',
+  combo2: 'combo2_1.JPG',
+  combox2a: 'x2_1.jpg',
+  arnes: 'arnes_1.jpg',
+};
+
+const FOTOS_COMBOS = {
+  combo1: 'combo1.jpg',
+  combo2: 'combo2.jpg',
+  arnes: 'arnes.jpg',
+  combox2a: 'x2.png',
+  combox2c: 'Promox2_correas.png',
+  correa: 'CorreaSola.png',
+};
+
+const MODELOS=['Rojo','Sunset','Naranja','Amarillo','Verde Fluo','Bordeaux','Fucsia','Rosa','Rosa Brillito','Ojitos','Paris','Summer Rosa','Lila','Violeta','Rainbow','Jean','Azul','Van Gogh','Turquesa','Celeste','Rambo','Rambo Azul','Argentino','Summer Celeste','Rock!','Pu Negro','Rambo Negro','Pampa Bordeaux','Pampa'];
+const EMOJIS=['🐾','⭐','🌟','💜','💛','🧡','💙','❤️','🔥','🌈','🦴','🐶','🐕','🌸','🌺','⚡','🎯','✨','💖','🏆'];
+
+const COMBOS=[
+  {id:'arnes',short:'Arnés solo',name:'Arnés MAMBO® + Identificación',descCard:'Con su identificación personalizada: nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección.',desc:'Arnés MAMBO® junto con su identificación personalizada (puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección).',emoji:'🐕',badge:'',key:'Arnés solo',hasCorrea:false,isX2:false,cc:'card-azul'},
+  {id:'combo1',short:'Combo 1',name:'Arnés MAMBO® + Identificación + Correa',descCard:'Con su identificación personalizada: nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección. Incluye correa MAMBO®.',desc:'Arnés MAMBO® junto con su identificación personalizada (puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección) y correa MAMBO®.',emoji:'🐕‍🦺',badge:'COMBO 1 · MÁS VENDIDO',key:'Combo 1 — ',hasCorrea:true,isX2:false,cc:'card-rosa'},
+  {id:'combo2',short:'Combo 2',name:'Arnés MAMBO® + Identificación + Correa + Collar',descCard:'Con su identificación personalizada: nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección. Incluye correa y collar MAMBO®.',desc:'Arnés MAMBO® junto con su identificación personalizada (puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección), correa y collar MAMBO®.',emoji:'🌟',badge:'COMBO 2 · COMPLETO',key:'Combo 2 — ',hasCorrea:true,isX2:false,cc:'card-violeta'},
+  {id:'combox2a',short:'Mambo x2 Arneses',name:'2 Arneses MAMBO® + 2 Identificaciones',descCard:'Cada arnés con su identificación personalizada: nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección.',desc:'Dos arneses MAMBO® con sus identificaciones personalizadas (cada una puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección).',emoji:'🐾',badge:'PROMO x2',key:'Mambo x2 (2 arneses)',hasCorrea:false,isX2:true,cc:'card-arcoiris'},
+  {id:'combox2c',short:'Mambo x2 + Correas',name:'2 Arneses MAMBO® + 2 Identificaciones + 2 Correas',descCard:'Cada arnés con su identificación personalizada y su correa MAMBO®.',desc:'Dos arneses MAMBO® con sus identificaciones personalizadas (cada una puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección) y dos correas MAMBO®.',emoji:'🐾',badge:'PROMO x2 + 2 CORREAS',key:'Mambo x2 + 2 correas',hasCorrea:true,isX2:true,cc:'card-verde'},
+  {id:'collar',name:'Collar Sublimado',desc:'Collar sublimado con identificación y bordado',emoji:'🏷️',badge:'',key:'Collar solo',hasCorrea:false,isX2:false,cc:'card-naranja'},
+  {id:'correa',name:'Correa',desc:'Correa a elección de largo',emoji:'🎀',badge:'TODOS LOS LARGOS DISPONIBLES!',key:'Correa sola',hasCorrea:true,isX2:false,cc:'card-negro'},
+  {id:'cinturon',name:'Cinturón auto',desc:'Cinturón de seguridad para auto',emoji:'🚗',badge:'',key:'Cinturón seguridad auto',hasCorrea:false,isX2:false,cc:'card-bordo'},
+];
+
+const PRECIOS_DEFAULT={'Arnés solo':{transf:41990,mp:65970,xCuota:21990},'Collar solo':{transf:12000,mp:16800,xCuota:5600},'Correa sola':{transf:12000,mp:16800,xCuota:5600},'Combo 1 — 1.20mt':{transf:49990,mp:65970,xCuota:21990},'Combo 1 — 2mt':{transf:51990,mp:69870,xCuota:23290},'Combo 1 — 3mt':{transf:53990,mp:73770,xCuota:24590},'Combo 1 — 4mt':{transf:55990,mp:76470,xCuota:25490},'Combo 1 — 5mt':{transf:57990,mp:79170,xCuota:26390},'Combo 1 — 10mt':{transf:64990,mp:89970,xCuota:29990},'Combo 2 — 1.20mt':{transf:61990,mp:77990,xCuota:25997},'Combo 2 — 2mt':{transf:63990,mp:81870,xCuota:27290},'Combo 2 — 3mt':{transf:65990,mp:85770,xCuota:28590},'Combo 2 — 4mt':{transf:67990,mp:89670,xCuota:29890},'Combo 2 — 5mt':{transf:70990,mp:93570,xCuota:31190},'Combo 2 — 10mt':{transf:76990,mp:102570,xCuota:34190},'Collar sublimado':{transf:19990,mp:27990,xCuota:9330},'Mambo x2 (2 arneses)':{transf:65990,mp:75000,xCuota:25000},'Mambo x2 + 2 correas':{transf:79990,mp:89970,xCuota:29990},'Cinturón seguridad auto':{transf:12000,mp:16800,xCuota:5600},'Envío a domicilio':{transf:7000,mp:0,xCuota:0}};
+
+let precios={},carrito=[],envioTipo='sucursal',envioCosto=0,curProd=null;
+
+// ── INIT ──
+async function init(){
+  precios=Object.assign({},PRECIOS_DEFAULT);
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/precios?select=data&id=eq.mambo_precios`,{headers:SUPA_H});
+    const d=await r.json();
+    if(d&&d[0]&&d[0].data)precios=d[0].data;
+  }catch(e){}
+  renderCarrusel();
+  renderCombos();
+  const ed=document.getElementById('envio-dom-precio');if(ed)ed.textContent='+'+fmt(envioDom());
+}
+
+function fmt(n){return'$'+(parseFloat(n)||0).toLocaleString('es-AR',{minimumFractionDigits:0});}
+
+// ── CARRUSEL ──
+function renderCarrusel(){
+  const strip=document.getElementById('hero-strip');
+  const N=10,lista=Array.from({length:N},(_,i)=>'Gracias'+(i+1)+'.jpg');
+  // Triplicar para efecto infinito
+  const slides=[...lista,...lista,...lista];
+  strip.innerHTML=slides.map((f,i)=>`
+    <div class="hero-slide" data-idx="${i%N}">
+      <img src="${BASE_URL}${f}" alt="Testimonio de un cliente de MAMBO" loading="eager" decoding="async" onerror="document.querySelectorAll('#hero-strip [data-idx=\\'${i%N}\\']').forEach(e=>e.remove())">
+    </div>`).join('');
+  initDrag();
+}
+
+function initDrag(){
+  const wrap=document.getElementById('strip-wrap');
+  const strip=document.getElementById('hero-strip');
+  let isDragging=false,startX=0,velX=0,lastX=0,animId=null;
+  let offset=0,sectionW=0;
+
+  function getSectionW(){
+    if(sectionW>0)return sectionW;
+    sectionW=strip.scrollWidth/3;
+    return sectionW;
+  }
+
+  // Start in the middle section so infinite works both ways
+  function initOffset(){
+    sectionW=strip.scrollWidth/3;
+    offset=sectionW;
+    strip.style.transform=`translateX(-${offset}px)`;
+  }
+
+  // Wait for images to load before init
+  const imgs=strip.querySelectorAll('img');
+  let loaded=0;
+  if(imgs.length===0){initOffset();}
+  else{
+    imgs.forEach(img=>{
+      const done=()=>{loaded++;if(loaded>=imgs.length)initOffset();};
+      if(img.complete)done();else{img.addEventListener('load',done);img.addEventListener('error',done);}
+    });
+  }
+
+  wrap.addEventListener('mousedown',e=>{
+    isDragging=true;startX=e.pageX;lastX=e.pageX;velX=0;
+    if(animId){cancelAnimationFrame(animId);animId=null;}
+  });
+  wrap.addEventListener('touchstart',e=>{
+    isDragging=true;startX=e.touches[0].pageX;lastX=e.touches[0].pageX;velX=0;
+    if(animId){cancelAnimationFrame(animId);animId=null;}
+  },{passive:true});
+
+  window.addEventListener('mousemove',e=>{
+    if(!isDragging)return;
+    velX=e.pageX-lastX;lastX=e.pageX;
+    offset-=(e.pageX-startX);startX=e.pageX;
+    applyOffset();
+  });
+  window.addEventListener('touchmove',e=>{
+    if(!isDragging)return;
+    velX=e.touches[0].pageX-lastX;lastX=e.touches[0].pageX;
+    offset-=(e.touches[0].pageX-startX);startX=e.touches[0].pageX;
+    applyOffset();
+  },{passive:true});
+
+  window.addEventListener('mouseup',()=>{if(isDragging){isDragging=false;startMomentum();}});
+  window.addEventListener('touchend',()=>{if(isDragging){isDragging=false;startMomentum();}});
+
+  function applyOffset(){
+    const max=getSectionW();
+    if(max===0)return;
+    // Wrap seamlessly
+    if(offset<0)offset+=max;
+    if(offset>=max)offset-=max;
+    strip.style.transform=`translateX(-${offset}px)`;
+  }
+
+  function startMomentum(){
+    function step(){
+      if(Math.abs(velX)<0.5){velX=0;return;}
+      velX*=0.94;
+      offset-=velX;
+      applyOffset();
+      animId=requestAnimationFrame(step);
+    }
+    animId=requestAnimationFrame(step);
+  }
+
+  // Auto scroll
+  function autoScroll(){
+    if(!isDragging&&Math.abs(velX)<0.5){
+      offset+=0.6;
+      applyOffset();
+    }
+    requestAnimationFrame(autoScroll);
+  }
+  requestAnimationFrame(autoScroll);
+}
+
+// ── COMBOS ──
+// ── BANNERS ──  subir al repo: banner_arnes, banner_combo1, banner_combo2, banner_x2, banner_x2correas (.jpg/.png/.webp)
+const BANNERS=[{f:'banner_arnes',id:'arnes'},{f:'banner_combo1',id:'combo1'},{f:'banner_combo2',id:'combo2'},{f:'banner_x2',id:'combox2a'},{f:'banner_x2correas',id:'combox2c'}];
+let bnrList=[],bnrIdx=0,bnrTimer=null,bnrPausa=false;
+function bnrProbar(base){
+  return new Promise(ok=>{const ex=['jpg','png','webp','jpeg'];let i=0;
+    const t=()=>{if(i>=ex.length)return ok(null);const im=new Image(),u=BASE_URL+base+'.'+ex[i++];im.onload=()=>ok(u);im.onerror=t;im.src=u;};t();});
+}
+function bnrPos(extraPx){
+  const tr=document.getElementById('bnr-track');
+  tr.style.transform=`translateX(calc(${-bnrIdx*100}% + ${extraPx||0}px))`;
+  document.querySelectorAll('#bnr-dots i').forEach((d,i)=>d.classList.toggle('on',i===bnrIdx));
+}
+function bnrIr(d){
+  const n=bnrList.length;if(n<2)return;
+  bnrIdx=(bnrIdx+d+n)%n;
+  const tr=document.getElementById('bnr-track');tr.classList.remove('nodrag');bnrPos(0);
+}
+function initBanners(){
+  Promise.all(BANNERS.map(b=>bnrProbar(b.f))).then(res=>{
+    bnrList=BANNERS.map((b,i)=>res[i]?{...b,src:res[i]}:null).filter(Boolean);
+    if(!bnrList.length)return;                       // sin imágenes subidas: no se muestra nada
+    const nombre=id=>(COMBOS.find(c=>c.id===id)||{}).name||'Promo';
+    document.getElementById('bnr-track').innerHTML=bnrList.map(b=>`<div class="bnr-slide"><img src="${b.src}" alt="${nombre(b.id)}" draggable="false"></div>`).join('');
+    document.getElementById('bnr-dots').innerHTML=bnrList.map((b,i)=>`<i onclick="bnrIdx=${i};bnrIr(0)"></i>`).join('');
+    const multi=bnrList.length>1;
+    ['bnr-l','bnr-r','bnr-dots'].forEach(id=>document.getElementById(id).style.display=multi?'':'none');
+    document.getElementById('bnr').style.display='';
+    bnrPos(0);
+    // arrastre con mouse o dedo; un toque sin arrastre abre el producto
+    const view=document.getElementById('bnr-view'),tr=document.getElementById('bnr-track');
+    let x0=0,dx=0,down=false;
+    view.addEventListener('pointerdown',e=>{if(e.button>0)return;down=true;x0=e.clientX;dx=0;bnrPausa=true;tr.classList.add('nodrag');view.classList.add('drag');try{view.setPointerCapture(e.pointerId);}catch(_){}});
+    view.addEventListener('pointermove',e=>{if(!down)return;dx=e.clientX-x0;bnrPos(dx);});
+    const fin=e=>{
+      if(!down)return;down=false;view.classList.remove('drag');tr.classList.remove('nodrag');
+      if(Math.abs(dx)<6){bnrPos(0);abrirModal(bnrList[bnrIdx].id);}
+      else if(Math.abs(dx)>50&&multi)bnrIr(dx<0?1:-1);
+      else bnrPos(0);
+      bnrPausa=false;
+    };
+    view.addEventListener('pointerup',fin);view.addEventListener('pointercancel',fin);
+    view.addEventListener('mouseenter',()=>bnrPausa=true);view.addEventListener('mouseleave',()=>{if(!down)bnrPausa=false;});
+    if(multi)bnrTimer=setInterval(()=>{if(!bnrPausa&&document.getElementById('view-shop').classList.contains('on')&&!document.getElementById('overlay').classList.contains('open'))bnrIr(1);},6000);
+  });
+}
+
+function renderCombos(){
+  document.getElementById('combos-grid').innerHTML=COMBOS.map(c=>{
+    const p=getP(c,'1.20mt');const cu=p.xCuota||Math.round(p.mp/3)||0;
+    const fotoArchivo=FOTOS_COMBOS[c.id],fotoHover=FOTOS_COMBOS_HOVER[c.id];
+    const imgHtml=fotoArchivo
+      ?`<img src="${BASE_URL}${fotoArchivo}" alt="${c.name}" loading="lazy" class="card-img-main">
+        ${fotoHover?`<img src="${BASE_URL}${fotoHover}" alt="${c.name}" loading="lazy" class="card-img-hover">`:''}`
+      :`<div class="combo-card-placeholder">${c.emoji}</div>`;
+    return`<div class="pc ${c.cc}" onclick="abrirModal('${c.id}')">
+      <div class="pc-img">${imgHtml}${c.badge?`<span class="pc-badge">${c.badge}</span>`:''}</div>
+      <div class="pc-body">
+        <h3 class="pc-name">${c.name}</h3>
+        <p class="pc-desc">${c.descCard||c.desc}</p>
+        ${["arnes","combo1","combo2","combox2a","combox2c"].includes(c.id)?`<div class="pc-envio"><img src="https://cdn-icons-png.flaticon.com/512/2936/2936985.png" alt="" onerror="this.replaceWith(document.createTextNode('🚚 '))"><span>ENVÍO GRATIS a sucursales de Correo Argentino de todo el país</span></div>`:''}
+        <div class="pc-price"><b>${fmt(p.transf)}</b><span class="pc-tr">por transferencia</span></div>
+        ${cu?`<div class="pc-mp">3 cuotas de ${fmt(cu)} con MercadoPago</div>`:''}
+        <button class="pc-btn" type="button">COMPRAR</button>
+      </div></div>`;
+  }).join('');
+}
+
+function claveP(c,largo){
+  if(c.hasCorrea&&largo&&largo!=='1.20mt'){const k=c.key+largo;if(precios[k])return k;}
+  const key=c.hasCorrea?c.key+'1.20mt':c.key;
+  return precios[key]?key:c.key;
+}
+function getP(c,largo){
+  if(c.hasCorrea&&largo&&largo!=='1.20mt'){const k=c.key+largo;if(precios[k])return precios[k];}
+  const key=c.hasCorrea?c.key+'1.20mt':c.key;
+  return precios[key]||precios[c.key]||{transf:0,mp:0,xCuota:0};
+}
+
+// ── MODAL ──
+function abrirModal(id){
+  curProd=COMBOS.find(c=>c.id===id);if(!curProd)return;
+  renderModal();
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function cerrarModal(e){if(e.target===document.getElementById('overlay'))cerrarModalBtn();}
+function cerrarModalBtn(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
+
+function renderModal(){
+  const c=curProd;const p=getP(c,'1.20mt');const cu=p.xCuota||Math.round(p.mp/3)||0;
+  const hasMod=!['collar','correa','cinturon'].includes(c.id);
+  const hasColor=['collar','correa'].includes(c.id);
+  const hasBord=!['correa','cinturon'].includes(c.id);
+  const hasSwap=!c.isX2&&c.hasCorrea&&(c.id==='combo1'||c.id==='combo2');
+  const fotoModal = FOTOS_COMBOS[c.id];
+  const talleF=hasMod?`<div class="fg"><label>📏 Talle <a href="#" class="lnk-talle" onclick="abrirTalle();return false">Guía de talles y cómo medir</a></label>${talleSel('m-talle')}</div>`:'';
+  const colF=(c.hasCorrea&&!c.isX2)?`<div class="fg"><label>Color de correa${c.id==='combo2'?' y collar':''}</label>${ccolorSel('m-ccolor')}</div>`:'';
+  const opts=`<div class="opt-row">${talleF}${colF}</div><div class="opt-row">
+    ${c.hasCorrea&&!c.isX2?`<div class="fg"><label>Largo de correa</label><select id="m-largo" onchange="onMLargo()"><option value="1.20mt">1.20mt (estándar)</option><option value="2mt">2mt</option><option value="3mt">3mt</option><option value="4mt">4mt</option><option value="5mt">5mt</option><option value="10mt">10mt</option></select></div>`:''}
+    ${hasSwap?`<div class="fg" id="m-swap-wrap" style="display:block"><label>¿Cambiar correa 1.20mt por?</label><select id="m-swap"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:''}
+    </div>`;
+
+  document.getElementById('modal-inner').innerHTML=`<div class="m-grid${c.isX2?' is-x2':''}">
+    <div class="m-left"><div class="modal-img">${fotoModal?`<img src="${BASE_URL}${fotoModal}" alt="${c.name}" decoding="async">`:c.emoji}<div class="modal-cap" id="m-cap"></div></div></div>
+    <div class="m-right">
+    <div class="m-head">
+      <div><div class="modal-tag">${c.badge||'MAMBO'}</div><div class="modal-name">${c.name}</div></div>
+      <div class="m-pr"><div class="modal-price" id="m-price">${fmt(p.transf)}</div>${cu?`<div class="modal-price-mp">3x ${fmt(cu)} con MercadoPago</div>`:''}</div>
+    </div>
+    <div class="modal-desc">${c.desc}</div>
+    <div class="m-body">
+    ${c.isX2?renderPerros(c):renderSingle(c,hasMod,hasColor,hasBord,opts)}
+    </div>
+    <div class="m-cta"><button class="btn-primary" onclick="agregarCarrito()">🛒 Agregar al carrito</button></div>
+    </div></div>`;
+  if(hasMod&&!c.isX2)renderMG('','m-mod','m-mod-grid');
+  if(c.isX2){renderMG('','x2-mod1','x2-mg1');renderMG('','x2-mod2','x2-mg2');renderEmojis('x2-emojis1','x2-bord1');renderEmojis('x2-emojis2','x2-bord2');}
+  else if(hasBord)renderEmojis('m-emojis','m-bord');
+  if(c.hasCorrea&&!c.isX2)onMLargo();
+  if(hasMod)precargarFotos(c.id);
+}
+
+function renderSingle(c,hasMod,hasColor,hasBord,opts){
+  return`${hasMod?`<div class="fg"><label>Modelo <span class="mod-sel" id="m-mod-sel">Elegí un modelo</span></label><input type="hidden" id="m-mod"><div class="mod-grid" id="m-mod-grid"></div><div class="stk-info" id="m-mod-grid-info"></div></div>`:''}
+    ${opts||''}
+    ${hasColor?`<div class="fg"><label>Color</label><input type="text" id="m-color" placeholder="ej: Negro, Rosa, Celeste…"></div>`:''}
+    ${hasBord?`<div class="fg"><label>🧵 Identificación bordada <span class="lbl-inc">Incluida con tu arnés</span></label><div class="bord-hint">Nombre + hasta 2 teléfonos, y puede llevar <strong>un emoji</strong> o <strong>la foto de tu perri</strong> (o ninguno de los dos). Ej: <strong>LUNA 1123456789 / 1187654321</strong></div><div class="bord-note">📷 Si querés la foto, mandánosla por WhatsApp después de comprar :)</div><input type="text" id="m-bord" placeholder="ej: LUNA 1123456789 / 1187654321" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="m-emojis"></div></div>`:''}`;
+}
+
+function renderPerros(c){
+  return[1,2].map(n=>`<div class="perro-card"><div class="perro-label">🐾 Perro ${n}</div>
+    <div class="fg" style="margin-bottom:10px"><label>Modelo <span class="mod-sel" id="x2-mod${n}-sel">Elegí un modelo</span></label><input type="hidden" id="x2-mod${n}"><div class="mod-grid" id="x2-mg${n}"></div><div class="stk-info" id="x2-mg${n}-info"></div></div>
+    <div class="opt-row"><div class="fg" style="margin-bottom:10px"><label>📏 Talle <a href="#" class="lnk-talle" onclick="abrirTalle();return false">Guía de talles y cómo medir</a></label>${talleSel('x2-talle'+n)}</div>${c.hasCorrea?`<div class="fg" style="margin-bottom:10px"><label>Color de correa</label>${ccolorSel('x2-ccolor'+n)}</div>`:''}</div>
+    <div class="fg" style="margin-bottom:${c.hasCorrea?'10px':'0'}"><label>🧵 Identificación bordada <span class="lbl-inc">Incluida</span></label><div class="bord-hint">Nombre + hasta 2 teléfonos, y un emoji o la foto de tu perri (o ninguno).</div><div class="bord-note">📷 Si querés la foto, mandánosla por WhatsApp después de comprar :)</div><input type="text" id="x2-bord${n}" placeholder="ej: LUNA 1123456789" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="x2-emojis${n}"></div></div>
+    ${c.hasCorrea?`<div class="fg"><label>Largo de correa</label><select id="x2-largo${n}" onchange="onCx2Largo(${n})"><option value="1.20mt">1.20mt (estándar)</option><option value="2mt">2mt</option><option value="3mt">3mt</option><option value="4mt">4mt</option><option value="5mt">5mt</option><option value="10mt">10mt</option></select></div>
+    <div class="fg" id="cx2-swap${n}-wrap"><label>¿Cambiar correa por?</label><select id="cx2-swap${n}"><option value="">Correa (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:''}
+    </div>`).join('');
+}
+
+const MOD_COLOR={'Rojo':'#d62828','Sunset':'#f4743b','Naranja':'#f77f00','Amarillo':'#fcd34d','Verde Fluo':'#7fff00','Bordeaux':'#7b1e3a','Fucsia':'#e6007e','Rosa':'#f9a8c9','Lila':'#c4a1ff','Violeta':'#7c3aed','Azul':'#1d4ed8','Turquesa':'#14b8a6','Celeste':'#7dd3fc','Pu Negro':'#222','Rambo Negro':'#222','Pampa Bordeaux':'#7b1e3a'};
+// ── Talle y color de correa ──
+const COLORES_CORREA=['negra','fucsia','rosa','azul','verde militar','turquesa','celeste','violeta','lila','roja'];
+function normColor(s){
+  const t=String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(!t)return '';
+  if(/negr/.test(t))return 'negra';if(/fucs/.test(t))return 'fucsia';if(/\bros/.test(t))return 'rosa';if(/azul/.test(t))return 'azul';
+  if(/fluo/.test(t))return '';if(/verde|militar/.test(t))return 'verde militar';if(/turq/.test(t))return 'turquesa';
+  if(/cele/.test(t))return 'celeste';if(/viol/.test(t))return 'violeta';if(/lila/.test(t))return 'lila';if(/roj/.test(t))return 'roja';
+  return '';
+}
+const COLOR_MODELO_FIJO={'sunset':'fucsia','ojitos':'rosa','rainbow':'violeta','van gogh':'azul'};
+function defColorModelo(m){m=String(m||'').trim();if(!m)return '';if(COLOR_MODELO_FIJO[m.toLowerCase()])return COLOR_MODELO_FIJO[m.toLowerCase()];const c=normColor(m);if(c)return c;if(/^rambo$/i.test(m))return 'verde militar';return 'negra';}
+const capit=x=>x?x.charAt(0).toUpperCase()+x.slice(1):'';
+function talleSel(id){return`<select id="${id}" onchange="refrescarStock()"><option value="">A confirmar (por WhatsApp)</option>${['XS','S','M','L','XL','XXL'].map(t=>`<option value="${t}">${t}</option>`).join('')}</select>`;}
+function ccolorSel(id){return`<select id="${id}"><option value="">Según el modelo elegido</option>${COLORES_CORREA.map(c=>`<option value="${c}">${capit(c)}</option>`).join('')}</select>`;}
+function colorAuto(m,selId){
+  const sel=document.getElementById(selId);if(!sel)return;
+  const d=defColorModelo(m);
+  sel.options[0].textContent=d?capit(d)+' (más elegida para este modelo)':'Según el modelo elegido';
+}
+function abrirTalle(){document.getElementById('modal-talle').style.display='flex';}
+// ── Stock (se lee de la gestión: tabla stock / mambo_stock = {modelo:{talle:cantidad}}) ──
+let STOCK={};
+async function cargarStock(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/stock?select=data&id=eq.mambo_stock`,{headers:SUPA_H});
+    const j=await r.json();
+    if(Array.isArray(j)&&j.length&&j[0].data&&typeof j[0].data==='object')STOCK=j[0].data;
+  }catch(e){}
+  try{if(document.getElementById('overlay').classList.contains('open'))refrescarStock();}catch(e){}
+}
+function stockQty(m,t){const o=STOCK[m];if(!o)return 0;if(t)return +o[t]||0;return Object.values(o).reduce((a,b)=>a+(+b||0),0);}
+function stockTalles(m){const o=STOCK[m]||{};return ['XS','S','M','L','XL','XXL'].filter(t=>(+o[t]||0)>0);}
+const SEL_STK={'m-mod':['m-mod-grid','m-talle'],'x2-mod1':['x2-mg1','x2-talle1'],'x2-mod2':['x2-mg2','x2-talle2']};
+function refrescarStock(){
+  Object.keys(SEL_STK).forEach(inp=>{
+    const [grid,tsel]=SEL_STK[inp];const g=document.getElementById(grid);if(!g)return;
+    const talle=document.getElementById(tsel)?.value||'';
+    const m=document.getElementById(inp)?.value||'';
+    g.querySelectorAll('.mt').forEach(t=>t.classList.toggle('stk',stockQty(t.dataset.m,talle)>0));
+    // opciones de talle con ✓ si hay stock del modelo elegido
+    const ts=document.getElementById(tsel);
+    if(ts)[...ts.options].forEach(o=>{if(!o.value)return;o.textContent=o.value+(m&&stockQty(m,o.value)>0?'  ✓ en stock':'');});
+    const info=document.getElementById(grid+'-info');
+    if(info){
+      if(!m){info.className='stk-info';info.innerHTML='<span class="stk-sq"></span> <b class="g">Borde verde = en stock.</b> El resto de los modelos disponibles tiene aprox. <b>7 días hábiles</b> de producción.';}
+      else{
+        const q=stockQty(m,talle),tl=stockTalles(m);
+        if(q>0){info.className='stk-info ok';info.innerHTML='<b>'+m+(talle?' talle '+talle:'')+': ¡en stock!</b>';}
+        else if(talle&&tl.length){info.className='stk-info';info.innerHTML='🛠 En talle '+talle+' se fabrica (aprox. <b>7 días hábiles</b>). <b>En stock en: '+tl.join(', ')+'</b>.';}
+        else if(tl.length){info.className='stk-info ok';info.innerHTML='<b>En stock en talle '+tl.join(', ')+'</b> — elegí el talle para confirmarlo.';}
+        else{info.className='stk-info';info.innerHTML='🛠 Se fabrica a pedido: aprox. <b>7 días hábiles</b>.';}
+      }
+    }
+  });
+}
+function renderMG(filter,inp,grid){
+  const cur=document.getElementById(inp)?.value||'';
+  const el=document.getElementById(grid);if(!el)return;
+  const cid=curProd?curProd.id:'';
+  el.innerHTML=MODELOS.map(m=>{
+    const u=PHOTO_THUMB[cid+'|'+m]||PHOTO_URL[cid+'|'+m];
+    const col=MOD_COLOR[m]||'';
+    const inner=u?`<img src="${BASE_URL}${u}" alt="${m}" decoding="async">`:`<i class="mt-ph"${col?` style="--c:${col}"`:''}></i>`;
+    return`<div class="mt${m===cur?' on':''}" data-m="${m}" onclick="selMod('${m}','${inp}','${grid}')"><div class="mt-i">${inner}</div><span>${m}</span><em class="stk-tag"><img src="${BASE_URL}tick.png" alt="" onerror="this.replaceWith(document.createTextNode('✓ '))">En stock!</em></div>`;
+  }).join('');
+  const sel=document.getElementById(inp+'-sel');
+  if(sel){sel.textContent=cur?'· '+cur:'· elegí uno';sel.classList.toggle('ok',!!cur);}
+  refrescarStock();
+}
+function filtMG(v,inp,grid){renderMG(v,inp,grid);}
+function selMod(m,inp,grid){
+  const el=document.getElementById(inp);if(!el)return;
+  if(el.value===m)m='';
+  el.value=m;
+  // sin re-render: solo cambia la marca de selección (instantáneo)
+  document.querySelectorAll('#'+grid+' .mt').forEach(t=>t.classList.toggle('on',t.dataset.m===m));
+  const sel=document.getElementById(inp+'-sel');
+  if(sel){sel.textContent=m?'· '+m:'· elegí uno';sel.classList.toggle('ok',!!m);}
+  actualizarFotoModal(m);
+  const cs={'m-mod':'m-ccolor','x2-mod1':'x2-ccolor1','x2-mod2':'x2-ccolor2'}[inp];if(cs)colorAuto(m,cs);
+  refrescarStock();
+}
+
+// ── Fotos por modelo ──
+// Se busca, en orden:  1) excepción manual FOTOS_MODELOS  2) foto propia del combo: combo1_<modelo>.jpg / combo2_<modelo>.jpg
+// 3) foto del modelo: mod_<modelo>.jpg  →  si no hay ninguna, se muestra la foto genérica del combo.
+// <modelo> = minúsculas, sin acentos, espacios → guiones (ej: van-gogh, rosa-brillito, rock).
+// Las miniaturas y la foto grande usan EL MISMO archivo: se descarga una sola vez y al clickear aparece al instante.
+const FOTOS_MODELOS={'combo1|Lila':'combo1.jpg','combo2|Fucsia':'combo2.jpg','arnes|Van Gogh':'arnes.jpg'};
+const FOTOS_FALLA=new Set();
+const PHOTO_URL={};           // 'combo|Modelo' -> archivo | null (ya resuelto)
+const PHOTO_PEND={};
+function slugModelo(m){return String(m||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function candFoto(cid,m){
+  const sl=slugModelo(m),c=[];
+  if(FOTOS_MODELOS[cid+'|'+m])c.push(FOTOS_MODELOS[cid+'|'+m]);
+  if(cid==='combo1'||cid==='combo2')c.push(cid+'_'+sl+'.jpg');
+  if(FOTOS_MODELOS[m])c.push(FOTOS_MODELOS[m]);
+  c.push('mod_'+sl+'.jpg');
+  return c.filter(x=>!FOTOS_FALLA.has(x));
+}
+function probeImg(f){return new Promise(r=>{const i=new Image();i.decoding='async';i.onload=()=>r(f);i.onerror=()=>{FOTOS_FALLA.add(f);r(null);};i.src=BASE_URL+f;});}
+// Miniaturas: si existe  mini_<archivo>  (ej: mini_mod_pu-negro.jpg) se usa para la cuadrícula (liviana);
+// la foto grande es <archivo>. Si no hay mini, la cuadrícula usa la foto grande (como antes).
+const PHOTO_THUMB={};
+function resolverFoto(cid,m){
+  const k=cid+'|'+m;
+  if(k in PHOTO_URL)return Promise.resolve(PHOTO_URL[k]);
+  if(PHOTO_PEND[k])return PHOTO_PEND[k];
+  return PHOTO_PEND[k]=(async()=>{
+    const list=candFoto(cid,m);
+    const minis=await Promise.all(list.map(f=>probeImg('mini_'+f)));
+    const i=minis.findIndex(Boolean);
+    if(i>=0){PHOTO_THUMB[k]=minis[i];PHOTO_URL[k]=list[i];}
+    else{const rs=await Promise.all(list.map(probeImg));const u=rs.find(Boolean)||null;PHOTO_URL[k]=u;PHOTO_THUMB[k]=u;}
+    delete PHOTO_PEND[k];return PHOTO_URL[k];
+  })();
+}
+function precargarFotos(cid){
+  const ms=[];
+  MODELOS.forEach(m=>resolverFoto(cid,m).then(u=>{
+    if(!u||!curProd||curProd.id!==cid)return;
+    const th=PHOTO_THUMB[cid+'|'+m]||u;
+    document.querySelectorAll('#modal-inner .mt[data-m="'+m.replace(/"/g,'')+'"] .mt-i').forEach(b=>{if(!b.querySelector('img'))b.innerHTML=`<img src="${BASE_URL}${th}" alt="${m}" decoding="async">`;});
+    // foto grande en segundo plano (escalonada) para que al clickear aparezca al instante
+    if(th!==u&&!ms.includes(u)){ms.push(u);setTimeout(()=>{const i=new Image();i.decoding='async';i.src=BASE_URL+u;},300+ms.length*120);}
+  }));
+}
+let _fotoSel='';
+function actualizarFotoModal(m){
+  const box=document.querySelector('#modal-inner .modal-img');if(!box||!curProd)return;
+  const cid=curProd.id,def=FOTOS_COMBOS[cid]||'';
+  _fotoSel=m;
+  const cap=box.querySelector('.modal-cap');
+  const pintar=(u,m2)=>{
+    let img=box.querySelector('img');
+    if(!img){box.insertAdjacentHTML('afterbegin','<img alt="" decoding="async">');img=box.querySelector('img');}
+    const f=BASE_URL+(u||def);
+    img.onerror=()=>{img.onerror=null;img.src=BASE_URL+def;};
+    if(img.getAttribute('src')!==f)img.src=f;
+    img.alt=curProd.name+(m2?' — '+m2:'');
+    if(cap){cap.innerHTML=m2?'<b>'+m2+'</b>'+(u?'':'<small>foto ilustrativa</small>'):'';cap.style.display=m2?'block':'none';}
+  };
+  if(!m){pintar(null,'');return;}
+  const k=cid+'|'+m;
+  if(k in PHOTO_URL){pintar(PHOTO_URL[k],m);return;}      // ya descargada → instantáneo
+  pintar(null,m);                                           // mientras tanto, nada queda en blanco
+  resolverFoto(cid,m).then(u=>{if(_fotoSel===m)pintar(u,m);});
+}
+function renderEmojis(rowId,inpId){
+  const row=document.getElementById(rowId);if(!row)return;
+  row.innerHTML=EMOJIS.map(e=>`<button class="emoji-btn" onclick="addEmoji('${inpId}','${e}')">${e}</button>`).join('');
+}
+function addEmoji(id,e){const el=document.getElementById(id);if(el)el.value=(el.value+e).toUpperCase();}
+function onMLargo(){
+  const largo=document.getElementById('m-largo')?.value||'1.20mt';
+  const p=getP(curProd,largo);
+  const pe=document.getElementById('m-price');if(pe)pe.textContent=fmt(p.transf);
+  const sw=document.getElementById('m-swap-wrap');
+  if(sw)sw.style.display=(!largo||largo==='1.20mt')?'block':'none';
+}
+function onCx2Largo(n){
+  const largo=document.getElementById(`x2-largo${n}`)?.value||'1.20mt';
+  const sw=document.getElementById(`cx2-swap${n}-wrap`);
+  if(sw){sw.style.display=largo==='1.20mt'?'block':'none';if(largo!=='1.20mt')document.getElementById(`cx2-swap${n}`).value='';}
+}
+
+// ── CARRITO ──
+function agregarCarrito(){
+  const c=curProd;
+  const largo=document.getElementById('m-largo')?.value||'1.20mt';
+  const swap=document.getElementById('m-swap')?.value||'';
+  const p=getP(c,largo);
+  const swL={cinturon:'cambia correa por cinturón auto',collar:'cambia correa por collar'};
+  if(c.isX2){
+    const pxU=p.transf/2;
+    [1,2].forEach(n=>{
+      const mod=document.getElementById(`x2-mod${n}`)?.value||'';
+      const bord=document.getElementById(`x2-bord${n}`)?.value||'';
+      const sw=document.getElementById(`cx2-swap${n}`)?.value||'';
+      const lg=document.getElementById(`x2-largo${n}`)?.value||'1.20mt';
+      const tl=document.getElementById(`x2-talle${n}`)?.value||'',cc=document.getElementById(`x2-ccolor${n}`)?.value||'';
+      carrito.push({id:Date.now()+n+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo:lg,swap:sw,swapLabel:sw?swL[sw]:'',precio:pxU,tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:true,pk:claveP(c,largo),pdiv:2});
+    });
+  }else{
+    const mod=document.getElementById('m-mod')?.value||document.getElementById('m-color')?.value||'';
+    const bord=document.getElementById('m-bord')?.value||'';
+    const tl=document.getElementById('m-talle')?.value||'',cc=document.getElementById('m-ccolor')?.value||'';
+    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf,tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:!!document.getElementById('m-talle'),pk:claveP(c,largo),pdiv:1});
+  }
+  updateUI();cerrarModalBtn();abrirDrawer();
+}
+
+function removeItem(id){carrito=carrito.filter(i=>i.id!==id);updateUI();renderCarrito();if(document.getElementById('drw').classList.contains('open'))renderDrawer();}
+
+// ── CARRITO LATERAL ──
+function abrirDrawer(){
+  renderDrawer();
+  document.getElementById('drw').classList.add('open');
+  document.getElementById('drw-back').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function cerrarDrawer(){
+  const d=document.getElementById('drw');if(!d)return;
+  d.classList.remove('open');document.getElementById('drw-back').classList.remove('open');
+  if(!document.getElementById('overlay').classList.contains('open'))document.body.style.overflow='';
+}
+function irAFinalizar(){cerrarDrawer();showView('carrito');}
+function renderDrawer(){
+  const body=document.getElementById('drw-body'),foot=document.getElementById('drw-foot');
+  if(!carrito.length){
+    body.innerHTML='<div class="drw-empty">Todavía no agregaste productos 🐾</div>';
+    foot.innerHTML='<button class="btn-primary" onclick="cerrarDrawer()">Ver productos</button>';return;
+  }
+  const sub=carrito.reduce((s,i)=>s+i.precio,0);
+  body.innerHTML=carrito.map(i=>`<div class="drw-item">
+    <div class="drw-thumb">${FOTOS_COMBOS[i.prodId]?`<img src="${BASE_URL}${FOTOS_COMBOS[i.prodId]}" alt="">`:i.emoji}</div>
+    <div class="drw-info">
+      <div class="drw-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}</div>
+      <div class="drw-det">${detItem(i)}</div>
+      <div class="drw-price">${fmt(i.precio)}</div>
+    </div>
+    <button class="drw-x" onclick="removeItem('${i.id}')" aria-label="Quitar">✕</button>
+  </div>`).join('');
+  foot.innerHTML=`<div class="drw-sub"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+    <div class="drw-note">El envío se elige en el siguiente paso. Gratis a sucursal de Correo Argentino.</div>
+    <button class="btn-primary" onclick="irAFinalizar()">Finalizar compra</button>
+    <button class="btn-secondary" onclick="cerrarDrawer()">Seguir comprando</button>`;
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarDrawer();cerrarModalBtn();}});
+
+function updateUI(){
+  const n=carrito.length;const sub=carrito.reduce((s,i)=>s+i.precio,0);
+  document.getElementById('cart-badge').textContent=n;
+  document.getElementById('fab-label').textContent=`${n} item${n!==1?'s':''}`;
+  document.getElementById('fab-price').textContent=fmt(sub+envioCosto);
+  document.getElementById('fab').classList.toggle('show',n>0);
+}
+
+function detItem(i){
+  const a=[];
+  if(i.conArnes)a.push(i.talle?'Talle '+i.talle:'Talle a confirmar');
+  if(i.largo&&i.largo!=='1.20mt')a.push('Correa '+i.largo);
+  if(i.colorCorrea)a.push('Correa '+i.colorCorrea);
+  if(i.swapLabel)a.push(i.swapLabel);
+  return a.join(' · ');
+}
+function renderCarrito(){
+  const list=document.getElementById('cart-items-list');
+  const empty=document.getElementById('cart-empty');
+  const bot=document.getElementById('cart-bottom');
+  if(!carrito.length){list.innerHTML='';empty.style.display='block';bot.style.display='none';return;}
+  empty.style.display='none';bot.style.display='block';
+  list.innerHTML=carrito.map(i=>`<div class="cart-item-card">
+    <div class="cart-item-icon">${FOTOS_COMBOS[i.prodId]?`<img src="${BASE_URL}${FOTOS_COMBOS[i.prodId]}" alt="">`:i.emoji}</div>
+    <div class="cart-item-info">
+      <div class="cart-item-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}</div>
+      <div class="cart-item-detail">${detItem(i)}</div>
+    </div>
+    <div class="cart-item-price">${fmt(i.precio)}</div>
+    <button class="cart-item-remove" onclick="removeItem('${i.id}')">✕</button>
+  </div>`).join('');
+  renderTotal();
+}
+
+function renderTotal(){
+  const sub=carrito.reduce((s,i)=>s+i.precio,0);const total=sub+envioCosto;
+  document.getElementById('subtotal-val').textContent=fmt(sub);
+  document.getElementById('envio-val').textContent=envioCosto>0?fmt(envioCosto):(envioTipo==='moto'||envioTipo==='motogba'?'A coordinar':'Gratis');
+  document.getElementById('total-val').textContent=fmt(total);
+  document.getElementById('fab-price').textContent=fmt(total);
+}
+
+function envioDom(){return +((precios['Envío a domicilio']||{}).transf)||7000;}
+function selEnvio(tipo,costo,el){
+  envioTipo=tipo;envioCosto=costo;
+  document.querySelectorAll('.envio-opt').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');renderTotal();
+}
+
+let envioModo='luego';
+function setEnvioModo(m){envioModo=m;renderEnvioDatos();}
+function renderEnvioDatos(){
+  const el=document.getElementById('envio-datos');if(!el)return;
+  const suc=envioTipo==='sucursal',dom=envioTipo==='domicilio';
+  if(!suc&&!dom){
+    el.innerHTML=`<div class="notice">${envioTipo==='urquiza'?'📍 Coordinamos el retiro en Urquiza por WhatsApp.':'🏍️ El envío en moto se abona aparte. Coordinamos dirección, horario y costo por WhatsApp.'}</div>`;return;
+  }
+  const v=id=>(document.getElementById(id)?.value||'').replace(/"/g,'&quot;');
+  const campos=envioModo==='ahora'?`${dom?`<div class="fg"><label>Localidad</label><input id="ed-loc" value="${v('ed-loc')}" autocomplete="address-level2"></div><div class="fg"><label>Dirección <span class="lbl-s">(calle, altura, piso, depto)</span></label><input id="ed-dir" value="${v('ed-dir')}" autocomplete="street-address"></div><div class="fg"><label>Código postal</label><input id="ed-cp" value="${v('ed-cp')}" inputmode="numeric"></div>`:`<div class="fg"><label>Sucursal a la que enviamos</label><input id="ed-suc" value="${v('ed-suc')}" placeholder="ej: Sucursal Caballito"><div class="lbl-s" style="margin-top:5px">Podés googlear la que te quede cómoda o buscarla <a href="https://www.correoargentino.com.ar/formularios/sucursales" target="_blank" rel="noopener">acá</a>.</div></div>`}
+    <div class="fg"><label>Mail</label><input id="ed-mail" type="email" value="${v('ed-mail')}" autocomplete="email"></div>
+    ${dom?`<div class="fg"><label>Observaciones <span class="lbl-s">(si hace falta)</span></label><input id="ed-obs" value="${v('ed-obs')}"></div>`:''}`:'';
+  el.innerHTML=`<div class="ed-title">${suc?'🏢 Datos para el envío a sucursal':'🏠 Datos para el envío a domicilio'}</div>
+    <div class="ed-opts"><button type="button" class="ed-opt${envioModo==='luego'?' on':''}" onclick="setEnvioModo('luego')"><b>Los envío luego por WhatsApp</b><span>Lo más rápido: terminás la compra ahora</span></button>
+    <button type="button" class="ed-opt${envioModo==='ahora'?' on':''}" onclick="setEnvioModo('ahora')"><b>Completarlos ahora</b><span>Así lo dejamos listo</span></button></div>${campos}`;
+}
+function datosEnvioTxt(){
+  const g=id=>(document.getElementById(id)?.value||'').trim().slice(0,120);
+  if(envioModo!=='ahora'||(envioTipo!=='sucursal'&&envioTipo!=='domicilio'))return '';
+  const l=[];
+  [['Localidad','ed-loc'],['Dirección','ed-dir'],['C.P.','ed-cp'],['Sucursal','ed-suc'],['Mail','ed-mail'],['Observaciones','ed-obs']].forEach(([k,id])=>{const x=g(id);if(x)l.push(k+': '+x);});
+  return l.join(' | ');
+}
+function waDatosEnvio(){
+  const n=lastPed.nombre||'',pr=lastPed.prov||'';
+  const dom=lastPed.envio==='domicilio';
+  const t=dom?`Hola! Hice un pedido en la web. Te paso los datos para el envío:\n\nNombre y Apellido: ${n}\nProvincia: ${pr}\nLocalidad: \nDirección (Calle-Altura-Piso-Depto): \nC.P.: \nMail: \n\nObservaciones de ser necesario: `
+    :`Hola! Hice un pedido en la web. Te paso los datos para el envío a sucursal de Correo:\n\nNombre y Apellido: ${n}\nProvincia: ${pr}\nMail: \n\nSucursal a la que enviamos: `;
+  return 'https://wa.me/5491140972105?text='+encodeURIComponent(t);
+}
+let lastPed={};
+function irAPago(){
+  const n=document.getElementById('d-nombre').value.trim();
+  const ig=document.getElementById('d-ig').value.trim();
+  const prov=document.getElementById('d-prov').value;
+  if(!n||!ig||!prov){toast('Completá todos los campos');return;}
+  const sub=carrito.reduce((s,i)=>s+i.precio,0);const total=sub+envioCosto;
+  const eL={sucursal:'Correo Sucursal',domicilio:'Correo Domicilio',urquiza:'Retiro Urquiza',moto:'Motito CABA',motogba:'Motito GBA'};
+  document.getElementById('pago-resumen-items').innerHTML=
+    carrito.map(i=>`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>${i.bordado?String(i.bordado).replace(/[<>"`]/g,'')+' · ':''}${i.nombre}${i.modelo?' — '+i.modelo:''}</span><span style="font-weight:700">${fmt(i.precio)}</span></div>`).join('')+
+    `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray3)"><span>Envío — ${eL[envioTipo]||envioTipo}</span><span>${envioCosto>0?fmt(envioCosto):'Gratis'}</span></div>`;
+  document.getElementById('pago-total').textContent=fmt(total);
+  document.getElementById('alias-show').textContent=ALIAS;
+  metodoPago='transf';renderMetodos();
+  showView('pago');
+}
+
+// ── Método de pago (transferencia / Mercado Pago) ──
+let metodoPago='transf';
+function totalMP(){return carrito.reduce((s,i)=>s+Math.round(((precios[i.pk]||{}).mp||0)/(i.pdiv||1)),0);}
+function mpDisponible(){return MP_ACTIVO&&carrito.length&&carrito.every(i=>i.pk&&(precios[i.pk]||{}).mp>0);}
+function setMetodo(m){metodoPago=m;renderMetodos();}
+function renderMetodos(){
+  const box=document.getElementById('pago-metodos'),tb=document.getElementById('pago-transf-box'),nt=document.getElementById('pago-notice'),btn=document.getElementById('btn-confirmar');
+  if(!box)return;
+  if(!mpDisponible()){box.style.display='none';tb.style.display='';if(nt)nt.style.display='';btn.textContent='✅ Confirmar pedido y finalizar compra';return;}
+  const sub=carrito.reduce((s,i)=>s+i.precio,0),mp=totalMP();
+  box.style.display='block';if(nt)nt.style.display='none';
+  box.innerHTML=`<div class="ed-opts">
+    <button type="button" class="ed-opt${metodoPago==='transf'?' on':''}" onclick="setMetodo('transf')"><b>Transferencia bancaria · ${fmt(sub+envioCosto)}</b><span>El mejor precio</span></button>
+    <button type="button" class="ed-opt${metodoPago==='mp'?' on':''}" onclick="setMetodo('mp')"><b>Mercado Pago · ${fmt(mp)} <span style="font-weight:600">(3 cuotas de ${fmt(Math.round(mp/3))})</span></b><span>Tarjeta de crédito o débito${envioCosto>0?' · el envío ('+fmt(envioCosto)+') se transfiere aparte':''}</span></button></div>`;
+  tb.style.display=metodoPago==='transf'?'':'none';
+  document.getElementById('pago-total').textContent=fmt(metodoPago==='mp'?mp:sub+envioCosto);
+  btn.textContent=metodoPago==='mp'?'💳 Pagar con Mercado Pago':'✅ Confirmar pedido y finalizar compra';
+}
+
+const ENVIO_GESTION={sucursal:'Correo Arg Sucursal',domicilio:'Correo Arg Domicilio',urquiza:'Retira Urquiza',moto:'Motito CABA',motogba:'Motito GBA'};
+function notasPedido(){
+  const l=['Pedido desde la web'];
+  if(envioTipo==='sucursal'||envioTipo==='domicilio'){const d=datosEnvioTxt();l.push(d?'Datos de envío: '+d:'Datos de envío: los manda por WhatsApp');}
+  if(carrito.some(i=>i.conArnes&&!i.talle))l.push('Talle a confirmar por WhatsApp');
+  const st=carrito.filter(i=>i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0).map(i=>i.modelo+(i.talle?' '+i.talle:''));
+  if(st.length)l.push('🟢 HAY STOCK: '+st.join(', '));
+  return l.join(' — ');
+}
+async function confirmarPedido(){
+  const n=document.getElementById('d-nombre').value.trim();
+  const ig=document.getElementById('d-ig').value.trim();
+  const prov=document.getElementById('d-prov').value;
+  const sub=carrito.reduce((s,i)=>s+i.precio,0);const total=sub+envioCosto;
+  const lim=x=>String(x||'').replace(/[<>"`]/g,'').slice(0,60);
+  const nId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2,8);
+  const pedido={id:nId,num:Date.now(),fecha:new Date().toISOString(),cliente:lim(ig),nombre:lim(n),provincia:lim(prov),estado:'shop',envio:ENVIO_GESTION[envioTipo]||envioTipo,envioCosto,totalCobrado:(metodoPago==='mp'&&mpDisponible())?totalMP()+envioCosto:total,pago:(metodoPago==='mp'&&mpDisponible())?'mercadopago':'transferencia',pagoEstado:(metodoPago==='mp'&&mpDisponible())?'pendiente':'',origen:'shop',notas:notasPedido(),
+    items:carrito.map(i=>({id:i.id,tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
+  const btn=document.getElementById('btn-confirmar');btn.textContent='Guardando…';btn.disabled=true;
+  try{
+    const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify({id:pedido.id,data:pedido})});
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    lastPed={nombre:n,prov:prov,envio:envioTipo,modo:envioModo,envioCosto};
+    if(metodoPago==='mp'&&mpDisponible()){
+      try{localStorage.setItem('mambo_lastped',JSON.stringify(lastPed));}catch(e){}
+      btn.textContent='Abriendo Mercado Pago…';
+      const rr=await fetch(MP_FN,{method:'POST',headers:SUPA_H,body:JSON.stringify({pedidoId:pedido.id,items:carrito.map(i=>({k:i.pk,div:i.pdiv||1}))})});
+      const dd=await rr.json();
+      if(!rr.ok||!dd.url)throw new Error('mp');
+      window.location.href=dd.url;return;
+    }
+    const ca=document.getElementById('confirm-comprobante');if(ca)ca.href='https://wa.me/5491140972105?text='+encodeURIComponent('Hola!! Realicé un pedido de MAMBO ('+n+') por '+fmt(total)+' y te escribo para dejar el comprobante de la transferencia 😊');
+    const wb=document.getElementById('confirm-envio');
+    if(wb){const nec=(envioTipo==='sucursal'||envioTipo==='domicilio')&&envioModo==='luego';wb.style.display=nec?'block':'none';if(nec)document.getElementById('confirm-envio-a').href=waDatosEnvio();}
+    document.getElementById('confirm-alias').textContent=ALIAS;
+    document.getElementById('confirm-total-val').textContent=`Total: ${fmt(total)}`;
+    showView('confirmado');
+  }catch(e){toast('Error, intentá de nuevo');btn.textContent='✅ Confirmar pedido y finalizar compra';btn.disabled=false;}
+}
+
+function mapTipo(id){const m={arnes:'Arnés',combo1:'Combo 1 — Arnés + Correa',combo2:'Combo 2 — Arnés + Correa + Collar',combox2a:'Arnés',combox2c:'Combo 1 — Arnés + Correa',collar:'Collar',correa:'Correa',cinturon:'Cinturón auto'};return m[id]||id;}
+function copiarAlias(){navigator.clipboard.writeText(ALIAS).then(()=>toast('✓ Alias copiado'));}
+function reiniciar(){carrito=[];envioTipo='sucursal';envioCosto=0;envioModo='luego';updateUI();showView('shop');}
+function showView(id){
+  try{cerrarDrawer();}catch(e){}
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('view-'+id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='carrito')renderCarrito();
+  if(id==='datos')renderEnvioDatos();
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+
+init();
+initBanners();
+cargarStock();
+
+// ── Regreso desde Mercado Pago (?mp=ok | pendiente | error) ──
+(function(){
+  let q;try{q=new URLSearchParams(location.search);}catch(e){return;}
+  const r=q.get('mp');if(!r)return;
+  let lp={};try{lp=JSON.parse(localStorage.getItem('mambo_lastped')||'{}');}catch(e){}
+  lastPed=lp;
+  const t=document.querySelector('#view-confirmado .confirm-title'),box=document.querySelector('#view-confirmado .confirm-box'),ok=document.getElementById('confirm-comprobante')?.parentElement;
+  if(box)box.style.display='none';if(ok)ok.style.display='none';
+  const dom=lp.envioCosto>0;
+  const msg=r==='ok'?'<strong style="color:var(--text)">¡Recibimos tu pago!</strong> En el día te contactamos por WhatsApp para confirmar talle y coordinar el envío.':r==='pendiente'?'Tu pago está <strong style="color:var(--text)">pendiente de acreditación</strong>. Apenas se acredite, te contactamos por WhatsApp.':'<strong style="color:var(--text)">No se pudo completar el pago.</strong> Tu pedido quedó guardado: escribinos por WhatsApp y lo resolvemos.';
+  if(t)t.innerHTML=r==='error'?'Pago<br>no completado':'¡Gracias por<br>tu compra!';
+  const pp=document.querySelector('#view-confirmado .confirm-page > p');if(pp)pp.innerHTML=msg+(dom&&r!=='error'?'<br><br>🏠 El envío a domicilio ('+fmt(lp.envioCosto)+') se transfiere aparte al alias <strong style="color:var(--text)">'+ALIAS+'</strong> (a nombre de Mariano Nahuel Arbotto).':'');
+  const wb=document.getElementById('confirm-envio');
+  if(wb&&r!=='error'&&(lp.envio==='sucursal'||lp.envio==='domicilio')&&lp.modo==='luego'){wb.style.display='block';document.getElementById('confirm-envio-a').href=waDatosEnvio();}
+  showView('confirmado');
+  try{history.replaceState(null,'',location.pathname);}catch(e){}
+})();
+</script>
+</body>
+</html>
