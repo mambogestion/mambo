@@ -319,9 +319,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 .pc{cursor:pointer;display:flex;flex-direction:column}
 .pc-img{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#fff}
 .pc-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .4s,transform .4s}
-.pc-img .card-img-hover{opacity:0}
-.pc:hover .card-img-main{opacity:0}
-.pc:hover .card-img-hover{opacity:1}
+.pc-img .pc-ph{opacity:0}.pc-img .pc-ph.on{opacity:1}
+.pc-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#111;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center;padding:0 0 3px}
+.pc-nav.prev{left:8px}.pc-nav.next{right:8px}
+.pc:hover .pc-nav{opacity:1}.pc-nav:hover{background:#fff}
+.pc-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:3;pointer-events:none}
+.pc-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6);box-shadow:0 0 2px rgba(0,0,0,.4)}.pc-dot.on{background:#fff;transform:scale(1.25)}
+@media(hover:none){.pc-nav{opacity:.9}}
 .pc-img .combo-card-placeholder{position:absolute;inset:0}
 .pc-badge{position:absolute;top:10px;left:10px;background:#fff;color:var(--rose);font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .pc-body{padding:14px 2px 0;display:flex;flex-direction:column;flex:1}
@@ -417,12 +421,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 .bord-hint{font-size:12px;color:var(--gray3);margin-bottom:6px;line-height:1.4}.bord-hint strong{color:var(--text)}
 .mt.stk .mt-i{border-color:#16a34a;box-shadow:0 0 0 1px #16a34a}
 .mt.stk.on .mt-i{border-color:#16a34a;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--rose)}
+.chk-idc{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;margin-bottom:6px}.chk-idc input{width:18px;height:18px;accent-color:#16a34a}.chk-idc b{color:#16a34a}
 .stk-info{font-size:12px;color:var(--gray3);margin-top:4px;line-height:1.4}
 .stk-info.ok{color:#15803d}
 .stk-info b{color:var(--text)}.stk-info.ok b{color:#15803d}
 .stk-sq{display:inline-block;width:11px;height:11px;border:2px solid #16a34a;border-radius:3px;vertical-align:-1px}
 .stk-tag{display:none;font-style:normal;font-size:10.5px;font-weight:800;color:#16a34a;text-align:center;line-height:1;margin-top:3px;white-space:nowrap}
-.mt.stk .stk-tag{display:flex;align-items:center;justify-content:center;gap:3px}
+.mt.stk .stk-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.stk-tag b{display:flex;align-items:center;gap:3px;font-weight:800}.stk-tl{font-size:9.5px;font-weight:700;color:#15803d;line-height:1.1}
 .stk-tag img{height:1em;width:auto;display:block}
 .stk-info b.g{color:#16a34a}
 .stk-info .stk-sq{margin-right:2px}
@@ -733,6 +738,45 @@ const FOTOS_COMBOS_HOVER = {
   arnes: 'arnes_1.jpg',
 };
 
+// Fotos extra de la galería de la portada (se suman a la principal y a la de hover)
+const rango=(p,a,b,e)=>Array.from({length:b-a+1},(_,i)=>p+(a+i)+(e||'.jpg'));
+const FOTOS_EXTRA = {
+  arnes: ['Arnes_2.jpg','Arnes_3.jpg','Arnes_4.jpeg','Arnes_5.jpg'].concat(rango('Arnes_',6,17)),
+  combo1: rango('combo1_',2,5),
+  combo2: rango('combo2_',3,11),
+  combox2a: ['x2_2.jpg'],
+};
+// si una foto no existe con esa extensión, prueba las otras antes de descartarla
+const EXTS=['.jpg','.jpeg','.JPG','.JPEG','.png'];
+function pcErr(im){
+  const card=im.closest('.pc');
+  const m=im.getAttribute('src').match(/^(.*?)(\.[A-Za-z]+)$/);
+  const tried=(im.dataset.t||m[2]).split('|');
+  const nxt=EXTS.find(e=>!tried.includes(e));
+  if(nxt){im.dataset.t=tried.concat(nxt).join('|');im.src=m[1]+nxt;return;}
+  im.remove();if(card){card._i=0;pcSet(card,0);}
+}
+function fotosCard(id){
+  const m=FOTOS_COMBOS[id];if(!m)return[];
+  return[m].concat(FOTOS_COMBOS_HOVER[id]?[FOTOS_COMBOS_HOVER[id]]:[],FOTOS_EXTRA[id]||[]);
+}
+function pcSet(card,i){
+  const im=card.querySelectorAll('.pc-ph');if(!im.length)return;
+  i=(i+im.length)%im.length;card._i=i;
+  im.forEach((e,k)=>e.classList.toggle('on',k===i));
+  const d=card.querySelector('.pc-dots');
+  if(d){d.innerHTML=Array.from(im,(e,k)=>`<i class="pc-dot${k===i?' on':''}"></i>`).join('');}
+  card.querySelectorAll('.pc-nav').forEach(b=>b.style.display=im.length>1?'':'none');
+}
+function pcNav(btn,d){const card=btn.closest('.pc');card._man=true;pcSet(card,(card._i||0)+d);}
+function pcHoverInit(){
+  document.querySelectorAll('#combos-grid .pc').forEach(card=>{
+    card._i=0;
+    card.addEventListener('mouseenter',()=>{if(card.querySelectorAll('.pc-ph').length>1&&!card._man)pcSet(card,1);});
+    card.addEventListener('mouseleave',()=>{card._man=false;pcSet(card,0);});
+  });
+}
+
 const FOTOS_COMBOS = {
   combo1: 'combo1.jpg',
   combo2: 'combo2.jpg',
@@ -740,6 +784,8 @@ const FOTOS_COMBOS = {
   combox2a: 'x2.png',
   combox2c: 'Promox2_correas.png',
   correa: 'CorreaSola.png',
+  collar: 'Collar.jpg',
+  cinturon: 'Cinto.jpg',
 };
 
 const MODELOS=['Rojo','Sunset','Naranja','Amarillo','Verde Fluo','Bordeaux','Fucsia','Rosa','Rosa Brillito','Ojitos','Paris','Summer Rosa','Lila','Violeta','Rainbow','Jean','Azul','Van Gogh','Turquesa','Celeste','Rambo','Rambo Azul','Argentino','Summer Celeste','Rock!','Pu Negro','Rambo Negro','Pampa Bordeaux','Pampa'];
@@ -751,12 +797,12 @@ const COMBOS=[
   {id:'combo2',short:'Combo 2',name:'Arnés MAMBO® + Identificación + Correa + Collar',descCard:'Con su identificación personalizada: nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección. Incluye correa y collar MAMBO®.',desc:'Arnés MAMBO® junto con su identificación personalizada (puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección), correa y collar MAMBO®.',emoji:'🌟',badge:'COMBO 2 · COMPLETO',key:'Combo 2 — ',hasCorrea:true,isX2:false,cc:'card-violeta'},
   {id:'combox2a',short:'Mambo x2 Arneses',name:'2 Arneses MAMBO® + 2 Identificaciones',descCard:'Cada arnés con su identificación personalizada: nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección.',desc:'Dos arneses MAMBO® con sus identificaciones personalizadas (cada una puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección).',emoji:'🐾',badge:'PROMO x2',key:'Mambo x2 (2 arneses)',hasCorrea:false,isX2:true,cc:'card-arcoiris'},
   {id:'combox2c',short:'Mambo x2 + Correas',name:'2 Arneses MAMBO® + 2 Identificaciones + 2 Correas',descCard:'Cada arnés con su identificación personalizada y su correa MAMBO®.',desc:'Dos arneses MAMBO® con sus identificaciones personalizadas (cada una puede llevar nombre solo, uno o dos teléfonos y foto de tu mascota o emoji a elección) y dos correas MAMBO®.',emoji:'🐾',badge:'PROMO x2 + 2 CORREAS',key:'Mambo x2 + 2 correas',hasCorrea:true,isX2:true,cc:'card-verde'},
-  {id:'collar',name:'Collar Sublimado',desc:'Collar sublimado con identificación y bordado',emoji:'🏷️',badge:'',key:'Collar solo',hasCorrea:false,isX2:false,cc:'card-naranja'},
+  {id:'collar',name:'Collar',desc:'Collar MAMBO® con identificación bordada opcional (nombre y teléfonos)',emoji:'🏷️',badge:'IDENTIFICACIÓN OPCIONAL',key:'Collar solo',hasCorrea:false,isX2:false,cc:'card-naranja'},
   {id:'correa',name:'Correa',desc:'Correa a elección de largo',emoji:'🎀',badge:'TODOS LOS LARGOS DISPONIBLES!',key:'Correa sola',hasCorrea:true,isX2:false,cc:'card-negro'},
   {id:'cinturon',name:'Cinturón auto',desc:'Cinturón de seguridad para auto',emoji:'🚗',badge:'',key:'Cinturón seguridad auto',hasCorrea:false,isX2:false,cc:'card-bordo'},
 ];
 
-const PRECIOS_DEFAULT={'Arnés solo':{transf:41990,mp:65970,xCuota:21990},'Collar solo':{transf:12000,mp:16800,xCuota:5600},'Correa sola':{transf:12000,mp:16800,xCuota:5600},'Combo 1 — 1.20mt':{transf:49990,mp:65970,xCuota:21990},'Combo 1 — 2mt':{transf:51990,mp:69870,xCuota:23290},'Combo 1 — 3mt':{transf:53990,mp:73770,xCuota:24590},'Combo 1 — 4mt':{transf:55990,mp:76470,xCuota:25490},'Combo 1 — 5mt':{transf:57990,mp:79170,xCuota:26390},'Combo 1 — 10mt':{transf:64990,mp:89970,xCuota:29990},'Combo 2 — 1.20mt':{transf:61990,mp:77990,xCuota:25997},'Combo 2 — 2mt':{transf:63990,mp:81870,xCuota:27290},'Combo 2 — 3mt':{transf:65990,mp:85770,xCuota:28590},'Combo 2 — 4mt':{transf:67990,mp:89670,xCuota:29890},'Combo 2 — 5mt':{transf:70990,mp:93570,xCuota:31190},'Combo 2 — 10mt':{transf:76990,mp:102570,xCuota:34190},'Collar sublimado':{transf:19990,mp:27990,xCuota:9330},'Mambo x2 (2 arneses)':{transf:65990,mp:75000,xCuota:25000},'Mambo x2 + 2 correas':{transf:79990,mp:89970,xCuota:29990},'Cinturón seguridad auto':{transf:12000,mp:16800,xCuota:5600},'Envío a domicilio':{transf:7000,mp:0,xCuota:0}};
+const PRECIOS_DEFAULT={'Arnés solo':{transf:41990,mp:65970,xCuota:21990},'Collar solo':{transf:12000,mp:16800,xCuota:5600},'Correa sola':{transf:12000,mp:16800,xCuota:5600},'Identificación collar':{transf:7000,mp:9800,xCuota:3267},'Correa sola — 1.20mt':{transf:12000,mp:16800,xCuota:5600},'Correa sola — 2mt':{transf:14000,mp:19600,xCuota:6533},'Correa sola — 3mt':{transf:16000,mp:22400,xCuota:7467},'Correa sola — 4mt':{transf:18000,mp:25200,xCuota:8400},'Correa sola — 5mt':{transf:20000,mp:28000,xCuota:9333},'Correa sola — 10mt':{transf:27000,mp:37800,xCuota:12600},'Combo 1 — 1.20mt':{transf:49990,mp:65970,xCuota:21990},'Combo 1 — 2mt':{transf:51990,mp:69870,xCuota:23290},'Combo 1 — 3mt':{transf:53990,mp:73770,xCuota:24590},'Combo 1 — 4mt':{transf:55990,mp:76470,xCuota:25490},'Combo 1 — 5mt':{transf:57990,mp:79170,xCuota:26390},'Combo 1 — 10mt':{transf:64990,mp:89970,xCuota:29990},'Combo 2 — 1.20mt':{transf:61990,mp:77990,xCuota:25997},'Combo 2 — 2mt':{transf:63990,mp:81870,xCuota:27290},'Combo 2 — 3mt':{transf:65990,mp:85770,xCuota:28590},'Combo 2 — 4mt':{transf:67990,mp:89670,xCuota:29890},'Combo 2 — 5mt':{transf:69990,mp:93570,xCuota:31190},'Combo 2 — 10mt':{transf:76990,mp:102570,xCuota:34190},'Collar sublimado':{transf:19990,mp:27990,xCuota:9330},'Mambo x2 (2 arneses)':{transf:65990,mp:75000,xCuota:25000},'Mambo x2 + 2 correas':{transf:79990,mp:89970,xCuota:29990},'Cinturón seguridad auto':{transf:12000,mp:16800,xCuota:5600},'Envío a domicilio':{transf:7000,mp:0,xCuota:0}};
 
 let precios={},carrito=[],envioTipo='sucursal',envioCosto=0,curProd=null;
 
@@ -766,7 +812,7 @@ async function init(){
   try{
     const r=await fetch(`${SUPA_URL}/rest/v1/precios?select=data&id=eq.mambo_precios`,{headers:SUPA_H});
     const d=await r.json();
-    if(d&&d[0]&&d[0].data)precios=d[0].data;
+    if(d&&d[0]&&d[0].data)precios=Object.assign({},PRECIOS_DEFAULT,d[0].data);
   }catch(e){}
   renderCarrusel();
   renderCombos();
@@ -925,9 +971,10 @@ function renderCombos(){
   document.getElementById('combos-grid').innerHTML=COMBOS.map(c=>{
     const p=getP(c,'1.20mt');const cu=p.xCuota||Math.round(p.mp/3)||0;
     const fotoArchivo=FOTOS_COMBOS[c.id],fotoHover=FOTOS_COMBOS_HOVER[c.id];
+    const fl=fotosCard(c.id);
     const imgHtml=fotoArchivo
-      ?`<img src="${BASE_URL}${fotoArchivo}" alt="${c.name}" loading="lazy" class="card-img-main">
-        ${fotoHover?`<img src="${BASE_URL}${fotoHover}" alt="${c.name}" loading="lazy" class="card-img-hover">`:''}`
+      ?fl.map((f,k)=>`<img src="${BASE_URL}${f}" alt="${c.name}" loading="${k?'lazy':'eager'}" class="pc-ph${k?'':' on'}" onerror="pcErr(this)">`).join('')
+        +(fl.length>1?`<button type="button" class="pc-nav prev" aria-label="Foto anterior" onclick="event.stopPropagation();pcNav(this,-1)">‹</button><button type="button" class="pc-nav next" aria-label="Foto siguiente" onclick="event.stopPropagation();pcNav(this,1)">›</button><div class="pc-dots">${fl.map((f,k)=>`<i class="pc-dot${k?'':' on'}"></i>`).join('')}</div>`:'')
       :`<div class="combo-card-placeholder">${c.emoji}</div>`;
     return`<div class="pc ${c.cc}" onclick="abrirModal('${c.id}')">
       <div class="pc-img">${imgHtml}${c.badge?`<span class="pc-badge">${c.badge}</span>`:''}</div>
@@ -935,22 +982,21 @@ function renderCombos(){
         <h3 class="pc-name">${c.name}</h3>
         <p class="pc-desc">${c.descCard||c.desc}</p>
         ${["arnes","combo1","combo2","combox2a","combox2c"].includes(c.id)?`<div class="pc-envio"><img src="https://cdn-icons-png.flaticon.com/512/2936/2936985.png" alt="" onerror="this.replaceWith(document.createTextNode('🚚 '))"><span>ENVÍO GRATIS a sucursales de Correo Argentino de todo el país</span></div>`:''}
-        <div class="pc-price"><b>${fmt(p.transf)}</b><span class="pc-tr">por transferencia</span></div>
+        <div class="pc-price"><b>${fmt(p.transf)}</b><span class="pc-tr">promo transferencia</span></div>
         ${cu?`<div class="pc-mp">3 cuotas de ${fmt(cu)} con MercadoPago</div>`:''}
         <button class="pc-btn" type="button">COMPRAR</button>
       </div></div>`;
   }).join('');
+  pcHoverInit();
 }
 
 function claveP(c,largo){
-  if(c.hasCorrea&&largo&&largo!=='1.20mt'){const k=c.key+largo;if(precios[k])return k;}
+  if(c.hasCorrea&&largo){for(const k of [c.key+largo,c.key+' — '+largo]){if(precios[k])return k;}}
   const key=c.hasCorrea?c.key+'1.20mt':c.key;
   return precios[key]?key:c.key;
 }
 function getP(c,largo){
-  if(c.hasCorrea&&largo&&largo!=='1.20mt'){const k=c.key+largo;if(precios[k])return precios[k];}
-  const key=c.hasCorrea?c.key+'1.20mt':c.key;
-  return precios[key]||precios[c.key]||{transf:0,mp:0,xCuota:0};
+  return precios[claveP(c,largo)]||precios[c.key]||{transf:0,mp:0,xCuota:0};
 }
 
 // ── MODAL ──
@@ -966,15 +1012,18 @@ function cerrarModalBtn(){document.getElementById('overlay').classList.remove('o
 function renderModal(){
   const c=curProd;const p=getP(c,'1.20mt');const cu=p.xCuota||Math.round(p.mp/3)||0;
   const hasMod=!['collar','correa','cinturon'].includes(c.id);
-  const hasColor=['collar','correa'].includes(c.id);
-  const hasBord=!['correa','cinturon'].includes(c.id);
+  const hasColor=false;
+  const hasBord=!['correa','cinturon','collar'].includes(c.id);
   const hasSwap=!c.isX2&&c.hasCorrea&&(c.id==='combo1'||c.id==='combo2');
   const fotoModal = FOTOS_COMBOS[c.id];
   const talleF=hasMod?`<div class="fg"><label>📏 Talle <a href="#" class="lnk-talle" onclick="abrirTalle();return false">Guía de talles y cómo medir</a></label>${talleSel('m-talle')}</div>`:'';
-  const colF=(c.hasCorrea&&!c.isX2)?`<div class="fg"><label>Color de correa${c.id==='combo2'?' y collar':''}</label>${ccolorSel('m-ccolor')}</div>`:'';
-  const opts=`<div class="opt-row">${talleF}${colF}</div><div class="opt-row">
+  const colF=((c.hasCorrea&&!c.isX2)||c.id==='collar')?`<div class="fg"><label>${c.id==='collar'?'Color del collar':'<b>Color de correa'+(c.id==='combo2'?' y collar':'')+'</b>'}</label>${ccolorSel('m-ccolor',!hasMod)}</div>`:'';
+  const pechoF=hasMod?`<div class="fg"><label>📐 Contorno de pecho (cm) <span class="lbl-s">opcional</span></label><input type="number" inputmode="decimal" min="20" max="120" id="m-pecho" placeholder="ej: 52"><div class="bord-hint" style="margin-top:4px">Es lo único que necesitamos para tu talle. Si no lo tenés, lo confirmás luego por WhatsApp.</div></div>`:'';
+  const hasCollar=c.id==='collar'||c.id==='combo2'||(hasSwap&&c.id==='combo1');
+  const cuelloF=hasCollar?`<div class="fg" id="m-cuello-wrap" style="display:${(c.id==='collar'||c.id==='combo2')?'block':'none'}"><label>📐 Contorno de cuello (cm) <span class="lbl-s">opcional</span></label><input type="number" inputmode="decimal" min="15" max="80" id="m-cuello" placeholder="ej: 35"><div class="bord-hint" style="margin-top:4px">Para el collar. Si no lo tenés, lo confirmás luego por WhatsApp.</div></div>`:'';
+  const opts=`<div class="opt-row">${talleF}${colF}</div>${pechoF}${cuelloF}<div class="opt-row">
     ${c.hasCorrea&&!c.isX2?`<div class="fg"><label>Largo de correa</label><select id="m-largo" onchange="onMLargo()"><option value="1.20mt">1.20mt (estándar)</option><option value="2mt">2mt</option><option value="3mt">3mt</option><option value="4mt">4mt</option><option value="5mt">5mt</option><option value="10mt">10mt</option></select></div>`:''}
-    ${hasSwap?`<div class="fg" id="m-swap-wrap" style="display:block"><label>¿Cambiar correa 1.20mt por?</label><select id="m-swap"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:''}
+    ${hasSwap?`<div class="fg" id="m-swap-wrap" style="display:block"><label>¿Cambiar correa 1.20mt por?</label><select id="m-swap" onchange="toggleCuello()"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:''}
     </div>`;
 
   document.getElementById('modal-inner').innerHTML=`<div class="m-grid${c.isX2?' is-x2':''}">
@@ -1001,13 +1050,36 @@ function renderSingle(c,hasMod,hasColor,hasBord,opts){
   return`${hasMod?`<div class="fg"><label>Modelo <span class="mod-sel" id="m-mod-sel">Elegí un modelo</span></label><input type="hidden" id="m-mod"><div class="mod-grid" id="m-mod-grid"></div><div class="stk-info" id="m-mod-grid-info"></div></div>`:''}
     ${opts||''}
     ${hasColor?`<div class="fg"><label>Color</label><input type="text" id="m-color" placeholder="ej: Negro, Rosa, Celeste…"></div>`:''}
-    ${hasBord?`<div class="fg"><label>🧵 Identificación bordada <span class="lbl-inc">Incluida con tu arnés</span></label><div class="bord-hint">Nombre + hasta 2 teléfonos, y puede llevar <strong>un emoji</strong> o <strong>la foto de tu perri</strong> (o ninguno de los dos). Ej: <strong>LUNA 1123456789 / 1187654321</strong></div><div class="bord-note">📷 Si querés la foto, mandánosla por WhatsApp después de comprar :)</div><input type="text" id="m-bord" placeholder="ej: LUNA 1123456789 / 1187654321" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="m-emojis"></div></div>`:''}`;
+    ${hasBord?`<div class="fg"><label>🧵 Identificación bordada <span class="lbl-inc">Incluida con tu arnés</span></label><div class="bord-hint">Nombre + hasta 2 teléfonos, y puede llevar <strong>un emoji</strong> o <strong>la foto de tu perri</strong> (o ninguno de los dos). Ej: <strong>LUNA 1123456789 / 1187654321</strong></div><div class="bord-note">📷 Si querés la foto, mandánosla por WhatsApp después de comprar :)</div><input type="text" id="m-bord" placeholder="ej: LUNA 1123456789 / 1187654321" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="m-emojis"></div></div>`:''}
+    ${(c.id==='collar'||c.id==='combo2')?bordOpc(c):''}`;
+}
+
+function exIdC(){return precios['Identificación collar']||PRECIOS_DEFAULT['Identificación collar'];}
+function bordOpc(c){
+  const e=exIdC();
+  return`<div class="fg bord-opc"><label class="chk-idc"><input type="checkbox" id="m-idc" onchange="toggleIdC()"> 🧵 Agregar identificación bordada al collar <b>+${fmt(e.transf)}</b></label>
+    <div id="m-idc-box" style="display:none"><div class="bord-hint">Nombre + hasta 2 teléfonos. Ej: <strong>LUNA 1123456789 / 1187654321</strong></div><input type="text" id="m-bordc" placeholder="ej: LUNA 1123456789" oninput="this.value=this.value.toUpperCase()"></div></div>`;
+}
+function toggleCuello(){const w=document.getElementById('m-cuello-wrap');if(!w||!curProd||curProd.id!=='combo1')return;w.style.display=document.getElementById('m-swap')?.value==='collar'?'block':'none';}
+function toggleIdC(){
+  const on=document.getElementById('m-idc')?.checked;
+  const b=document.getElementById('m-idc-box');if(b)b.style.display=on?'block':'none';
+  precioModal();
+}
+function precioModal(){
+  const c=curProd;if(!c)return;
+  const largo=document.getElementById('m-largo')?.value||'1.20mt';
+  const p=getP(c,largo);const on=document.getElementById('m-idc')?.checked;
+  const t=p.transf+(on?exIdC().transf:0);
+  const pe=document.getElementById('m-price');if(pe)pe.textContent=fmt(t);
+  const pm=document.querySelector('.modal-price-mp');
+  if(pm){const mp=(p.mp||0)+(on?(exIdC().mp||0):0);pm.textContent='3x '+fmt(Math.round(mp/3))+' con MercadoPago';}
 }
 
 function renderPerros(c){
   return[1,2].map(n=>`<div class="perro-card"><div class="perro-label">🐾 Perro ${n}</div>
     <div class="fg" style="margin-bottom:10px"><label>Modelo <span class="mod-sel" id="x2-mod${n}-sel">Elegí un modelo</span></label><input type="hidden" id="x2-mod${n}"><div class="mod-grid" id="x2-mg${n}"></div><div class="stk-info" id="x2-mg${n}-info"></div></div>
-    <div class="opt-row"><div class="fg" style="margin-bottom:10px"><label>📏 Talle <a href="#" class="lnk-talle" onclick="abrirTalle();return false">Guía de talles y cómo medir</a></label>${talleSel('x2-talle'+n)}</div>${c.hasCorrea?`<div class="fg" style="margin-bottom:10px"><label>Color de correa</label>${ccolorSel('x2-ccolor'+n)}</div>`:''}</div>
+    <div class="opt-row"><div class="fg" style="margin-bottom:10px"><label>📏 Talle <a href="#" class="lnk-talle" onclick="abrirTalle();return false">Guía de talles y cómo medir</a></label>${talleSel('x2-talle'+n)}</div><div class="fg" style="margin-bottom:10px"><label>📐 Pecho (cm) <span class="lbl-s">opcional</span></label><input type="number" inputmode="decimal" min="20" max="120" id="x2-pecho${n}" placeholder="ej: 52"></div>${c.hasCorrea?`<div class="fg" style="margin-bottom:10px"><label>Color de correa</label>${ccolorSel('x2-ccolor'+n)}</div>`:''}</div>
     <div class="fg" style="margin-bottom:${c.hasCorrea?'10px':'0'}"><label>🧵 Identificación bordada <span class="lbl-inc">Incluida</span></label><div class="bord-hint">Nombre + hasta 2 teléfonos, y un emoji o la foto de tu perri (o ninguno).</div><div class="bord-note">📷 Si querés la foto, mandánosla por WhatsApp después de comprar :)</div><input type="text" id="x2-bord${n}" placeholder="ej: LUNA 1123456789" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="x2-emojis${n}"></div></div>
     ${c.hasCorrea?`<div class="fg"><label>Largo de correa</label><select id="x2-largo${n}" onchange="onCx2Largo(${n})"><option value="1.20mt">1.20mt (estándar)</option><option value="2mt">2mt</option><option value="3mt">3mt</option><option value="4mt">4mt</option><option value="5mt">5mt</option><option value="10mt">10mt</option></select></div>
     <div class="fg" id="cx2-swap${n}-wrap"><label>¿Cambiar correa por?</label><select id="cx2-swap${n}"><option value="">Correa (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:''}
@@ -1029,7 +1101,7 @@ const COLOR_MODELO_FIJO={'sunset':'fucsia','ojitos':'rosa','rainbow':'violeta','
 function defColorModelo(m){m=String(m||'').trim();if(!m)return '';if(COLOR_MODELO_FIJO[m.toLowerCase()])return COLOR_MODELO_FIJO[m.toLowerCase()];const c=normColor(m);if(c)return c;if(/^rambo$/i.test(m))return 'verde militar';return 'negra';}
 const capit=x=>x?x.charAt(0).toUpperCase()+x.slice(1):'';
 function talleSel(id){return`<select id="${id}" onchange="refrescarStock()"><option value="">A confirmar (por WhatsApp)</option>${['XS','S','M','L','XL','XXL'].map(t=>`<option value="${t}">${t}</option>`).join('')}</select>`;}
-function ccolorSel(id){return`<select id="${id}"><option value="">Según el modelo elegido</option>${COLORES_CORREA.map(c=>`<option value="${c}">${capit(c)}</option>`).join('')}</select>`;}
+function ccolorSel(id,sm){return`<select id="${id}"><option value="">${sm?'A confirmar (por WhatsApp)':'Según el modelo elegido'}</option>${COLORES_CORREA.map(c=>`<option value="${c}">${capit(c)}</option>`).join('')}</select>`;}
 function colorAuto(m,selId){
   const sel=document.getElementById(selId);if(!sel)return;
   const d=defColorModelo(m);
@@ -1047,6 +1119,7 @@ async function cargarStock(){
   try{if(document.getElementById('overlay').classList.contains('open'))refrescarStock();}catch(e){}
 }
 function stockQty(m,t){const o=STOCK[m];if(!o)return 0;if(t)return +o[t]||0;return Object.values(o).reduce((a,b)=>a+(+b||0),0);}
+function listaTalles(a){return a.length>1?a.slice(0,-1).join(', ')+' y '+a[a.length-1]:a.join('');}
 function stockTalles(m){const o=STOCK[m]||{};return ['XS','S','M','L','XL','XXL'].filter(t=>(+o[t]||0)>0);}
 const SEL_STK={'m-mod':['m-mod-grid','m-talle'],'x2-mod1':['x2-mg1','x2-talle1'],'x2-mod2':['x2-mg2','x2-talle2']};
 function refrescarStock(){
@@ -1054,7 +1127,7 @@ function refrescarStock(){
     const [grid,tsel]=SEL_STK[inp];const g=document.getElementById(grid);if(!g)return;
     const talle=document.getElementById(tsel)?.value||'';
     const m=document.getElementById(inp)?.value||'';
-    g.querySelectorAll('.mt').forEach(t=>t.classList.toggle('stk',stockQty(t.dataset.m,talle)>0));
+    g.querySelectorAll('.mt').forEach(t=>{t.classList.toggle('stk',stockQty(t.dataset.m,talle)>0);const tl=t.querySelector('.stk-tl');if(tl)tl.textContent=stockTalles(t.dataset.m).join(' · ');});
     // opciones de talle con ✓ si hay stock del modelo elegido
     const ts=document.getElementById(tsel);
     if(ts)[...ts.options].forEach(o=>{if(!o.value)return;o.textContent=o.value+(m&&stockQty(m,o.value)>0?'  ✓ en stock':'');});
@@ -1063,9 +1136,9 @@ function refrescarStock(){
       if(!m){info.className='stk-info';info.innerHTML='<span class="stk-sq"></span> <b class="g">Borde verde = en stock.</b> El resto de los modelos disponibles tiene aprox. <b>7 días hábiles</b> de producción.';}
       else{
         const q=stockQty(m,talle),tl=stockTalles(m);
-        if(q>0){info.className='stk-info ok';info.innerHTML='<b>'+m+(talle?' talle '+talle:'')+': ¡en stock!</b>';}
-        else if(talle&&tl.length){info.className='stk-info';info.innerHTML='🛠 En talle '+talle+' se fabrica (aprox. <b>7 días hábiles</b>). <b>En stock en: '+tl.join(', ')+'</b>.';}
-        else if(tl.length){info.className='stk-info ok';info.innerHTML='<b>En stock en talle '+tl.join(', ')+'</b> — elegí el talle para confirmarlo.';}
+        if(q>0){info.className='stk-info ok';info.innerHTML='<b>'+m+(talle?' talle '+talle:'')+': ¡en stock!</b>'+(tl.length>1?' En stock en talles '+listaTalles(tl)+'.':'');}
+        else if(talle&&tl.length){info.className='stk-info';info.innerHTML='🛠 En talle '+talle+' se fabrica (aprox. <b>7 días hábiles</b>). <b>En stock en talle'+(tl.length>1?'s':'')+' '+listaTalles(tl)+'</b>.';}
+        else if(tl.length){info.className='stk-info ok';info.innerHTML='<b>En stock en talle'+(tl.length>1?'s':'')+' '+listaTalles(tl)+'</b> — elegí el talle para confirmarlo.';}
         else{info.className='stk-info';info.innerHTML='🛠 Se fabrica a pedido: aprox. <b>7 días hábiles</b>.';}
       }
     }
@@ -1079,7 +1152,7 @@ function renderMG(filter,inp,grid){
     const u=PHOTO_THUMB[cid+'|'+m]||PHOTO_URL[cid+'|'+m];
     const col=MOD_COLOR[m]||'';
     const inner=u?`<img src="${BASE_URL}${u}" alt="${m}" decoding="async">`:`<i class="mt-ph"${col?` style="--c:${col}"`:''}></i>`;
-    return`<div class="mt${m===cur?' on':''}" data-m="${m}" onclick="selMod('${m}','${inp}','${grid}')"><div class="mt-i">${inner}</div><span>${m}</span><em class="stk-tag"><img src="${BASE_URL}tick.png" alt="" onerror="this.replaceWith(document.createTextNode('✓ '))">En stock!</em></div>`;
+    return`<div class="mt${m===cur?' on':''}" data-m="${m}" onclick="selMod('${m}','${inp}','${grid}')"><div class="mt-i">${inner}</div><span>${m}</span><em class="stk-tag"><b><img src="${BASE_URL}tick.png" alt="" onerror="this.replaceWith(document.createTextNode('✓ '))">En stock!</b><small class="stk-tl"></small></em></div>`;
   }).join('');
   const sel=document.getElementById(inp+'-sel');
   if(sel){sel.textContent=cur?'· '+cur:'· elegí uno';sel.classList.toggle('ok',!!cur);}
@@ -1173,7 +1246,7 @@ function addEmoji(id,e){const el=document.getElementById(id);if(el)el.value=(el.
 function onMLargo(){
   const largo=document.getElementById('m-largo')?.value||'1.20mt';
   const p=getP(curProd,largo);
-  const pe=document.getElementById('m-price');if(pe)pe.textContent=fmt(p.transf);
+  precioModal();
   const sw=document.getElementById('m-swap-wrap');
   if(sw)sw.style.display=(!largo||largo==='1.20mt')?'block':'none';
 }
@@ -1198,13 +1271,23 @@ function agregarCarrito(){
       const sw=document.getElementById(`cx2-swap${n}`)?.value||'';
       const lg=document.getElementById(`x2-largo${n}`)?.value||'1.20mt';
       const tl=document.getElementById(`x2-talle${n}`)?.value||'',cc=document.getElementById(`x2-ccolor${n}`)?.value||'';
-      carrito.push({id:Date.now()+n+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo:lg,swap:sw,swapLabel:sw?swL[sw]:'',precio:pxU,tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:true,pk:claveP(c,largo),pdiv:2});
+      const pecho=(document.getElementById(`x2-pecho${n}`)?.value||'').trim().slice(0,6);
+      carrito.push({id:Date.now()+n+'',pecho,prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo:lg,swap:sw,swapLabel:sw?swL[sw]:'',precio:pxU,tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:true,pk:claveP(c,largo),pdiv:2});
     });
   }else{
-    const mod=document.getElementById('m-mod')?.value||document.getElementById('m-color')?.value||'';
-    const bord=document.getElementById('m-bord')?.value||'';
+    const ccSel=document.getElementById('m-ccolor')?.value||'';
+    const mod=document.getElementById('m-mod')?.value||(['collar','correa'].includes(c.id)?ccSel:'');
+    const pecho=(document.getElementById('m-pecho')?.value||'').trim().slice(0,6);
+    const cuelloOn=document.getElementById('m-cuello-wrap')?.style.display!=='none';
+    const cuello=cuelloOn?(document.getElementById('m-cuello')?.value||'').trim().slice(0,6):'';
+    let bord=document.getElementById('m-bord')?.value||'';
+    const idc=!!document.getElementById('m-idc')?.checked;
+    const bc=idc?(document.getElementById('m-bordc')?.value||'').trim():'';
+    if(idc&&!bc){const ii=document.getElementById('m-bordc');if(ii){ii.style.borderColor='#dc2626';ii.focus();}return;}
+    if(c.id==='collar')bord=bc;
+    const exK=idc?'Identificación collar':'';
     const tl=document.getElementById('m-talle')?.value||'',cc=document.getElementById('m-ccolor')?.value||'';
-    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf,tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:!!document.getElementById('m-talle'),pk:claveP(c,largo),pdiv:1});
+    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,bordadoCollar:c.id==='combo2'?bc:'',extra:exK,pecho,cuello,conCollar:cuelloOn,largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf+(exK?exIdC().transf:0),tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:!!document.getElementById('m-talle'),pk:claveP(c,largo),pdiv:1});
   }
   updateUI();cerrarModalBtn();abrirDrawer();
 }
@@ -1234,7 +1317,7 @@ function renderDrawer(){
   body.innerHTML=carrito.map(i=>`<div class="drw-item">
     <div class="drw-thumb">${FOTOS_COMBOS[i.prodId]?`<img src="${BASE_URL}${FOTOS_COMBOS[i.prodId]}" alt="">`:i.emoji}</div>
     <div class="drw-info">
-      <div class="drw-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}</div>
+      <div class="drw-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}${i.bordadoCollar?` <small>(collar: <b>${String(i.bordadoCollar).replace(/[<>"`]/g,'')}</b>)</small>`:''}</div>
       <div class="drw-det">${detItem(i)}</div>
       <div class="drw-price">${fmt(i.precio)}</div>
     </div>
@@ -1272,7 +1355,7 @@ function renderCarrito(){
   list.innerHTML=carrito.map(i=>`<div class="cart-item-card">
     <div class="cart-item-icon">${FOTOS_COMBOS[i.prodId]?`<img src="${BASE_URL}${FOTOS_COMBOS[i.prodId]}" alt="">`:i.emoji}</div>
     <div class="cart-item-info">
-      <div class="cart-item-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}</div>
+      <div class="cart-item-name">${i.bordado?`<strong>${i.bordado}</strong> · `:''}${i.nombre}${i.modelo?' — '+i.modelo:''}${i.bordadoCollar?` <small>(collar: <b>${String(i.bordadoCollar).replace(/[<>"`]/g,'')}</b>)</small>`:''}</div>
       <div class="cart-item-detail">${detItem(i)}</div>
     </div>
     <div class="cart-item-price">${fmt(i.precio)}</div>
@@ -1345,7 +1428,7 @@ function irAPago(){
 
 // ── Método de pago (transferencia / Mercado Pago) ──
 let metodoPago='transf';
-function totalMP(){return carrito.reduce((s,i)=>s+Math.round(((precios[i.pk]||{}).mp||0)/(i.pdiv||1)),0);}
+function totalMP(){return carrito.reduce((s,i)=>s+Math.round(((precios[i.pk]||{}).mp||0)/(i.pdiv||1))+(i.extra?((precios[i.extra]||{}).mp||0):0),0);}
 function mpDisponible(){return MP_ACTIVO&&carrito.length&&carrito.every(i=>i.pk&&(precios[i.pk]||{}).mp>0);}
 function setMetodo(m){metodoPago=m;renderMetodos();}
 function renderMetodos(){
@@ -1355,7 +1438,7 @@ function renderMetodos(){
   const sub=carrito.reduce((s,i)=>s+i.precio,0),mp=totalMP();
   box.style.display='block';if(nt)nt.style.display='none';
   box.innerHTML=`<div class="ed-opts">
-    <button type="button" class="ed-opt${metodoPago==='transf'?' on':''}" onclick="setMetodo('transf')"><b>Transferencia bancaria · ${fmt(sub+envioCosto)}</b><span>El mejor precio</span></button>
+    <button type="button" class="ed-opt${metodoPago==='transf'?' on':''}" onclick="setMetodo('transf')"><b>Promo transferencia bancaria · ${fmt(sub+envioCosto)}</b><span>El mejor precio</span></button>
     <button type="button" class="ed-opt${metodoPago==='mp'?' on':''}" onclick="setMetodo('mp')"><b>Mercado Pago · ${fmt(mp)} <span style="font-weight:600">(3 cuotas de ${fmt(Math.round(mp/3))})</span></b><span>Tarjeta de crédito o débito${envioCosto>0?' · el envío ('+fmt(envioCosto)+') se transfiere aparte':''}</span></button></div>`;
   tb.style.display=metodoPago==='transf'?'':'none';
   document.getElementById('pago-total').textContent=fmt(metodoPago==='mp'?mp:sub+envioCosto);
@@ -1367,6 +1450,10 @@ function notasPedido(){
   const l=['Pedido desde la web'];
   if(envioTipo==='sucursal'||envioTipo==='domicilio'){const d=datosEnvioTxt();l.push(d?'Datos de envío: '+d:'Datos de envío: los manda por WhatsApp');}
   if(carrito.some(i=>i.conArnes&&!i.talle))l.push('Talle a confirmar por WhatsApp');
+  carrito.filter(i=>i.pecho).forEach(i=>l.push('📐 Pecho '+String(i.pecho).replace(/[^0-9.,]/g,'')+' cm ('+i.nombre+(i.modelo?' '+i.modelo:'')+')'));
+  carrito.filter(i=>i.cuello).forEach(i=>l.push('📐 Cuello '+String(i.cuello).replace(/[^0-9.,]/g,'')+' cm ('+i.nombre+')'));
+  if(carrito.some(i=>i.conCollar&&!i.cuello))l.push('Medida de cuello a confirmar por WhatsApp');
+  carrito.filter(i=>i.bordadoCollar).forEach(i=>l.push('🧵 Identificación COLLAR ('+i.nombre+'): '+String(i.bordadoCollar).replace(/[<>"`]/g,'').slice(0,60)));
   const st=carrito.filter(i=>i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0).map(i=>i.modelo+(i.talle?' '+i.talle:''));
   if(st.length)l.push('🟢 HAY STOCK: '+st.join(', '));
   return l.join(' — ');
@@ -1379,7 +1466,7 @@ async function confirmarPedido(){
   const lim=x=>String(x||'').replace(/[<>"`]/g,'').slice(0,60);
   const nId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2,8);
   const pedido={id:nId,num:Date.now(),fecha:new Date().toISOString(),cliente:lim(ig),nombre:lim(n),provincia:lim(prov),estado:'shop',envio:ENVIO_GESTION[envioTipo]||envioTipo,envioCosto,totalCobrado:(metodoPago==='mp'&&mpDisponible())?totalMP()+envioCosto:total,pago:(metodoPago==='mp'&&mpDisponible())?'mercadopago':'transferencia',pagoEstado:(metodoPago==='mp'&&mpDisponible())?'pendiente':'',origen:'shop',notas:notasPedido(),
-    items:carrito.map(i=>({id:i.id,tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
+    items:carrito.map(i=>({id:i.id,tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),bordadoCollar:lim(i.bordadoCollar||''),pecho:lim(i.pecho||''),cuello:lim(i.cuello||''),cuelloAConfirmar:!!(i.conCollar&&!i.cuello),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
   const btn=document.getElementById('btn-confirmar');btn.textContent='Guardando…';btn.disabled=true;
   try{
     const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify({id:pedido.id,data:pedido})});
@@ -1388,7 +1475,7 @@ async function confirmarPedido(){
     if(metodoPago==='mp'&&mpDisponible()){
       try{localStorage.setItem('mambo_lastped',JSON.stringify(lastPed));}catch(e){}
       btn.textContent='Abriendo Mercado Pago…';
-      const rr=await fetch(MP_FN,{method:'POST',headers:SUPA_H,body:JSON.stringify({pedidoId:pedido.id,items:carrito.map(i=>({k:i.pk,div:i.pdiv||1}))})});
+      const rr=await fetch(MP_FN,{method:'POST',headers:SUPA_H,body:JSON.stringify({pedidoId:pedido.id,items:carrito.flatMap(i=>[{k:i.pk,div:i.pdiv||1}].concat(i.extra?[{k:i.extra,div:1}]:[]))})});
       const dd=await rr.json();
       if(!rr.ok||!dd.url)throw new Error('mp');
       window.location.href=dd.url;return;
