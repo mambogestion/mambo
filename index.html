@@ -283,43 +283,28 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
   <img src="https://mambogestion.github.io/mambo/logo.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover">
   <img src="https://mambogestion.github.io/mambo/logoletras_blanco.png" style="height:28px;object-fit:contain">
   <div style="color:rgba(255,255,255,.5);font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:8px">Gestión interna</div>
-  <div style="display:flex;flex-direction:column;gap:10px;width:220px">
-    <input id="login-input" type="password" placeholder="Contraseña" maxlength="20"
-      style="padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:18px;text-align:center;font-family:'Nunito',sans-serif;letter-spacing:4px;outline:none"
+  <div style="display:flex;flex-direction:column;gap:10px;width:260px">
+    <input id="login-email" type="email" placeholder="Email" autocomplete="username"
+      style="padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:15px;font-family:'Nunito',sans-serif;outline:none"
+      onkeydown="if(event.key==='Enter')document.getElementById('login-input').focus()">
+    <input id="login-input" type="password" placeholder="Contraseña" autocomplete="current-password"
+      style="padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:15px;font-family:'Nunito',sans-serif;outline:none"
       onkeydown="if(event.key==='Enter')checkLogin()">
-    <button onclick="checkLogin()"
+    <button id="login-btn" onclick="checkLogin()"
       style="padding:13px;border-radius:12px;background:#db2777;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif">
       Entrar →
     </button>
-    <div id="login-error" style="color:#f87171;font-size:12px;text-align:center;display:none">Contraseña incorrecta</div>
+    <div id="login-error" style="color:#f87171;font-size:12px;text-align:center;display:none">Email o contraseña incorrectos</div>
   </div>
 </div>
-<script>
-(function(){
-  const PWD='4306',KEY='mambo_auth';
-  function checkLogin(){
-    const v=document.getElementById('login-input').value;
-    if(v===PWD){
-      localStorage.setItem(KEY,'1');
-      document.getElementById('login-screen').style.display='none';
-    } else {
-      document.getElementById('login-error').style.display='block';
-      document.getElementById('login-input').value='';
-      document.getElementById('login-input').focus();
-    }
-  }
-  window.checkLogin=checkLogin;
-  if(localStorage.getItem(KEY)!=='1'){
-    document.getElementById('login-screen').style.display='flex';
-  }
-})();
-</script>
+<script>window.checkLogin=function(){if(window.authLogin)window.authLogin();};</script>
 <header class="hdr">
   <div class="hdr-logo">
     <img src="https://mambogestion.github.io/mambo/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">
     <img src="https://mambogestion.github.io/mambo/logoletras_blanco.png" alt="MAMBO Mascotas Exigentes" style="height:26px;object-fit:contain">
   </div>
   <div class="hdr-date" id="hdrDate"></div>
+  <button onclick="authLogout()" title="Cerrar sesión" style="background:rgba(255,255,255,.12);border:none;color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 9px;margin-left:8px;cursor:pointer">Salir</button>
 </header>
 
 <nav class="nav">
@@ -1076,6 +1061,35 @@ const supaHeaders = {
   'apikey': SUPA_KEY,
   'Authorization': 'Bearer ' + SUPA_KEY
 };
+
+// ══════════ LOGIN (Supabase Auth) ══════════
+// La protección real está en la base (RLS): sin sesión válida no se puede leer ni escribir nada.
+const SESS_KEY='mambo_sess';
+function mostrarLogin(){const l=document.getElementById('login-screen');if(l)l.style.display='flex';}
+function authSet(s){localStorage.setItem(SESS_KEY,JSON.stringify({a:s.access_token,r:s.refresh_token,e:Date.now()+(s.expires_in||3600)*1000}));supaHeaders.Authorization='Bearer '+s.access_token;}
+async function authTok(grant,body){try{const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=${grant}`,{method:'POST',headers:{apikey:SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok?await r.json():null;}catch(e){return null;}}
+async function authRefresh(){const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s||!s.r)return false;const d=await authTok('refresh_token',{refresh_token:s.r});if(!d)return false;authSet(d);return true;}
+async function authEnsure(){const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s)return false;if(Date.now()>s.e-120000)return authRefresh();supaHeaders.Authorization='Bearer '+s.a;return true;}
+async function authInit(){
+  const ok=await authEnsure();
+  if(!ok){mostrarLogin();return false;}
+  setInterval(()=>{authRefresh().then(o=>{if(!o)mostrarLogin();});},45*60*1000);
+  return true;
+}
+async function authLogin(){
+  const em=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-input').value;
+  const err=document.getElementById('login-error'),btn=document.getElementById('login-btn');
+  btn.disabled=true;btn.textContent='Entrando…';
+  const d=await authTok('password',{email:em,password:pw});
+  btn.disabled=false;btn.textContent='Entrar →';
+  if(!d){err.style.display='block';document.getElementById('login-input').value='';return;}
+  err.style.display='none';authSet(d);
+  document.getElementById('login-input').value='';
+  document.getElementById('login-screen').style.display='none';
+  setInterval(()=>{authRefresh().then(o=>{if(!o)mostrarLogin();});},45*60*1000);
+  loadData();
+}
+function authLogout(){localStorage.removeItem(SESS_KEY);localStorage.removeItem('mambo_auth');location.reload();}
 
 let pedidos = [];
 let egresos = [];
@@ -4095,6 +4109,7 @@ async function guardarYLink(){
 async function syncPagos(){
   try{
     if(document.getElementById('ov-form')?.classList.contains('on'))return;
+    if(!(await authEnsure()))return;
     const r=await fetch(`${SUPA_URL}/rest/v1/pedidos?select=data`,{headers:supaHeaders});
     const rows=await r.json();if(!Array.isArray(rows))return;
     let cambio=false;
@@ -4102,7 +4117,7 @@ async function syncPagos(){
       const l=pedidos.find(x=>x.id===d.id);if(!l)return;
       if(d.mpPaymentId&&(d.pagoEstado!==l.pagoEstado||d.mpPaymentId!==l.mpPaymentId||d.notas!==l.notas)){
         const nuevoAprob=d.pagoEstado==='aprobado'&&l.pagoEstado!=='aprobado';
-        Object.assign(l,{pago:d.pago,pagoEstado:d.pagoEstado,pagoMP:d.pagoMP,mpPaymentId:d.mpPaymentId,notas:d.notas});
+        Object.assign(l,limpiar({pago:d.pago,pagoEstado:d.pagoEstado,pagoMP:d.pagoMP,mpPaymentId:d.mpPaymentId,notas:d.notas}));
         cambio=true;if(nuevoAprob)toast('💳 Pago aprobado · pedido #'+l.num);
       }
     });
@@ -4110,7 +4125,7 @@ async function syncPagos(){
   }catch(e){}
 }
 setInterval(syncPagos,60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncPagos();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){authEnsure().then(ok=>{if(ok)syncPagos();else mostrarLogin();});}});
 
 // ══════════ RESUMEN PARA WHATSAPP ══════════
 const ALIAS_RESUMEN='MAMBO.ARGENTINA (Mariano Nahuel Arbotto)';
@@ -4222,7 +4237,7 @@ async function deleteFromDB(table, id){
 
 // ── Seguridad: neutraliza HTML en cualquier dato que venga de la base ──
 function limpiar(v){
-  if(typeof v==='string') return v.replace(/[<>"`]/g,'');
+  if(typeof v==='string') return v.replace(/[<>"`\\]/g,'').replace(/'/g,'’');
   if(Array.isArray(v)) return v.map(limpiar);
   if(v&&typeof v==='object'){const o={};for(const k in v)o[k]=limpiar(v[k]);return o;}
   return v;
@@ -4235,6 +4250,7 @@ async function loadData(){
       fetch(`${SUPA_URL}/rest/v1/precios?select=data&id=eq.mambo_precios`, {headers:supaHeaders}),
       fetch(`${SUPA_URL}/rest/v1/stock?select=data&id=eq.mambo_stock`, {headers:supaHeaders})
     ]);
+    if(rPed.status===401||rPed.status===403){mostrarLogin();return;}
     const pedRaw = await rPed.json();
     const egrRaw = await rEgr.json();
     const preRaw = await rPre.json();
@@ -4618,7 +4634,7 @@ document.addEventListener('click', function(e){
   if(pid && iid && est) setEstadoItem(pid, iid, est);
 });
 
-loadData();
+authInit().then(ok=>{if(ok)loadData();});
 loadMesesCollapsed();
 initVista();
 </script>
