@@ -713,6 +713,22 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 </div>
 
 <!-- ═══ MODAL NUEVO / EDITAR ═══ -->
+<div class="ov" id="ov-link"><div class="modal">
+  <div class="mh"></div><button class="mc" onclick="closeOv('ov-link')">✕</button>
+  <div class="mt">💳 Link de pago · Mercado Pago</div>
+  <div id="lk-body"></div>
+</div></div>
+
+<div class="ov" id="ov-res"><div class="modal">
+  <div class="mh"></div><button class="mc" onclick="closeOv('ov-res')">✕</button>
+  <div class="mt">📋 Resumen para WhatsApp</div>
+  <div style="font-size:12px;color:var(--gray3);margin-bottom:6px">Podés editar el texto antes de copiarlo.</div>
+  <textarea id="res-txt" style="width:100%;min-height:300px;font-size:13px;line-height:1.45;font-family:inherit"></textarea>
+  <div id="res-link-row" style="margin-top:8px"></div>
+  <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-pk" style="flex:1" onclick="navigator.clipboard.writeText(document.getElementById('res-txt').value).then(()=>toast('Resumen copiado 📋'))">📋 Copiar resumen</button>
+  <a id="res-wa" class="btn" style="flex:1;text-align:center;background:#25d366;color:#fff;text-decoration:none" target="_blank" rel="noopener" href="#" onclick="this.href='https://wa.me/?text='+encodeURIComponent(document.getElementById('res-txt').value)">WhatsApp</a></div>
+</div></div>
+
 <div class="ov" id="ov-form" onclick="if(event.target===this&&false)closeOv('ov-form')">
 <div class="modal">
   <div class="mh"></div>
@@ -1039,6 +1055,7 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 
   <div class="fg"><label>Notas del pedido (opcional)</label><textarea id="f-notas" placeholder="Observaciones generales…" style="min-height:46px"></textarea></div>
   <button class="btn btn-pk" id="f-save-btn" onclick="savePedido()">Guardar pedido ✓</button>
+  <button class="btn" id="f-link-btn" onclick="guardarYLink()" style="margin-top:8px;background:#0a7cc4;color:#fff;width:100%">💳 Guardar y obtener link de pago</button>
 </div>
 </div>
 
@@ -1050,6 +1067,8 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 <script>
 // ══════════ DATA ══════════
 const SUPA_URL = 'https://fllkkrgsibuizxoerkel.supabase.co';
+// Foto de perro subida desde el shop: solo se acepta una URL de nuestro bucket (evita enlaces ajenos)
+function fotoPerroUrl(i){const u=String((i&&i.fotoUrl)||'');return u.startsWith(SUPA_URL+'/storage/v1/object/public/fotos-perros/')&&/^[A-Za-z0-9:\/._-]+$/.test(u)?u:'';}
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsbGtrcmdzaWJ1aXp4b2Vya2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzOTQwMDgsImV4cCI6MjA4OTk3MDAwOH0.5JoH8xyx6iroGpM5cMKn4_RaCvbuN29TDVQEkld4l4o';
 
 const supaHeaders = {
@@ -1565,7 +1584,7 @@ function pedidoBlock(p, compact=false){
     <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--black)">${fmt(p.totalCobrado||0)}</span>
   </div>`;
 
-  const editBtn=compact?'':`<div style="padding:6px 10px;border-top:1px solid var(--gray2)"><button onclick="openEditar('${p.id}')" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--pink-dark);cursor:pointer">✏️ Editar pedido</button><button onclick="confirmDelete('${p.id}')" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--red);cursor:pointer;margin-left:14px">🗑 Eliminar</button></div>`;
+  const editBtn=compact?'':`<div style="padding:6px 10px;border-top:1px solid var(--gray2)"><button onclick="openEditar('${p.id}')" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--pink-dark);cursor:pointer">✏️ Editar pedido</button><button onclick="resumenWA('${p.id}')" style="background:none;border:none;font-size:12px;font-weight:700;color:#15803d;cursor:pointer;margin-left:14px">📋 Resumen WhatsApp</button><button onclick="linkPagoMP('${p.id}')" style="background:none;border:none;font-size:12px;font-weight:700;color:#0a7cc4;cursor:pointer;margin-left:14px">💳 Link de pago</button><button onclick="confirmDelete('${p.id}')" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--red);cursor:pointer;margin-left:14px">🗑 Eliminar</button>${p.pagoEstado==='aprobado'?'<span style="margin-left:12px;font-size:11px;font-weight:800;color:#15803d">✅ Pagado MP</span>':p.pagoEstado==='pendiente'&&p.pagoMP?'<span style="margin-left:12px;font-size:11px;font-weight:800;color:#b45309">⏳ Link generado</span>':''}</div>`;
 
   return `<div class="pedido-block">${headerHTML}${itemsHTML}${totalFooter}${editBtn}</div>`;
 }
@@ -3786,8 +3805,7 @@ function renderIL(){
     if(i.colorCorrea)ex.push('Correa '+i.colorCorrea);
     if(i.mosq)ex.push('Mosq. '+i.mosq);
     if(i.bordadoCollar)ex.push('🧵 ID collar: '+i.bordadoCollar);
-    if(i.pecho)ex.push('📐 Pecho '+i.pecho+' cm');
-    if(i.cuello)ex.push('📐 Cuello '+i.cuello+' cm');
+    if(fotoPerroUrl(i))ex.push('<a href="'+fotoPerroUrl(i)+'" target="_blank" rel="noopener" style="color:var(--pink-dark);font-weight:800">📷 foto del perro</a>');
     if(i.cuelloAConfirmar)ex.push('Cuello a confirmar');
     const combx2badge=i.esCombx2?`<span style="background:var(--pink);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-right:4px">x2</span>`:'';
     return `<div class="ir">
@@ -3985,6 +4003,181 @@ function closeOv(id){document.getElementById(id).classList.remove('on');}
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o&&o.id!=='ov-form')o.classList.remove('on');}));
 
 // ══════════ HELPERS ══════════
+
+// ══════════ LINK DE PAGO MERCADO PAGO ══════════
+// Usa la misma función crear-pago que el shop: recalcula el monto en el servidor con la tabla de precios (campo "MP total").
+// El envío nunca va en el link: se transfiere aparte.
+function itemsMP(p){
+  const out=[],sinPrecio=[];
+  (p.items||[]).forEach(i=>{
+    const t=i.tipo||'',lg=i.largo||'1.20mt',cant=Math.max(1,parseInt(i.cant)||1);
+    let keys=[],div=1;
+    if(i.esCombx2){keys=[/Combo 1/.test(t)?'Mambo x2 + 2 correas':'Mambo x2 (2 arneses)'];div=2;}
+    else if(t==='Arnés')keys=['Arnés solo'];
+    else if(t.startsWith('Combo 1'))keys=['Combo 1 — '+lg];
+    else if(t.startsWith('Combo 2'))keys=['Combo 2 — '+lg];
+    else if(t==='Correa')keys=['Correa sola — '+lg];
+    else if(t==='Collar'){keys=['Collar solo'];if((i.bordado||'').trim())keys.push('Identificación collar');}
+    else if(t==='Collar sublimado')keys=['Collar sublimado'];
+    else if(t.startsWith('Cinturón'))keys=['Cinturón seguridad auto'];
+    else{sinPrecio.push(t||'ítem');return;}
+    if(t.startsWith('Combo 2')&&(i.bordadoCollar||'').trim())keys.push('Identificación collar');
+    for(let c=0;c<cant;c++)keys.forEach(k=>{
+      const pr=preciosData[k];
+      if(!pr||!(pr.mp>0)){sinPrecio.push(k);return;}
+      out.push({k,div,mp:Math.round(pr.mp/div),modelo:i.modelo||''});
+    });
+  });
+  return {lineas:out,sinPrecio};
+}
+let _lkPed=null;
+function linkPagoMP(id){
+  const p=pedidos.find(x=>x.id===id);if(!p){toast('Pedido no encontrado');return;}
+  _lkPed=p;
+  const {lineas,sinPrecio}=itemsMP(p);
+  const total=lineas.reduce((s,l)=>s+l.mp,0);
+  const body=document.getElementById('lk-body');
+  if(!lineas.length||lineas.length>12){body.innerHTML='<div style="padding:14px;font-size:13px">'+(lineas.length?'El pedido tiene demasiados ítems para un solo link (máx. 12).':'Este pedido no tiene ítems con precio de Mercado Pago cargado.')+'</div>';openOv('ov-link');return;}
+  body.innerHTML=`<div style="font-size:12px;color:var(--gray3);margin-bottom:8px">Pedido #${p.num} · ${p.cliente||''}</div>
+  ${lineas.map(l=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--gray2)"><span>${l.k}${l.modelo?' — '+l.modelo:''}${l.div>1?' (½)':''}</span><b>${fmt(l.mp)}</b></div>`).join('')}
+  <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding:10px 0 2px"><span>Total Mercado Pago</span><span>${fmt(total)}</span></div>
+  <div style="font-size:12px;color:var(--gray3)">3 cuotas de ${fmt(Math.round(total/3))} · el envío se transfiere aparte</div>
+  ${sinPrecio.length?`<div style="margin-top:8px;font-size:12px;color:#b45309;font-weight:700">⚠️ Sin precio MP (no se incluyen): ${sinPrecio.join(', ')}</div>`:''}
+  <button class="btn btn-pk" id="lk-gen" style="margin-top:12px;width:100%" onclick="generarLinkMP()">Obtener link de pago</button>
+  <div id="lk-res"></div>`;
+  openOv('ov-link');
+}
+async function crearLinkMP(p){
+  await saveOnePedido(p);   // la función necesita que el pedido ya esté en la base
+  const {lineas}=itemsMP(p);
+  const r=await fetch(`${SUPA_URL}/functions/v1/crear-pago`,{method:'POST',headers:supaHeaders,body:JSON.stringify({pedidoId:p.id,items:lineas.map(l=>({k:l.k,div:l.div}))})});
+  const d=await r.json();
+  if(!r.ok||!d.url)throw new Error(d.error||('error '+r.status));
+  p.pago='mercadopago';p.pagoEstado='pendiente';p.pagoMP=d.total;p.linkMP=d.url;
+  await saveOnePedido(p);
+  return d;
+}
+async function generarLinkMP(){
+  const p=_lkPed;if(!p)return;
+  const btn=document.getElementById('lk-gen'),res=document.getElementById('lk-res');
+  btn.disabled=true;btn.textContent='Generando…';
+  try{
+    await saveOnePedido(p);   // la función necesita que el pedido ya esté en la base
+    const {lineas}=itemsMP(p);
+    const r=await fetch(`${SUPA_URL}/functions/v1/crear-pago`,{method:'POST',headers:supaHeaders,body:JSON.stringify({pedidoId:p.id,items:lineas.map(l=>({k:l.k,div:l.div}))})});
+    const d=await r.json();
+    if(!r.ok||!d.url)throw new Error(d.error||('error '+r.status));
+    p.pago='mercadopago';p.pagoEstado='pendiente';p.pagoMP=d.total;p.linkMP=d.url;
+    await saveOnePedido(p);
+    const msg=`Hola! Te paso el link para abonar tu pedido de MAMBO® ($${Number(d.total).toLocaleString('es-AR')} en hasta 3 cuotas sin interés): ${d.url}`;
+    res.innerHTML=`<div style="margin-top:12px;font-size:12px;font-weight:800;color:#15803d">✅ Link listo · ${fmt(d.total)}</div>
+      <input id="lk-url" readonly value="${d.url}" onclick="this.select()" style="width:100%;margin:6px 0;font-size:12px">
+      <div style="display:flex;gap:8px"><button class="btn btn-pk" style="flex:1" onclick="navigator.clipboard.writeText(document.getElementById('lk-url').value).then(()=>toast('Link copiado 📋'))">📋 Copiar link</button>
+      <a class="btn" style="flex:1;text-align:center;background:#25d366;color:#fff;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">WhatsApp</a></div>
+      <button class="btn" style="width:100%;margin-top:8px" onclick="closeOv('ov-link');resumenWA('${p.id}')">📋 Ver resumen completo para WhatsApp</button>`;
+    btn.style.display='none';
+    try{renderAll();}catch(_){}
+  }catch(e){
+    res.innerHTML=`<div style="margin-top:10px;font-size:12px;color:var(--red);font-weight:700">No se pudo generar el link (${String(e.message||e).slice(0,120)}). Revisá que la función crear-pago esté publicada.</div>`;
+    btn.disabled=false;btn.textContent='Reintentar';
+  }
+}
+async function guardarYLink(){
+  const cli=document.getElementById('f-cli').value.trim();
+  if(!cli||!tempItems.length){savePedido();return;}   // muestra el aviso que corresponda
+  const eid=editId,antes=pedidos.length;
+  savePedido();
+  const p=eid?pedidos.find(x=>x.id===eid):pedidos[pedidos.length-1];
+  if(!p||(!eid&&pedidos.length===antes))return;
+  linkPagoMP(p.id);
+}
+// Trae de la base los pagos que Mercado Pago fue confirmando (así no se pisan al guardar desde acá)
+async function syncPagos(){
+  try{
+    if(document.getElementById('ov-form')?.classList.contains('on'))return;
+    const r=await fetch(`${SUPA_URL}/rest/v1/pedidos?select=data`,{headers:supaHeaders});
+    const rows=await r.json();if(!Array.isArray(rows))return;
+    let cambio=false;
+    rows.forEach(({data:d})=>{
+      const l=pedidos.find(x=>x.id===d.id);if(!l)return;
+      if(d.mpPaymentId&&(d.pagoEstado!==l.pagoEstado||d.mpPaymentId!==l.mpPaymentId||d.notas!==l.notas)){
+        const nuevoAprob=d.pagoEstado==='aprobado'&&l.pagoEstado!=='aprobado';
+        Object.assign(l,{pago:d.pago,pagoEstado:d.pagoEstado,pagoMP:d.pagoMP,mpPaymentId:d.mpPaymentId,notas:d.notas});
+        cambio=true;if(nuevoAprob)toast('💳 Pago aprobado · pedido #'+l.num);
+      }
+    });
+    if(cambio)renderAll();
+  }catch(e){}
+}
+setInterval(syncPagos,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncPagos();});
+
+// ══════════ RESUMEN PARA WHATSAPP ══════════
+const ALIAS_RESUMEN='MAMBO.ARGENTINA (Mariano Nahuel Arbotto)';
+const arsM=n=>'$ '+Math.round(n).toLocaleString('es-AR');
+function bloquesResumen(p){
+  const bl=[],items=p.items||[];
+  const x2=items.filter(i=>i.esCombx2),resto=items.filter(i=>!i.esCombx2);
+  const datos=i=>[i.modelo?i.modelo:'',(i.talle&&i.talle!=='Sin talle'&&!noTalleItem(i))?'talle '+i.talle:''].filter(Boolean).join(' · ');
+  const corr=i=>'Correa MAMBO®'+((i.largo&&i.largo!=='1.20mt')?' '+i.largo.replace('mt',' mt'):'');
+  for(let k=0;k<x2.length;k+=2){
+    const a=x2[k],b=x2[k+1]||a,conCorr=/Combo 1/.test(a.tipo||'');
+    bl.push({t:conCorr?'🐶 PROMO x2 + 2 correas MAMBO®':'🐶 PROMO x2 MAMBO®',l:['2 Arneses MAMBO®'+(datos(a)||datos(b)?' ('+[datos(a),datos(b)].filter(Boolean).join(' / ')+')':''),'2 Identificaciones con nombre y tel'].concat(conCorr?['2 Correas MAMBO®']:[]),precio:(a.precio||0)+(b.precio||0)});
+  }
+  resto.forEach(i=>{
+    const t=i.tipo||'',cant=Math.max(1,parseInt(i.cant)||1),d=datos(i),pre=(i.precio||0)*cant,pf=cant>1?cant+' × ':'';
+    let b;
+    if(t.startsWith('Combo 1')){
+      const sw=i.swap==='collar'?'Collar MAMBO®':i.swap==='cinturon'?'Cinturón de seguridad MAMBO®':corr(i);
+      b={t:'✨ '+pf+'Combo 1 MAMBO®',l:['Arnés MAMBO®'+(d?' ('+d+')':''),'Identificación con nombre y tel',sw]};
+    }else if(t.startsWith('Combo 2')){
+      b={t:'🐶 '+pf+'Combo 2 MAMBO®',l:['Arnés MAMBO®'+(d?' ('+d+')':''),'Identificación con nombre y tel',corr(i),'Collar MAMBO®'+((i.bordadoCollar||'').trim()?' con identificación bordada':'')]};
+    }else if(t==='Arnés')b={t:'✨ '+pf+'Arnés MAMBO®',l:['Arnés MAMBO®'+(d?' ('+d+')':''),'Identificación con nombre y tel']};
+    else if(t==='Correa')b={t:'🎀 '+pf+'Correa MAMBO®',l:[corr(i)+(i.modelo?' ('+i.modelo+')':'')]};
+    else if(t==='Collar')b={t:'🐾 '+pf+'Collar MAMBO®',l:['Collar MAMBO®'+(i.modelo?' ('+i.modelo+')':'')].concat((i.bordado||'').trim()?['Identificación bordada']:[])};
+    else if(t==='Collar sublimado')b={t:'🐾 '+pf+'Collar sublimado MAMBO®',l:['Collar sublimado MAMBO®']};
+    else if(t.startsWith('Cinturón'))b={t:'🚗 '+pf+'Cinturón de seguridad MAMBO®',l:['Cinturón de seguridad MAMBO®']};
+    else b={t:'✨ '+pf+(t||'Producto')+' MAMBO®',l:[]};
+    b.precio=pre;bl.push(b);
+  });
+  return bl;
+}
+function textoResumen(p){
+  const bl=bloquesResumen(p),total=bl.reduce((s,b)=>s+b.precio,0);
+  const {lineas,sinPrecio}=itemsMP(p),totMP=lineas.reduce((s,l)=>s+l.mp,0);
+  const out=[];
+  if(bl.length===1){
+    out.push(bl[0].t,'');bl[0].l.forEach(l=>out.push('✔️ '+l));
+  }else{
+    out.push('🐶 Tu pedido MAMBO®','');
+    bl.forEach(b=>{out.push('▪️ '+b.t.replace(/^\S+\s/,''));b.l.forEach(l=>out.push('   ✔️ '+l));});
+  }
+  const env=String(p.envio||''),ec=parseFloat(p.envioCosto)||0;
+  if(/sucursal/i.test(env))out.push('📦 Envío gratis a sucursal de Correo Argentino');
+  else if(/domicilio/i.test(env))out.push('🚚 Envío a domicilio'+(ec?': '+arsM(ec)+' (se transfiere aparte)':' (se transfiere aparte)'));
+  else if(/moto/i.test(env))out.push('🏍️ Envío en moto (costo aparte, se transfiere)');
+  out.push('','💵 '+arsM(total)+'  🔥 en Promo transferencia','Alias '+ALIAS_RESUMEN,'');
+  if(totMP>0&&!sinPrecio.length){
+    out.push('💳 Tarjeta de crédito 3 cuotas de '+arsM(totMP/3)+' sin interés 🐾 total '+arsM(totMP)+(p.linkMP?' '+p.linkMP:' (te paso el link de pago)'));
+  }
+  return out.join('\n');
+}
+function resumenWA(id){
+  const p=pedidos.find(x=>x.id===id);if(!p){toast('Pedido no encontrado');return;}
+  _lkPed=p;
+  document.getElementById('res-txt').value=textoResumen(p);
+  const row=document.getElementById('res-link-row');
+  const {lineas,sinPrecio}=itemsMP(p);
+  row.innerHTML=p.linkMP?`<div style="font-size:12px;color:#15803d;font-weight:700">✅ Incluye el link de pago de Mercado Pago</div>`
+    :(lineas.length&&!sinPrecio.length?`<button class="btn" style="width:100%;background:#0a7cc4;color:#fff" id="res-gen" onclick="resumenConLink()">💳 Generar link de pago e incluirlo</button>`:`<div style="font-size:12px;color:#b45309;font-weight:700">${sinPrecio.length?'⚠️ Hay ítems sin precio MP: el resumen sale sin la parte de tarjeta.':''}</div>`);
+  openOv('ov-res');
+}
+async function resumenConLink(){
+  const p=_lkPed;if(!p)return;const b=document.getElementById('res-gen');b.disabled=true;b.textContent='Generando link…';
+  try{await crearLinkMP(p);try{renderAll();}catch(_){}resumenWA(p.id);toast('Link incluido ✅');}
+  catch(e){b.disabled=false;b.textContent='Reintentar: '+String(e.message||e).slice(0,60);}
+}
+
 async function saveOnePedido(p){
   try {
     await fetch(`${SUPA_URL}/rest/v1/pedidos`, {
@@ -4306,12 +4499,13 @@ function rBordados(){
   const rows=[];
   filtPed.forEach(p=>{
     p.items.forEach(i=>{
-      if(i.bordado&&i.bordado.trim()){
+      if((i.bordado&&i.bordado.trim())||fotoPerroUrl(i)){
         rows.push({
+          foto: fotoPerroUrl(i),
           key:p.id+'|'+i.id,
           pid:p.id, iid:i.id,
           num:p.num,
-          nombre:i.bordado.trim().toUpperCase(),
+          nombre:((i.bordado||'').trim().toUpperCase())||'📷 SOLO FOTO',
           producto:i.tipo.replace('Combo 1 — Arnés + Correa','Combo 1').replace('Combo 2 — Arnés + Correa + Collar','Combo 2'),
           modelo:i.modelo||'',
           talle:i.talle&&i.talle!=='Sin talle'?i.talle:'',
@@ -4362,7 +4556,7 @@ function rBordados(){
           return `<tr>
             <td><input type="checkbox" ${bordSel.has(r.key)?'checked':''} onchange="bordToggleSel('${r.key}',this)" style="width:20px;height:20px;cursor:pointer;accent-color:var(--pink-dark)"></td>
             <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${r.num}</td>
-            <td><div class="bord-name">${r.nombre}</div></td>
+            <td><div class="bord-name">${r.nombre}</div>${r.foto?`<a href="${r.foto}" target="_blank" rel="noopener" style="font-size:12px;font-weight:800;color:var(--pink-dark)">📷 ver foto</a>`:''}</td>
             <td><div style="font-size:13px;font-weight:700">${r.producto}${r.modelo?' — '+r.modelo:''}</div></td>
             <td><span class="pt-talle">${r.talle||'—'}</span></td>
             <td><span class="badge ${estObj.c}">${estObj.e} ${estObj.l}</span></td>
@@ -4377,7 +4571,7 @@ function rBordados(){
       <tbody>
         ${hechos.map(r=>`<tr>
           <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--pink-dark)">#${r.num}</td>
-          <td><div class="bord-name" style="color:var(--pink-dark)">${r.nombre}</div></td>
+          <td><div class="bord-name" style="color:var(--pink-dark)">${r.nombre}</div>${r.foto?`<a href="${r.foto}" target="_blank" rel="noopener" style="font-size:12px;font-weight:800;color:var(--pink-dark)">📷 ver foto</a>`:''}</td>
           <td><div style="font-size:13px;font-weight:700">${r.producto}${r.modelo?' — '+r.modelo:''}</div></td>
           <td><span class="pt-talle">${r.talle||'—'}</span></td>
           <td style="text-align:right"><button onclick="bordDeshacer('${r.pid}','${r.iid}')" title="Volver a pendientes" style="background:#fff;border:1.5px solid #9ca3af;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:800;cursor:pointer;color:#374151">↩ Pendiente</button></td>
