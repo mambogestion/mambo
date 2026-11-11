@@ -1106,24 +1106,31 @@ const tieneArnes=t=>t&&(t.includes('Arnés')||t.includes('Combo 1')||t.includes(
 const TALLES_STOCK=['XS','S','M','L','XL','XXL'];
 
 const PRECIOS_DEFAULT={
-  'Arnés solo':                {transf:38990, mp:47970, cuotas:3, xCuota:15990},
-  'Combo 1 — 1.20mt':          {transf:48990, mp:59970, cuotas:3, xCuota:19990},
-  'Combo 1 — 2mt':             {transf:50990, mp:63870, cuotas:3, xCuota:21290},
-  'Combo 1 — 3mt':             {transf:52990, mp:67770, cuotas:3, xCuota:22590},
-  'Combo 1 — 4mt':             {transf:54990, mp:71670, cuotas:3, xCuota:23890},
-  'Combo 1 — 5mt':             {transf:56990, mp:75570, cuotas:3, xCuota:25190},
-  'Combo 1 — 10mt':            {transf:60990, mp:85470, cuotas:3, xCuota:28490},
-  'Combo 2 — 1.20mt':          {transf:58990, mp:69990, cuotas:3, xCuota:23330},
-  'Combo 2 — 2mt':             {transf:60990, mp:72990, cuotas:3, xCuota:24330},
-  'Combo 2 — 3mt':             {transf:62990, mp:75990, cuotas:3, xCuota:25330},
-  'Combo 2 — 4mt':             {transf:64990, mp:78990, cuotas:3, xCuota:26330},
-  'Combo 2 — 5mt':             {transf:66990, mp:81990, cuotas:3, xCuota:27330},
-  'Combo 2 — 10mt':            {transf:70990, mp:90990, cuotas:3, xCuota:30330},
-  'Mambo x2 (2 arneses)':      {transf:59990, mp:74970, cuotas:3, xCuota:24990},
-  'Mambo x2 + 2 correas':      {transf:79990, mp:98970, cuotas:3, xCuota:32990},
+  'Arnés solo':                {transf:41990, mp:65970, cuotas:3, xCuota:21990},
+  'Combo 1 — 1.20mt':          {transf:49990, mp:65970, cuotas:3, xCuota:21990},
+  'Combo 1 — 2mt':             {transf:51990, mp:69870, cuotas:3, xCuota:23290},
+  'Combo 1 — 3mt':             {transf:53990, mp:73770, cuotas:3, xCuota:24590},
+  'Combo 1 — 4mt':             {transf:55990, mp:76470, cuotas:3, xCuota:25490},
+  'Combo 1 — 5mt':             {transf:57990, mp:79170, cuotas:3, xCuota:26390},
+  'Combo 1 — 10mt':            {transf:64990, mp:89970, cuotas:3, xCuota:29990},
+  'Combo 2 — 1.20mt':          {transf:61990, mp:77990, cuotas:3, xCuota:25997},
+  'Combo 2 — 2mt':             {transf:63990, mp:81870, cuotas:3, xCuota:27290},
+  'Combo 2 — 3mt':             {transf:65990, mp:85770, cuotas:3, xCuota:28590},
+  'Combo 2 — 4mt':             {transf:67990, mp:89670, cuotas:3, xCuota:29890},
+  'Combo 2 — 5mt':             {transf:69990, mp:93570, cuotas:3, xCuota:31190},
+  'Combo 2 — 10mt':            {transf:76990, mp:102570, cuotas:3, xCuota:34190},
+  'Mambo x2 (2 arneses)':      {transf:65990, mp:75000, cuotas:3, xCuota:25000},
+  'Mambo x2 + 2 correas':      {transf:79990, mp:89970, cuotas:3, xCuota:29990},
   'Correa sola':               {transf:12000, mp:16800, cuotas:3, xCuota:5600},
+  'Identificación collar':     {transf:7000, mp:9800, cuotas:3, xCuota:3267},
+  'Correa sola — 1.20mt': {transf:12000, mp:16800, cuotas:3, xCuota:5600},
+  'Correa sola — 2mt': {transf:14000, mp:19600, cuotas:3, xCuota:6533},
+  'Correa sola — 3mt': {transf:16000, mp:22400, cuotas:3, xCuota:7467},
+  'Correa sola — 4mt': {transf:18000, mp:25200, cuotas:3, xCuota:8400},
+  'Correa sola — 5mt': {transf:20000, mp:28000, cuotas:3, xCuota:9333},
+  'Correa sola — 10mt': {transf:27000, mp:37800, cuotas:3, xCuota:12600},
   'Collar solo':               {transf:12000, mp:16800, cuotas:3, xCuota:5600},
-  'Collar sublimado':          {transf:0,     mp:0,     cuotas:3, xCuota:0},
+  'Collar sublimado':          {transf:19990,     mp:27990,     cuotas:3, xCuota:9330},
   'Cinturón seguridad auto':   {transf:12000, mp:16800, cuotas:3, xCuota:5600},
   'Envío a domicilio':         {transf:7000,  mp:0,     cuotas:1, xCuota:0},
 };
@@ -1145,6 +1152,7 @@ async function savePrecios(){
     const campo=inp.dataset.campo;
     if(preciosData[prod]) preciosData[prod][campo]=parseFloat(inp.value)||0;
   });
+  if(preciosData['Correa sola — 1.20mt']) preciosData['Correa sola']=Object.assign({},preciosData['Correa sola — 1.20mt']);
   Object.keys(preciosData).forEach(prod=>{
     preciosData[prod].xCuota=Math.round((preciosData[prod].mp||0)/3);
   });
@@ -1177,7 +1185,7 @@ function rPrecios(){
           <th style="padding:10px 8px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--pink)">3 cuotas de</th>
         </tr></thead>
         <tbody>
-          ${Object.entries(preciosData).map(([prod,p],i)=>`
+          ${Object.entries(preciosData).filter(([prod])=>prod!=='Correa sola').map(([prod,p],i)=>`
             <tr style="background:${i%2===0?'var(--gray)':'white'}">
               <td style="padding:8px 12px;font-weight:700;font-size:12px">${prod}</td>
               <td style="padding:6px 8px;text-align:center">
@@ -1372,13 +1380,13 @@ function rStock(){
         return `<td style="padding:5px 4px;text-align:center;min-width:60px;opacity:${dimmed?'0.25':'1'};border-left:2px solid var(--gray2)">
           <div style="display:flex;align-items:center;justify-content:center;gap:3px">
             <button onclick="adjStock('${modelo}','${t}',-1)" style="width:20px;height:20px;border-radius:50%;border:none;background:var(--gray2);font-size:13px;cursor:pointer;line-height:1;font-weight:800;flex-shrink:0">−</button>
-            <span style="font-weight:800;font-size:14px;min-width:18px;text-align:center;color:${cant===0?'var(--gray3)':cant<=2?'var(--orange)':'var(--black)'}">${cant}</span>
+            <span style="font-weight:800;font-size:14px;min-width:18px;text-align:center;color:${cant<0?'#dc2626':cant===0?'var(--gray3)':cant<=2?'var(--orange)':'var(--black)'}">${cant}</span>
             <button onclick="adjStock('${modelo}','${t}',1)" style="width:20px;height:20px;border-radius:50%;border:none;background:var(--pink);color:white;font-size:13px;cursor:pointer;line-height:1;font-weight:800;flex-shrink:0">+</button>
           </div>
           ${stockMinEdit?`<input type="number" min="0" value="${mn}" onchange="setStockMin('${modelo}','${t}',this.value)" title="Mínimo" style="width:44px;margin-top:3px;padding:2px;border:1.5px solid #fbbf24;background:#fffbeb;border-radius:6px;font-size:11px;font-weight:800;text-align:center">`:(mn?`<div style="font-size:9px;font-weight:800;margin-top:1px;color:${cant<mn?'var(--red)':'var(--gray3)'}">mín ${mn}</div>`:'')}
         </td>`;
       }).join('')}
-      <td style="padding:8px 4px;text-align:center;font-weight:800;font-size:15px;color:${total===0?'var(--gray3)':total<=3?'var(--orange)':'var(--green)'}">${total}</td>
+      <td style="padding:8px 4px;text-align:center;font-weight:800;font-size:15px;color:${total<0?'#dc2626':total===0?'var(--gray3)':total<=3?'var(--orange)':'var(--green)'}">${total}</td>
     </tr>`;
   }).join('');
 }
@@ -1386,7 +1394,7 @@ function rStock(){
 function adjStock(modelo, talle, delta){
   if(!stockData[modelo]) stockData[modelo]={};
   const cur=stockData[modelo][talle]||0;
-  stockData[modelo][talle]=Math.max(0, cur+delta);
+  stockData[modelo][talle]=cur+delta;   // puede quedar negativo: es lo que falta fabricar
   saveStock();
   rStock();
 }
@@ -2664,7 +2672,7 @@ function onTipo(){
 }
 
 function getLargoOpts(tipo){
-  if(tipo==='Correa') return ['1.20mt','2mt','3mt','4mt','5mt','10mt'].map(l=>({label:l,key:'Correa sola'}));
+  if(tipo==='Correa') return ['1.20mt','2mt','3mt','4mt','5mt','10mt'].map(l=>({label:l,key:'Correa sola — '+l}));
   if(tipo==='Combo 1 — Arnés + Correa') return ['1.20mt','2mt','3mt','4mt','5mt','10mt'].map(l=>({label:l,key:'Combo 1 — '+l}));
   if(tipo==='Combo 2 — Arnés + Correa + Collar') return ['1.20mt','2mt','3mt','4mt','5mt','10mt'].map(l=>({label:l,key:'Combo 2 — '+l}));
   return [];
@@ -3058,7 +3066,7 @@ function syncFaltAuto(){
   }catch(e){}
 }
 function insumoStockSet(id,v){
-  v=parseFloat(v);if(isNaN(v)||v<0)return;
+  v=parseFloat(v);if(isNaN(v))return;   // admite negativos (déficit)
   insumos.stk[id]={stock:v,desdeTs:Date.now()};
   saveInsumos();renderFaltantes();renderAll();
 }
@@ -3706,7 +3714,7 @@ function confirmarDesdeStock(usarStock){
   delete window._pendingStockItem;delete window._pendingStockCb;
   if(usarStock){
     if(!stockData[item.modelo]) stockData[item.modelo]={};
-    stockData[item.modelo][item.talle]=Math.max(0,(stockData[item.modelo][item.talle]||0)-1);
+    stockData[item.modelo][item.talle]=(stockData[item.modelo][item.talle]||0)-1;
     saveStock();
     item.desdeStock=true;
     item.estadoItem='listo';
@@ -3777,6 +3785,10 @@ function renderIL(){
     if(i.cuello)ex.push('Cuello '+i.cuello+'cm');
     if(i.colorCorrea)ex.push('Correa '+i.colorCorrea);
     if(i.mosq)ex.push('Mosq. '+i.mosq);
+    if(i.bordadoCollar)ex.push('🧵 ID collar: '+i.bordadoCollar);
+    if(i.pecho)ex.push('📐 Pecho '+i.pecho+' cm');
+    if(i.cuello)ex.push('📐 Cuello '+i.cuello+' cm');
+    if(i.cuelloAConfirmar)ex.push('Cuello a confirmar');
     const combx2badge=i.esCombx2?`<span style="background:var(--pink);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-right:4px">x2</span>`:'';
     return `<div class="ir">
       <div class="ii">
@@ -4036,7 +4048,11 @@ async function loadData(){
     const stoRaw = await rSto.json();
     pedidos  = Array.isArray(pedRaw) ? pedRaw.map(r=>limpiar(r.data)) : [];
     egresos  = Array.isArray(egrRaw) ? egrRaw.map(r=>limpiar(r.data)) : [];
-    if(Array.isArray(preRaw) && preRaw.length) preciosData = preRaw[0].data;
+    if(Array.isArray(preRaw) && preRaw.length){
+      const falt=Object.keys(PRECIOS_DEFAULT).some(k=>!(k in preRaw[0].data));
+      preciosData = Object.assign(JSON.parse(JSON.stringify(PRECIOS_DEFAULT)), preRaw[0].data);
+      if(falt) setTimeout(()=>{try{savePrecios();}catch(e){}},1500); // publica los precios nuevos (ej. correas por largo) para el shop
+    }
     if(Array.isArray(stoRaw) && stoRaw.length) stockData   = stoRaw[0].data;
   } catch(err){
     console.error('Error loading:', err);
