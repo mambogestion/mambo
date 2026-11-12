@@ -1081,8 +1081,9 @@ function authSet(s){localStorage.setItem(SESS_KEY,JSON.stringify({a:s.access_tok
 async function authTok(grant,body){
   const ac=new AbortController(),to=setTimeout(()=>ac.abort(),15000);
   try{const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=${grant}`,{method:'POST',signal:ac.signal,headers:{apikey:SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
-    return r.ok?{data:await r.json()}:{data:null,status:r.status};}
-  catch(e){return {data:null,net:true};}
+    if(!r.ok){let m='';try{m=(await r.json()).msg||'';}catch(_){}return {data:null,status:r.status,why:'HTTP '+r.status+(m?' · '+m:'')};}
+    return {data:await r.json()};}
+  catch(e){return {data:null,net:true,why:(e&&e.name==='AbortError'?'tiempo agotado (15 s)':String((e&&e.message)||e))};}
   finally{clearTimeout(to);}
 }
 // una sola renovación a la vez (si dos pedían a la vez, Supabase invalidaba la sesión)
@@ -1138,7 +1139,7 @@ async function authLogin(){
   btn.disabled=true;btn.textContent='Entrando…';
   const t=await authTok('password',{email:em,password:pw});
   btn.disabled=false;btn.textContent='Entrar →';
-  if(!t.data){err.textContent=t.net?'Sin conexión. Probá de nuevo en unos segundos.':'Email o contraseña incorrectos';err.style.display='block';document.getElementById('login-input').value='';return;}
+  if(!t.data){err.textContent=t.net?'Sin conexión con el servidor ('+t.why+'). Probá de nuevo.':(t.status===400?'Email o contraseña incorrectos':'No se pudo entrar ('+t.why+')');err.style.display='block';document.getElementById('login-input').value='';return;}
   err.style.display='none';authSet(t.data);
   document.getElementById('login-input').value='';
   document.getElementById('login-screen').style.display='none';
