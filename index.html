@@ -17,9 +17,9 @@
 {"@type":"Organization","name":"MAMBO","url":"https://mambomascotas.github.io/mambo/","logo":"https://mambomascotas.github.io/mambo/logo.png","areaServed":"AR","contactPoint":{"@type":"ContactPoint","telephone":"+54-9-11-4097-2105","contactType":"customer service","availableLanguage":"es"}},
 {"@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"¿Cómo sé qué talle necesita mi perro?","acceptedAnswer":{"@type":"Answer","text":"Usá la guía de talles de la tienda. Si dudás, te confirmamos el talle por WhatsApp."}},
-{"@type":"Question","name":"¿Cuánto tarda mi pedido?","acceptedAnswer":{"@type":"Answer","text":"Te contactamos por WhatsApp en el día para confirmar talle y coordinar el envío. Si tu modelo está en stock, sale enseguida; si no, se fabrica en aprox. 7 días hábiles."}},
-{"@type":"Question","name":"¿Cómo se paga?","acceptedAnswer":{"@type":"Answer","text":"Por transferencia al alias MAMBO.ARGENTINA. Confirmamos la recepción por WhatsApp."}},
-{"@type":"Question","name":"¿Tiene costo el envío?","acceptedAnswer":{"@type":"Answer","text":"El envío a sucursal de Correo Argentino es gratis a todo el país."}},
+{"@type":"Question","name":"¿Cuánto tarda mi pedido?","acceptedAnswer":{"@type":"Answer","text":"Todos los pedidos tienen un tiempo de producción de 7 días hábiles. Los modelos con stock inmediato se despachan en el momento. Te contactamos por WhatsApp en el día para confirmar talle y coordinar el envío."}},
+{"@type":"Question","name":"¿Cómo se paga?","acceptedAnswer":{"@type":"Answer","text":"Promo transferencia o efectivo (el efectivo, al retirar personalmente por Villa Urquiza) o tarjeta de crédito en 3 cuotas sin interés con Mercado Pago."}},
+{"@type":"Question","name":"¿Tiene costo el envío?","acceptedAnswer":{"@type":"Answer","text":"Envío gratis a sucursal de Correo Argentino en todo el país en todos los combos. También retiro por Villa Urquiza, envío en moto en CABA y GBA (costo aparte) y envío a domicilio a todo el país."}},
 {"@type":"Question","name":"¿El bordado del nombre tiene costo?","acceptedAnswer":{"@type":"Answer","text":"No. El nombre bordado y los emojis están incluidos."}}]}]}</script>
 <title>MAMBO® — Arneses para perros exigentes</title>
 <link rel="icon" type="image/png" href="https://mambomascotas.github.io/mambo/logo.png">
@@ -464,6 +464,33 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 @media(max-width:700px){.bn-full{display:none}.bn-short{display:inline}.banner{font-size:11.5px;padding:10px 8px}}
 .nav-busca{flex:1;max-width:460px;margin:0 20px;min-width:0}
 @media(max-width:700px){.nav .logo-round{width:50px;height:50px}.nav .logo-letras{height:38px}.nav{flex-wrap:wrap;height:auto;padding:8px 12px 10px}.nav-busca{order:3;flex:1 1 100%;max-width:none;margin:8px 0 0}.busca-in input{padding:10px 40px 10px 12px;font-size:14px}}
+/* ── Legales / arrepentimiento ── */
+.foot-legal{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;font-size:12px}
+.foot-legal a,.foot-legal button.lk{color:#d8d4cc;font-weight:600;text-decoration:underline;text-underline-offset:3px;background:none;border:0;cursor:pointer;font:inherit;font-size:12px;padding:0}
+.foot-btns{margin-top:16px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.btn-arrep{background:transparent;border:1.5px solid #fff;color:#fff;font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:11px 18px;border-radius:10px;cursor:pointer;font-family:inherit}
+.btn-arrep:hover{background:#fff;color:#111}
+.foot-prov{margin-top:14px;font-size:11.5px;color:#a9a59d;line-height:1.6}
+.foot-prov a{color:#d8d4cc;font-weight:600}
+.lg-ov{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:16px}
+.lg-ov.on{display:flex}
+.lg-box{background:#fff;color:#222;border-radius:16px;max-width:660px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lg-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid #eee}
+.lg-hd h2{font-family:'Cabin',sans-serif;font-size:18px;margin:0;font-weight:800}
+.lg-x{background:#f3f1ed;border:0;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1}
+.lg-bd{padding:18px 22px 24px;overflow:auto;font-size:14px;line-height:1.65}
+.lg-bd h3{font-size:14.5px;margin:18px 0 4px;font-weight:800}
+.lg-bd p{margin:0 0 8px}.lg-bd ul{margin:0 0 8px;padding-left:20px}
+.lg-bd .lg-note{background:#faf6ee;border-radius:10px;padding:10px 12px;font-size:13px}
+.lg-bd label{display:block;font-size:12px;font-weight:700;margin:12px 0 4px;color:#555}
+.lg-bd input,.lg-bd textarea,.lg-bd select{width:100%;padding:11px 12px;border:1.5px solid #ddd;border-radius:10px;font:inherit;font-size:14px;box-sizing:border-box}
+.lg-bd textarea{min-height:70px;resize:vertical}
+.lg-send{margin-top:16px;width:100%;padding:13px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+.lg-send:disabled{opacity:.6}
+.lg-code{font-family:'Cabin',sans-serif;font-size:26px;font-weight:900;text-align:center;letter-spacing:2px;background:#f3f1ed;border-radius:12px;padding:16px;margin:14px 0;user-select:all}
+.acepto{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;margin:14px 0 6px;color:var(--text)}
+.acepto input{margin-top:3px;width:18px;height:18px;flex-shrink:0}
+.acepto a{color:var(--rose);font-weight:700;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
@@ -545,9 +572,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
     <div class="faq-inner">
       <h2>Preguntas frecuentes</h2>
       <details><summary>¿Cómo sé qué talle necesita mi perro?</summary><p>Usá la <a href="#talle" onclick="document.getElementById('modal-talle').style.display='flex';return false">guía de talles</a>. Si dudás, te lo confirmamos por WhatsApp antes de avanzar.</p></details>
-      <details><summary>¿Cuánto tarda mi pedido?</summary><p>Te contactamos por WhatsApp en el día para confirmar talle y coordinar el envío. Si tu modelo está en stock, sale enseguida; si no, se fabrica en aprox. 7 días hábiles.</p></details>
-      <details><summary>¿Cómo se paga?</summary><p>Por transferencia al alias <b>MAMBO.ARGENTINA</b> (a nombre de Mariano Nahuel Arbotto). Confirmamos la recepción por WhatsApp.</p></details>
-      <details><summary>¿Tiene costo el envío?</summary><p>El envío a sucursal de Correo Argentino es gratis a todo el país.</p></details>
+      <details><summary>¿Cuánto tarda mi pedido?</summary><p>Todos los pedidos tienen un tiempo de producción de <b>7 días hábiles</b>. Los modelos con <b>stock inmediato</b> se despachan en el momento. Te contactamos por WhatsApp en el día para confirmar talle y coordinar el envío.</p></details>
+      <details><summary>¿Cómo se paga?</summary><p><b>Promo transferencia o efectivo</b> (al alias <b>MAMBO.ARGENTINA</b>, o en efectivo si retirás personalmente por Villa Urquiza) o <b>tarjeta de crédito en 3 cuotas sin interés</b> con Mercado Pago. Confirmamos tu pago por WhatsApp.</p></details>
+      <details><summary>¿Tiene costo el envío?</summary><p><b>Envío gratis a sucursal de Correo Argentino en todo el país</b> en todos los combos. También podés retirar sin cargo por Villa Urquiza, coordinar envío en moto en CABA y GBA (costo aparte) o pedir envío a domicilio a todo el país.</p></details>
       <details><summary>¿El bordado del nombre tiene costo?</summary><p>No, el nombre bordado y los emojis están incluidos.</p></details>
     </div>
   </section>
@@ -566,9 +593,22 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
     Mascotas exigentes · Buenos Aires, Argentina<br>
     <a href="https://wa.me/5491140972105" target="_blank" rel="noopener">WhatsApp +54 9 11 4097-2105</a>
     <div class="foot-ig"><a href="https://www.instagram.com/mambo.mascotasexigentes/" target="_blank" rel="noopener" aria-label="Instagram de MAMBO®"><img src="https://mambomascotas.github.io/mambo/Instagram.png" alt="Instagram" onerror="this.replaceWith(document.createTextNode('Instagram'))"></a><span>@mambo.mascotasexigentes</span></div>
+      <div class="foot-btns">
+      <button class="btn-arrep" onclick="lgAbrir('arrep')">Botón de arrepentimiento</button>
+      <button class="btn-arrep" onclick="lgAbrir('baja')">Botón de baja</button>
+    </div>
+    <div class="foot-legal">
+      <button class="lk" onclick="lgAbrir('tyc')">Términos y condiciones</button>
+      <button class="lk" onclick="lgAbrir('priv')">Política de privacidad</button>
+      <button class="lk" onclick="lgAbrir('camb')">Cambios y devoluciones</button>
+      <button class="lk" onclick="lgAbrir('env')">Envíos y plazos</button>
+    </div>
+    <div class="foot-prov" id="foot-prov"></div>
   </footer>
 
 </div>
+
+<div class="lg-ov" id="lg-ov" onclick="if(event.target===this)lgCerrar()"><div class="lg-box" role="dialog" aria-modal="true"><div class="lg-hd"><h2 id="lg-t"></h2><button class="lg-x" onclick="lgCerrar()" aria-label="Cerrar">×</button></div><div class="lg-bd" id="lg-b"></div></div></div>
 
 <!-- WHATSAPP -->
 <a class="wa-float" href="https://wa.me/5491140972105?text=Hola!%20Quiero%20consultar%20por%20un%20arn%C3%A9s" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
@@ -654,6 +694,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
       <button class="copy-btn" onclick="copiarAlias()">📋 Copiar alias</button>
     </div>
     <div class="notice" id="pago-notice">💡 Por ahora solo aceptamos <strong>transferencia bancaria</strong>. Próximamente MercadoPago.</div>
+    <input type="text" id="hp-web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <label class="acepto"><input type="checkbox" id="acepto-tyc"><span>Leí y acepto los <a onclick="lgAbrir('tyc')">Términos y condiciones</a>, la <a onclick="lgAbrir('priv')">Política de privacidad</a> y la política de <a onclick="lgAbrir('camb')">cambios y devoluciones</a>.</span></label>
     <button class="btn-primary" id="btn-confirmar" onclick="confirmarPedido()">✅ Confirmar pedido y finalizar compra</button>
     <button class="btn-secondary" onclick="showView('datos')">← Volver</button>
   </div>
@@ -1539,7 +1581,120 @@ function notasPedido(){
   if(st.length)l.push('🟢 HAY STOCK: '+st.join(', '));
   return l.join(' — ');
 }
+
+// ══════════ LEGALES · ARREPENTIMIENTO · BAJA ══════════
+// COMPLETAR con los datos reales del titular (aparecen en el pie y en los Términos). Lo que quede vacío no se muestra.
+const LEGAL={
+  marca:'MAMBO®',
+  titular:'Mariano Nahuel Arbotto',
+  cuit:'',                 // ej: '20-12345678-9'
+  domicilio:'',            // ej: 'Calle 123, CABA'
+  tel:'+54 9 11 4097-2105',
+  email:'',                // ej: 'hola@…'
+  horario:'Lunes a viernes de 9 a 18 h',
+  provincia:'Ciudad Autónoma de Buenos Aires'
+};
+const DC_URL='https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario';
+function lgProv(){
+  const L=LEGAL,f=[];
+  f.push('<b>'+L.marca+'</b> es una marca registrada.');
+  f.push(L.titular+(L.cuit?' · CUIT '+L.cuit:''));
+  if(L.domicilio)f.push(L.domicilio);
+  f.push('Atención al consumidor: '+L.tel+(L.email?' · '+L.email:'')+' · '+L.horario);
+  f.push('<a href="'+DC_URL+'" target="_blank" rel="noopener">Defensa del Consumidor · Para reclamos ingrese aquí</a>');
+  return f.join('<br>');
+}
+function lgDatos(){
+  const L=LEGAL;
+  return '<ul><li><b>Titular:</b> '+L.titular+'</li>'+(L.cuit?'<li><b>CUIT:</b> '+L.cuit+'</li>':'')+(L.domicilio?'<li><b>Domicilio:</b> '+L.domicilio+'</li>':'')+'<li><b>Teléfono / WhatsApp:</b> '+L.tel+'</li>'+(L.email?'<li><b>Email:</b> '+L.email+'</li>':'')+'<li><b>Horario de atención:</b> '+L.horario+'</li></ul>';
+}
+const LG_FORM=(tipo)=>{
+  const baja=tipo==='baja';
+  return '<p>'+(baja?'Solicitá la baja de un servicio contratado a distancia.':'Tenés <b>10 días corridos</b> desde que recibís tu compra para arrepentirte, sin dar explicaciones y sin costo para vos. No hace falta registrarte.')+'</p>'+
+  '<label>Nombre y apellido</label><input id="lgf-nombre" maxlength="80" autocomplete="name">'+
+  '<label>WhatsApp, email o usuario de Instagram para contactarte</label><input id="lgf-contacto" maxlength="80">'+
+  '<label>N.º de pedido (si lo tenés) o nombre con el que compraste</label><input id="lgf-pedido" maxlength="80">'+
+  '<label>Producto'+(baja?' / servicio':'')+'</label><input id="lgf-producto" maxlength="120">'+
+  '<label>Comentario (opcional)</label><textarea id="lgf-motivo" maxlength="400"></textarea>'+
+  '<input type="text" id="lgf-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">'+
+  '<button class="lg-send" id="lgf-btn" onclick="lgEnviar(\''+tipo+'\')">Enviar solicitud</button>'+
+  '<div id="lgf-err" style="color:#b91c1c;font-size:13px;margin-top:10px;display:none"></div>';
+};
+const LG={
+  arrep:{t:'Botón de arrepentimiento',h:()=>LG_FORM('arrep')},
+  baja:{t:'Botón de baja',h:()=>LG_FORM('baja')},
+  tyc:{t:'Términos y condiciones',h:()=>`
+<div class="lg-note">Contrato de adhesión · Ley N.º 24.240 de Defensa del Consumidor</div>
+<h3>1. Quiénes somos</h3><p>Este sitio es operado por:</p>${lgDatos()}
+<h3>2. Productos y precios</h3><p>Los precios están expresados en pesos argentinos e incluyen IVA cuando corresponda. El precio promocional por transferencia bancaria o efectivo y el precio con tarjeta de crédito en 3 cuotas sin interés (Mercado Pago) pueden diferir y se informan antes de confirmar la compra. Las promociones se informan con sus condiciones y vigencia en el sitio. La disponibilidad de stock puede variar; si un producto no estuviera disponible, te lo informaremos y podrás elegir esperar la confección, cambiarlo o cancelar la compra con devolución total de lo pagado.</p>
+<h3>3. Productos personalizados</h3><p>Los arneses y accesorios se confeccionan con los datos que elegís (talle, medidas, color, bordado de nombre o identificación). Es tu responsabilidad cargar bien las medidas y los textos. Si tenés dudas con el talle, escribinos antes de comprar.</p>
+<h3>4. Formas de pago</h3><p><b>Transferencia bancaria o efectivo (promo):</b> el pedido se confirma al acreditarse el pago y recibir el comprobante. El efectivo solo se acepta al retirar personalmente por Villa Urquiza. <b>Tarjeta de crédito:</b> hasta 3 cuotas sin interés a través de Mercado Pago; el pago se procesa en el sitio de Mercado Pago; MAMBO® no recibe ni almacena los datos de tu tarjeta.</p>
+<h3>5. Envíos y plazos</h3><p>Los pedidos tienen un tiempo de producción de 7 días hábiles; los productos con stock inmediato se despachan en el momento. Las modalidades y costos de entrega se detallan en la sección “Envíos y plazos”.</p>
+<h3>6. Derecho de arrepentimiento</h3><p>Conforme al art. 34 de la Ley 24.240, al art. 1110 del Código Civil y Comercial y a la Disposición 954/2025, podés revocar la compra dentro de los 10 días corridos desde la recepción del producto, usando el “Botón de arrepentimiento” de este sitio. Ver detalles y excepciones en “Cambios y devoluciones”.</p>
+<h3>7. Garantía legal</h3><p>Los productos tienen la garantía legal prevista en los arts. 11 a 18 de la Ley 24.240. Si recibís un producto con defectos, escribinos por los canales de atención.</p>
+<h3>8. Reclamos</h3><p>Podés comunicarte por los canales de atención indicados. También podés reclamar ante la Dirección de Defensa del Consumidor de tu jurisdicción o en <a href="${DC_URL}" target="_blank" rel="noopener">argentina.gob.ar/defensadelconsumidor</a>.</p>
+<h3>9. Ley aplicable y jurisdicción</h3><p>Rige la ley argentina. Para cualquier controversia, el consumidor podrá optar por los tribunales del lugar de su domicilio, conforme al art. 36 de la Ley 24.240.</p>
+<h3>10. Modificaciones</h3><p>Podemos actualizar estos términos. Se aplican a las compras realizadas desde su publicación. Última actualización: noviembre de 2026.</p>`},
+  priv:{t:'Política de privacidad',h:()=>`
+<h3>Responsable</h3>${lgDatos()}
+<h3>Qué datos recolectamos</h3><ul><li>Nombre, usuario de Instagram o contacto, provincia y datos de envío.</li><li>Medidas y características de tu mascota, textos de bordado y, si la subís, una foto de tu mascota.</li><li>Datos del pedido y del pago (no almacenamos números de tarjeta).</li></ul>
+<h3>Para qué los usamos</h3><p>Exclusivamente para confeccionar y entregar tu pedido, coordinar el pago y el envío, atender consultas, reclamos y solicitudes de arrepentimiento, y cumplir obligaciones legales y fiscales.</p>
+<h3>Con quién los compartimos</h3><ul><li><b>Mercado Pago</b>, si elegís pagar por ese medio.</li><li><b>Correo Argentino</b> u otro transporte, solo los datos necesarios para el envío.</li><li>Nuestros proveedores de infraestructura tecnológica (almacenamiento del sitio y de la base de datos).</li></ul><p>No vendemos ni cedemos tus datos a terceros con fines comerciales.</p>
+<h3>Fotos de tu mascota</h3><p>Se usan únicamente para realizar el bordado y se eliminan una vez entregado el pedido. Solo podés subir fotos de las que seas titular o tengas autorización para usar.</p>
+<h3>Tus derechos</h3><p>Como titular de los datos tenés derecho a acceder, rectificar, actualizar y suprimir tus datos personales, de forma gratuita a intervalos no inferiores a seis meses, salvo interés legítimo (art. 14 de la Ley 25.326). Escribinos por los canales de atención para ejercerlos.</p>
+<div class="lg-note">La Agencia de Acceso a la Información Pública, en su carácter de Órgano de Control de la Ley N.º 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas sobre protección de datos personales.</div>
+<h3>Seguridad y conservación</h3><p>Aplicamos medidas técnicas para proteger tus datos y los conservamos por el tiempo necesario para cumplir las finalidades y las obligaciones legales (por ejemplo, fiscales y de garantía).</p>`},
+  camb:{t:'Cambios y devoluciones',h:()=>`
+<h3>Arrepentimiento (10 días)</h3><p>Podés revocar tu compra dentro de los <b>10 días corridos</b> desde que recibís el producto, sin dar motivos y sin costo. Usá el <b>Botón de arrepentimiento</b> del pie de página: al enviarlo recibís un <b>código de trámite</b> y nos comunicamos dentro de las <b>24 horas</b> para coordinar la devolución.</p>
+<h3>Devolución</h3><p>Solo tenés que poner el producto a nuestra disposición, sin uso y en su estado original. <b>Los gastos de devolución corren por nuestra cuenta.</b> Te reintegramos el importe pagado por el mismo medio de pago.</p>
+<h3>Excepciones</h3><p>De acuerdo con el art. 1116 del Código Civil y Comercial y la normativa vigente, el derecho de arrepentimiento <b>no aplica</b> a:</p><ul><li>Productos <b>confeccionados a medida o claramente personalizados</b> (por ejemplo, con bordado de nombre o identificación, o medidas especiales).</li><li>Productos ya usados o consumidos durante el plazo.</li><li>Compras realizadas para reventa o para integrarlas a un proceso productivo.</li></ul>
+<h3>Producto con defectos o error nuestro</h3><p>Si el producto llega con fallas o no es el que pediste, lo cambiamos o reintegramos el dinero, con costo de envío a nuestro cargo. Escribinos dentro de los 30 días de recibido, con fotos.</p>
+<h3>Cambios de talle</h3><p>Si el talle no le queda a tu perri, escribinos: evaluamos el cambio. En productos personalizados el cambio depende de que se pueda reutilizar.</p>`},
+  env:{t:'Envíos y plazos',h:()=>`
+<h3>Modalidades de entrega</h3><ul>
+<li><b>Envío gratis a sucursal de Correo Argentino</b>, a todo el país, en todos los combos.</li>
+<li><b>Retiro personal por Villa Urquiza</b> (CABA), sin cargo. Lo coordinamos por WhatsApp.</li>
+<li><b>Envío en moto en CABA y GBA</b>, con costo aparte que coordinamos por WhatsApp.</li>
+<li><b>Envío a domicilio</b> a todo el país por Correo Argentino. El costo se informa antes de confirmar el pedido.</li></ul>
+<h3>Plazos</h3><p>Todos los pedidos tienen un <b>tiempo de producción de 7 días hábiles</b>, que se cuentan desde que se confirma el pago. Los productos que figuran con <b>stock inmediato</b> se despachan en el momento. Al despachar te enviamos el número de seguimiento por WhatsApp o Instagram.</p>
+<h3>Recepción</h3><p>Revisá el paquete al recibirlo. Si llega dañado o con diferencias, escribinos de inmediato con fotos.</p>
+<h3>Medios de pago</h3><p><b>Promo transferencia bancaria o efectivo</b> (el efectivo, únicamente al retirar personalmente por Villa Urquiza) y <b>tarjeta de crédito en 3 cuotas sin interés</b> a través de Mercado Pago.</p>`}
+};
+function lgAbrir(k){
+  const o=LG[k];if(!o)return;
+  document.getElementById('lg-t').textContent=o.t;
+  document.getElementById('lg-b').innerHTML=o.h();
+  document.getElementById('lg-b').scrollTop=0;
+  document.getElementById('lg-ov').classList.add('on');
+}
+function lgCerrar(){document.getElementById('lg-ov').classList.remove('on');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lgCerrar();});
+async function lgEnviar(tipo){
+  const v=id=>String((document.getElementById(id)||{}).value||'').replace(/[<>"`\\]/g,'').replace(/'/g,'’').trim();
+  const err=document.getElementById('lgf-err'),btn=document.getElementById('lgf-btn');
+  if(v('lgf-hp'))return;
+  const nombre=v('lgf-nombre'),contacto=v('lgf-contacto'),pedido=v('lgf-pedido'),producto=v('lgf-producto'),motivo=v('lgf-motivo');
+  if(!nombre||!contacto||!(pedido||producto)){err.textContent='Completá tu nombre, un medio de contacto y el pedido o producto.';err.style.display='block';return;}
+  const d=new Date(),pad=n=>String(n).padStart(2,'0');
+  const rnd=Array.from(crypto.getRandomValues(new Uint8Array(5))).map(n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%32]).join('');
+  const codigo=(tipo==='baja'?'BAJA':'ARR')+'-'+String(d.getFullYear()).slice(2)+pad(d.getMonth()+1)+pad(d.getDate())+'-'+rnd;
+  const data={codigo,tipo,nombre,contacto,pedido,producto,motivo,fecha:d.toISOString(),estado:'nuevo'};
+  btn.disabled=true;btn.textContent='Enviando…';err.style.display='none';
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos`,{method:'POST',headers:SUPA_H,body:JSON.stringify({id:codigo,data})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    document.getElementById('lg-t').textContent='Solicitud recibida ✅';
+    document.getElementById('lg-b').innerHTML='<p>Registramos tu solicitud de <b>'+(tipo==='baja'?'baja':'arrepentimiento')+'</b>. Este es tu <b>código de trámite</b>:</p><div class="lg-code">'+codigo+'</div><p>Guardalo o sacale una captura: es tu constancia. Nos vamos a comunicar con vos dentro de las <b>24 horas</b> por el medio de contacto que indicaste.</p><button class="lg-send" onclick="lgCerrar()">Cerrar</button>';
+  }catch(e){
+    btn.disabled=false;btn.textContent='Enviar solicitud';
+    err.innerHTML='No pudimos registrar la solicitud. Escribinos por <a href="https://wa.me/5491140972105" target="_blank" rel="noopener">WhatsApp</a> y la gestionamos de inmediato.';err.style.display='block';
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{const f=document.getElementById('foot-prov');if(f)f.innerHTML=lgProv();});
+if(document.readyState!=='loading'){const f=document.getElementById('foot-prov');if(f)f.innerHTML=lgProv();}
 async function confirmarPedido(){
+  if((document.getElementById('hp-web')||{}).value){return;}   // campo trampa: solo lo completan los bots
+  if(!document.getElementById('acepto-tyc').checked){alert('Para continuar, aceptá los Términos y condiciones y la Política de privacidad.');return;}
   const n=document.getElementById('d-nombre').value.trim();
   const ig=document.getElementById('d-ig').value.trim();
   const prov=document.getElementById('d-prov').value;
