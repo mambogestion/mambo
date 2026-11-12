@@ -306,6 +306,8 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
     <img src="https://mambomascotas.github.io/mambo/logoletras_blanco.png" alt="MAMBO Mascotas Exigentes" style="height:26px;object-fit:contain">
   </div>
   <div class="hdr-date" id="hdrDate"></div>
+  <button id="ar-btn" onclick="arAbrir()" title="Solicitudes de arrepentimiento / baja" style="background:rgba(255,255,255,.12);border:none;color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 9px;margin-left:8px;cursor:pointer">↩️ Arrepent. <span id="ar-n"></span></button>
+  <button id="bk-btn" onclick="hacerBackup()" title="Descargar copia de todos los datos" style="background:rgba(255,255,255,.12);border:none;color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 9px;margin-left:8px;cursor:pointer">💾 Backup</button>
   <button onclick="authLogout()" title="Cerrar sesión" style="background:rgba(255,255,255,.12);border:none;color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 9px;margin-left:8px;cursor:pointer">Salir</button>
 </header>
 
@@ -1067,30 +1069,155 @@ const supaHeaders = {
 // ══════════ LOGIN (Supabase Auth) ══════════
 // La protección real está en la base (RLS): sin sesión válida no se puede leer ni escribir nada.
 const SESS_KEY='mambo_sess';
+let _authBusy=null,_pend=[];            // _pend: escrituras que no llegaron a la base (sesión vencida o sin conexión)
 function mostrarLogin(){const l=document.getElementById('login-screen');if(l)l.style.display='flex';}
+function avisoSesion(on){
+  let b=document.getElementById('ses-bar');
+  if(!on){if(b)b.remove();return;}
+  if(!b){b=document.createElement('div');b.id='ses-bar';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#dc2626;color:#fff;font:700 13px/1.4 sans-serif;padding:10px 14px;text-align:center';document.body.appendChild(b);}
+  b.textContent='⚠️ Hay cambios SIN GUARDAR ('+_pend.length+'). Entrá de nuevo y se guardan solos. No cierres esta pantalla.';
+}
 function authSet(s){localStorage.setItem(SESS_KEY,JSON.stringify({a:s.access_token,r:s.refresh_token,e:Date.now()+(s.expires_in||3600)*1000}));supaHeaders.Authorization='Bearer '+s.access_token;}
-async function authTok(grant,body){try{const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=${grant}`,{method:'POST',headers:{apikey:SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok?await r.json():null;}catch(e){return null;}}
-async function authRefresh(){const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s||!s.r)return false;const d=await authTok('refresh_token',{refresh_token:s.r});if(!d)return false;authSet(d);return true;}
+async function authTok(grant,body){
+  const ac=new AbortController(),to=setTimeout(()=>ac.abort(),15000);
+  try{const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=${grant}`,{method:'POST',signal:ac.signal,headers:{apikey:SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    return r.ok?{data:await r.json()}:{data:null,status:r.status};}
+  catch(e){return {data:null,net:true};}
+  finally{clearTimeout(to);}
+}
+// una sola renovación a la vez (si dos pedían a la vez, Supabase invalidaba la sesión)
+function authRefresh(){
+  if(_authBusy)return _authBusy;
+  _authBusy=(async()=>{
+    try{
+      const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s||!s.r)return false;
+      const t=await authTok('refresh_token',{refresh_token:s.r});
+      if(t.net)return 'net';                       // sin conexión: no es motivo para sacar la sesión
+      if(!t.data)return false;
+      authSet(t.data);return true;
+    }finally{_authBusy=null;}
+  })();
+  return _authBusy;
+}
 async function authEnsure(){const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s)return false;if(Date.now()>s.e-120000)return authRefresh();supaHeaders.Authorization='Bearer '+s.a;return true;}
+function pendAdd(u,o){
+  try{let id='';try{id=JSON.parse(o.body).id||'';}catch(_){}
+    const k=(o.method||'')+u+id;_pend=_pend.filter(z=>z.k!==k);_pend.push({k,u,o:{method:o.method,headers:o.headers,body:o.body}});if(_pend.length>150)_pend.shift();}catch(_){}
+}
+async function replayPend(){
+  const q=_pend;_pend=[];
+  for(const z of q){try{await fetch(z.u,z.o);}catch(_){}}   // si vuelve a fallar, el wrapper lo guarda de nuevo
+  if(!_pend.length){avisoSesion(false);if(q.length)toast('✅ Se guardaron '+q.length+' cambios pendientes');}else avisoSesion(true);
+}
+// Todas las llamadas a la base pasan por acá: renuevan la sesión, reintentan y avisan si algo no se guardó
+const _fetch0=window.fetch.bind(window);
+window.fetch=async function(u,o){
+  const url=typeof u==='string'?u:((u&&u.url)||'');
+  if(!url.startsWith(SUPA_URL)||url.includes('/auth/v1/')||url.includes('/storage/'))return _fetch0(u,o);
+  const write=!!(o&&o.method&&o.method!=='GET');
+  const go=async()=>{await authEnsure();return _fetch0(u,{...o,headers:{...((o&&o.headers)||{}),Authorization:supaHeaders.Authorization}});};
+  let r;
+  try{r=await go();}
+  catch(e){if(write){pendAdd(url,o);avisoSesion(true);}throw e;}
+  if(r.status===401){const ok=await authRefresh();if(ok===true)r=await go();}
+  if(r.status===401){if(write)pendAdd(url,o);avisoSesion(_pend.length>0);mostrarLogin();}
+  else if(write&&!r.ok){try{toast('⚠️ No se pudo guardar (error '+r.status+')');}catch(_){}}
+  return r;
+};
+let _authTimer=null;
+function authTimer(){if(_authTimer)return;_authTimer=setInterval(()=>{authEnsure().then(o=>{if(o===false)mostrarLogin();});},5*60*1000);}
 async function authInit(){
   const ok=await authEnsure();
-  if(!ok){mostrarLogin();return false;}
-  setInterval(()=>{authRefresh().then(o=>{if(!o)mostrarLogin();});},45*60*1000);
+  if(ok===false){mostrarLogin();return false;}
+  authTimer();
   return true;
 }
 async function authLogin(){
   const em=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-input').value;
   const err=document.getElementById('login-error'),btn=document.getElementById('login-btn');
   btn.disabled=true;btn.textContent='Entrando…';
-  const d=await authTok('password',{email:em,password:pw});
+  const t=await authTok('password',{email:em,password:pw});
   btn.disabled=false;btn.textContent='Entrar →';
-  if(!d){err.style.display='block';document.getElementById('login-input').value='';return;}
-  err.style.display='none';authSet(d);
+  if(!t.data){err.textContent=t.net?'Sin conexión. Probá de nuevo en unos segundos.':'Email o contraseña incorrectos';err.style.display='block';document.getElementById('login-input').value='';return;}
+  err.style.display='none';authSet(t.data);
   document.getElementById('login-input').value='';
   document.getElementById('login-screen').style.display='none';
-  setInterval(()=>{authRefresh().then(o=>{if(!o)mostrarLogin();});},45*60*1000);
+  authTimer();
+  await replayPend();      // primero se guarda lo que había quedado pendiente, después se vuelve a leer la base
   loadData();
 }
+function authLogout(){localStorage.removeItem(SESS_KEY);localStorage.removeItem('mambo_auth');location.reload();}
+
+// ══════════ ARREPENTIMIENTOS (botón del shop) ══════════
+let AR=[];
+async function arCargar(){
+  try{
+    if(!(await authEnsure()))return;
+    const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos?select=id,data&order=id.desc&limit=300`,{headers:supaHeaders});
+    if(!r.ok)return;
+    AR=(await r.json()).map(o=>limpiar(o.data||{}));
+    const nuevos=AR.filter(a=>a.estado==='nuevo').length;
+    const n=document.getElementById('ar-n'),b=document.getElementById('ar-btn');
+    if(n)n.textContent=nuevos?'('+nuevos+')':'';
+    if(b){b.style.background=nuevos?'#dc2626':'rgba(255,255,255,.12)';}
+  }catch(e){}
+}
+function arEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function arAbrir(){
+  let o=document.getElementById('ar-ov');
+  if(!o){o=document.createElement('div');o.id='ar-ov';o.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:14px';
+    o.onclick=e=>{if(e.target===o)o.remove();};document.body.appendChild(o);}
+  const fila=a=>{const f=new Date(a.fecha);
+    return `<div style="border:1.5px solid ${a.estado==='nuevo'?'#dc2626':'#e5e7eb'};border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${arEsc(a.codigo)}</b><span style="font-size:12px;font-weight:800;color:${a.estado==='nuevo'?'#dc2626':'#16a34a'}">${a.estado==='nuevo'?'NUEVO · responder antes de '+new Date(f.getTime()+864e5).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'ATENDIDO'}</span></div>
+    <div style="font-size:13px;margin-top:6px;line-height:1.5">${a.tipo==='baja'?'🔻 Baja':'↩️ Arrepentimiento'} · ${arEsc(a.nombre)}<br>📞 ${arEsc(a.contacto)}<br>📦 ${arEsc(a.pedido)} ${arEsc(a.producto)}${a.motivo?'<br>💬 '+arEsc(a.motivo):''}<br><span style="color:#888;font-size:11px">${f.toLocaleString('es-AR')}</span></div>
+    ${a.estado==='nuevo'?`<button onclick="arAtender('${arEsc(a.codigo)}')" style="margin-top:8px;padding:7px 12px;border:0;border-radius:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer">Marcar como atendido</button>`:''}</div>`;};
+  o.innerHTML=`<div style="background:#f3f4f6;border-radius:16px;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:16px">↩️ Arrepentimiento / baja</b><button onclick="document.getElementById('ar-ov').remove()" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:18px;cursor:pointer">×</button></div>
+  <div style="font-size:12px;color:#555;margin-bottom:10px">Hay que contestar dentro de las 24 h. Si el pedido es personalizado (bordado/medidas), no corresponde la devolución: avisale al cliente con amabilidad.</div>
+  ${AR.length?AR.map(fila).join(''):'<div style="text-align:center;color:#888;padding:30px">No hay solicitudes.</div>'}</div>`;
+}
+async function arAtender(codigo){
+  const a=AR.find(z=>z.codigo===codigo);if(!a)return;
+  try{
+    if(!(await authEnsure())){mostrarLogin();return;}
+    const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos?id=eq.${encodeURIComponent(codigo)}`,{method:'PATCH',headers:{...supaHeaders,'Content-Type':'application/json'},body:JSON.stringify({data:{...a,estado:'atendido',atendido:new Date().toISOString()}})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    await arCargar();arAbrir();
+  }catch(e){alert('No se pudo actualizar: '+e.message);}
+}
+setTimeout(arCargar,1500);setInterval(arCargar,5*60*1000);
+// ══════════ BACKUP ══════════
+const BK_KEY='mambo_ultimo_backup';
+async function hacerBackup(){
+  const btn=document.getElementById('bk-btn');const t0=btn.textContent;btn.textContent='Descargando…';btn.disabled=true;
+  try{
+    if(!(await authEnsure())){mostrarLogin();return;}
+    const out={app:'MAMBO',fecha:new Date().toISOString(),tablas:{}};
+    for(const t of ['pedidos','egresos','stock','precios','faltantes','arrepentimientos']){
+      const r=await fetch(`${SUPA_URL}/rest/v1/${t}?select=id,data&limit=100000`,{headers:supaHeaders});
+      if(!r.ok)throw new Error(t+' → HTTP '+r.status);
+      out.tablas[t]=await r.json();
+    }
+    const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='mambo_backup_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    localStorage.setItem(BK_KEY,String(Date.now()));
+    avisoBackup();
+    alert('Backup descargado ✅ ('+Object.entries(out.tablas).map(([k,v])=>k+': '+v.length).join(', ')+')\nGuardalo en Drive o en tu mail.');
+  }catch(e){alert('No se pudo hacer el backup: '+e.message);}
+  finally{btn.textContent=t0;btn.disabled=false;}
+}
+function avisoBackup(){
+  const b=document.getElementById('bk-btn');if(!b)return;
+  const t=Number(localStorage.getItem(BK_KEY)||0);
+  const dias=t?Math.floor((Date.now()-t)/864e5):null;
+  const viejo=dias===null||dias>=7;
+  b.style.background=viejo?'#f59e0b':'rgba(255,255,255,.12)';
+  b.style.color=viejo?'#111':'#fff';
+  b.title=dias===null?'Todavía no hiciste ningún backup':'Último backup: hace '+dias+' día(s)';
+}
+setTimeout(avisoBackup,500);
 function authLogout(){localStorage.removeItem(SESS_KEY);localStorage.removeItem('mambo_auth');location.reload();}
 
 let pedidos = [];
@@ -4127,7 +4254,8 @@ async function syncPagos(){
   }catch(e){}
 }
 setInterval(syncPagos,60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){authEnsure().then(ok=>{if(ok)syncPagos();else mostrarLogin();});}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){authEnsure().then(async ok=>{if(ok===false){mostrarLogin();return;}if(_pend.length&&ok===true)await replayPend();syncPagos();});}});
+window.addEventListener('online',()=>{if(_pend.length)authEnsure().then(ok=>{if(ok===true)replayPend();});});
 
 // ══════════ RESUMEN PARA WHATSAPP ══════════
 const ALIAS_RESUMEN='MAMBO.ARGENTINA (Mariano Nahuel Arbotto)';
