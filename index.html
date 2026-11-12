@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src https://fllkkrgsibuizxoerkel.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Arneses, correas y collares de diseño para perros, hechos en Buenos Aires. 29 modelos, nombre bordado incluido y envío gratis a sucursal de Correo Argentino.">
 <meta name="theme-color" content="#db2777">
@@ -1545,7 +1547,7 @@ async function confirmarPedido(){
   const lim=x=>String(x||'').replace(/[<>"`]/g,'').slice(0,60);
   const nId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2,8);
   const pedido={id:nId,num:Date.now(),fecha:new Date().toISOString(),cliente:lim(ig),nombre:lim(n),provincia:lim(prov),estado:'shop',envio:ENVIO_GESTION[envioTipo]||envioTipo,envioCosto,totalCobrado:(metodoPago==='mp'&&mpDisponible())?totalMP()+envioCosto:total,pago:(metodoPago==='mp'&&mpDisponible())?'mercadopago':'transferencia',pagoEstado:(metodoPago==='mp'&&mpDisponible())?'pendiente':'',origen:'shop',notas:notasPedido(),
-    items:carrito.map(i=>({id:i.id,tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),bordadoCollar:lim(i.bordadoCollar||''),pecho:lim(i.pecho||''),fotoUrl:String(i.foto||'').startsWith(SUPA_URL+'/storage/v1/object/public/')?i.foto:'',cuello:lim(i.cuello||''),cuelloAConfirmar:!!(i.conCollar&&!i.cuello),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
+    items:carrito.map(i=>({id:i.id,pk:i.pk||'',pdiv:i.pdiv||1,extra:i.extra||'',tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),bordadoCollar:lim(i.bordadoCollar||''),pecho:lim(i.pecho||''),fotoUrl:String(i.foto||'').startsWith(SUPA_URL+'/storage/v1/object/public/')?i.foto:'',cuello:lim(i.cuello||''),cuelloAConfirmar:!!(i.conCollar&&!i.cuello),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
   const btn=document.getElementById('btn-confirmar');btn.textContent='Guardando…';btn.disabled=true;
   try{
     const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify({id:pedido.id,data:pedido})});
@@ -1554,7 +1556,7 @@ async function confirmarPedido(){
     if(metodoPago==='mp'&&mpDisponible()){
       try{localStorage.setItem('mambo_lastped',JSON.stringify(lastPed));}catch(e){}
       btn.textContent='Abriendo Mercado Pago…';
-      const rr=await fetch(MP_FN,{method:'POST',headers:SUPA_H,body:JSON.stringify({pedidoId:pedido.id,items:carrito.flatMap(i=>[{k:i.pk,div:i.pdiv||1}].concat(i.extra?[{k:i.extra,div:1}]:[]))})});
+      const rr=await fetch(MP_FN,{method:'POST',headers:SUPA_H,body:JSON.stringify({pedidoId:pedido.id})});
       const dd=await rr.json();
       if(!rr.ok||!dd.url)throw new Error('mp');
       window.location.href=dd.url;return;
