@@ -1186,7 +1186,7 @@ async function arAtender(codigo){
     await arCargar();arAbrir();
   }catch(e){alert('No se pudo actualizar: '+e.message);}
 }
-setTimeout(arCargar,1500);setInterval(arCargar,5*60*1000);
+setTimeout(arCargar,1500);setInterval(()=>{if(!document.hidden)arCargar();},10*60*1000);
 // ══════════ BACKUP ══════════
 const BK_KEY='mambo_ultimo_backup';
 async function hacerBackup(){
@@ -4240,7 +4240,9 @@ async function syncPagos(){
   try{
     if(document.getElementById('ov-form')?.classList.contains('on'))return;
     if(!(await authEnsure()))return;
-    const r=await fetch(`${SUPA_URL}/rest/v1/pedidos?select=data`,{headers:supaHeaders});
+    if(document.hidden)return;
+    const r=await fetch(`${SUPA_URL}/rest/v1/pedidos?select=data&data-%3E%3EmpPaymentId=not.is.null`,{headers:supaHeaders});
+    if(!r.ok)return;
     const rows=await r.json();if(!Array.isArray(rows))return;
     let cambio=false;
     rows.forEach(({data:d})=>{
@@ -4254,7 +4256,7 @@ async function syncPagos(){
     if(cambio)renderAll();
   }catch(e){}
 }
-setInterval(syncPagos,60000);
+setInterval(syncPagos,180000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){authEnsure().then(async ok=>{if(ok===false){mostrarLogin();return;}if(_pend.length&&ok===true)await replayPend();syncPagos();});}});
 window.addEventListener('online',()=>{if(_pend.length)authEnsure().then(ok=>{if(ok===true)replayPend();});});
 
@@ -4326,32 +4328,37 @@ async function resumenConLink(){
 
 async function saveOnePedido(p){
   try {
-    await fetch(`${SUPA_URL}/rest/v1/pedidos`, {
+    const r=await fetch(`${SUPA_URL}/rest/v1/pedidos`, {
       method:'POST',
       headers:{...supaHeaders,'Prefer':'resolution=merge-duplicates'},
       body:JSON.stringify({id:p.id, data:p})
     });
+    if(r.ok)_snap['p'+p.id]=JSON.stringify(p);
   } catch(err){ toast('⚠️ Error al guardar'); }
 }
 
+// Guarda solo lo que cambió desde la última vez (antes reescribía TODOS los pedidos en cada guardado y agotaba el disco de Supabase)
+let _snap={};
+function snapPrime(){_snap={};pedidos.forEach(p=>{_snap['p'+p.id]=JSON.stringify(p);});egresos.forEach(e=>{_snap['e'+e.id]=JSON.stringify(e);});}
 async function save(){
-  // Save all pedidos and egresos to Supabase
   try {
-    // Upsert pedidos
     for(const p of pedidos){
-      await fetch(`${SUPA_URL}/rest/v1/pedidos`, {
+      const s=JSON.stringify(p);if(_snap['p'+p.id]===s)continue;
+      const r=await fetch(`${SUPA_URL}/rest/v1/pedidos`, {
         method:'POST',
         headers:{...supaHeaders,'Prefer':'resolution=merge-duplicates'},
         body:JSON.stringify({id:p.id, data:p})
       });
+      if(r.ok)_snap['p'+p.id]=s;
     }
-    // Upsert egresos
     for(const e of egresos){
-      await fetch(`${SUPA_URL}/rest/v1/egresos`, {
+      const s=JSON.stringify(e);if(_snap['e'+e.id]===s)continue;
+      const r=await fetch(`${SUPA_URL}/rest/v1/egresos`, {
         method:'POST',
         headers:{...supaHeaders,'Prefer':'resolution=merge-duplicates'},
         body:JSON.stringify({id:e.id, data:e})
       });
+      if(r.ok)_snap['e'+e.id]=s;
     }
   } catch(err){
     console.error('Error saving:', err);
@@ -4382,6 +4389,7 @@ async function loadData(){
       fetch(`${SUPA_URL}/rest/v1/stock?select=data&id=eq.mambo_stock`, {headers:supaHeaders})
     ]);
     if(rPed.status===401||rPed.status===403){mostrarLogin();return;}
+    if(!rPed.ok||!rEgr.ok){toast('⚠️ La base de datos no responde ahora. Esperá unos minutos y recargá.');return;}
     const pedRaw = await rPed.json();
     const egrRaw = await rEgr.json();
     const preRaw = await rPre.json();
@@ -4394,6 +4402,7 @@ async function loadData(){
       if(falt) setTimeout(()=>{try{savePrecios();}catch(e){}},1500); // publica los precios nuevos (ej. correas por largo) para el shop
     }
     if(Array.isArray(stoRaw) && stoRaw.length) stockData   = stoRaw[0].data;
+    snapPrime();
   } catch(err){
     console.error('Error loading:', err);
     toast('⚠️ Error al cargar datos');
