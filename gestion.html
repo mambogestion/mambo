@@ -1081,6 +1081,7 @@ function authSet(s){localStorage.setItem(SESS_KEY,JSON.stringify({a:s.access_tok
 async function authTok(grant,body){
   const ac=new AbortController(),to=setTimeout(()=>ac.abort(),15000);
   try{const r=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=${grant}`,{method:'POST',signal:ac.signal,headers:{apikey:SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status>=500)return {data:null,net:true,why:'el servidor de Supabase no responde (HTTP '+r.status+')'};
     if(!r.ok){let m='';try{m=(await r.json()).msg||'';}catch(_){}return {data:null,status:r.status,why:'HTTP '+r.status+(m?' · '+m:'')};}
     return {data:await r.json()};}
   catch(e){return {data:null,net:true,why:(e&&e.name==='AbortError'?'tiempo agotado (15 s)':String((e&&e.message)||e))};}
@@ -1094,7 +1095,7 @@ function authRefresh(){
       const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s||!s.r)return false;
       const t=await authTok('refresh_token',{refresh_token:s.r});
       if(t.net)return 'net';                       // sin conexión: no es motivo para sacar la sesión
-      if(!t.data)return false;
+      if(!t.data){localStorage.removeItem(SESS_KEY);return false;}   // token inválido: se borra para no seguir insistiendo
       authSet(t.data);return true;
     }finally{_authBusy=null;}
   })();
@@ -1120,13 +1121,16 @@ window.fetch=async function(u,o){
   let r;
   try{r=await go();}
   catch(e){if(write){pendAdd(url,o);avisoSesion(true);}throw e;}
+  if(r.status>=500)_baseCaida=Date.now();
   if(r.status===401){const ok=await authRefresh();if(ok===true)r=await go();}
   if(r.status===401){if(write)pendAdd(url,o);avisoSesion(_pend.length>0);mostrarLogin();}
   else if(write&&!r.ok){try{toast('⚠️ No se pudo guardar (error '+r.status+')');}catch(_){}}
   return r;
 };
+let _baseCaida=0;   // momento del último error 5xx de la base: mientras tanto no se consulta en segundo plano
+function baseCaida(){return Date.now()-_baseCaida<5*60*1000;}
 let _authTimer=null;
-function authTimer(){if(_authTimer)return;_authTimer=setInterval(()=>{authEnsure().then(o=>{if(o===false)mostrarLogin();});},5*60*1000);}
+function authTimer(){if(_authTimer)return;_authTimer=setInterval(()=>{if(baseCaida()||document.hidden)return;authEnsure().then(o=>{if(o===false)mostrarLogin();});},5*60*1000);}
 async function authInit(){
   const ok=await authEnsure();
   if(ok===false){mostrarLogin();return false;}
@@ -1153,6 +1157,7 @@ function authLogout(){localStorage.removeItem(SESS_KEY);localStorage.removeItem(
 let AR=[];
 async function arCargar(){
   try{
+    if(baseCaida())return;
     if(!(await authEnsure()))return;
     const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos?select=id,data&order=id.desc&limit=300`,{headers:supaHeaders});
     if(!r.ok)return;
@@ -4239,6 +4244,7 @@ async function guardarYLink(){
 async function syncPagos(){
   try{
     if(document.getElementById('ov-form')?.classList.contains('on'))return;
+    if(baseCaida())return;
     if(!(await authEnsure()))return;
     if(document.hidden)return;
     const r=await fetch(`${SUPA_URL}/rest/v1/pedidos?select=data&data-%3E%3EmpPaymentId=not.is.null`,{headers:supaHeaders});
