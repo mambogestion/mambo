@@ -545,7 +545,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 
   <!-- ¿POR QUÉ MAMBO®? — testimonios de clientes -->
   <div id="por-que" style="background:var(--cream);padding:34px 0 34px">
-    <div class="why-head"><h2>Lo que nos escriben después de recibir su MAMBO® 💌</h2><p>Mensajes reales de nuestros clientes. Deslizá y leelos, son hermosos 🐾</p></div>
+    <div class="why-head"><h2>¿Por qué elegir MAMBO®?</h2><p>Miles de clientes felices en TODO EL PAÍS te lo cuentan 🐾</p></div>
     <div class="hero">
       <div class="hero-strip-wrap" id="strip-wrap">
         <div class="hero-strip" id="hero-strip"></div>
@@ -595,7 +595,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
     <div class="foot-ig"><a href="https://www.instagram.com/mambo.mascotasexigentes/" target="_blank" rel="noopener" aria-label="Instagram de MAMBO®"><img src="https://mambomascotas.github.io/mambo/Instagram.png" alt="Instagram" onerror="this.replaceWith(document.createTextNode('Instagram'))"></a><span>@mambo.mascotasexigentes</span></div>
       <div class="foot-btns">
       <button class="btn-arrep" onclick="lgAbrir('arrep')">Botón de arrepentimiento</button>
-      <button class="btn-arrep" onclick="lgAbrir('baja')">Botón de baja</button>
     </div>
     <div class="foot-legal">
       <button class="lk" onclick="lgAbrir('tyc')">Términos y condiciones</button>
@@ -695,6 +694,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
     </div>
     <div class="notice" id="pago-notice">💡 Por ahora solo aceptamos <strong>transferencia bancaria</strong>. Próximamente MercadoPago.</div>
     <input type="text" id="hp-web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <div class="notice" style="margin-top:12px">ℹ️ Los productos con <b>nombre bordado o medidas a pedido</b> son personalizados y <b>no admiten devolución ni arrepentimiento</b>. Revisá bien los datos antes de confirmar.</div>
     <label class="acepto"><input type="checkbox" id="acepto-tyc"><span>Leí y acepto los <a onclick="lgAbrir('tyc')">Términos y condiciones</a>, la <a onclick="lgAbrir('priv')">Política de privacidad</a> y la política de <a onclick="lgAbrir('camb')">cambios y devoluciones</a>.</span></label>
     <button class="btn-primary" id="btn-confirmar" onclick="confirmarPedido()">✅ Confirmar pedido y finalizar compra</button>
     <button class="btn-secondary" onclick="showView('datos')">← Volver</button>
@@ -1586,7 +1586,7 @@ function notasPedido(){
 // COMPLETAR con los datos reales del titular (aparecen en el pie y en los Términos). Lo que quede vacío no se muestra.
 const LEGAL={
   marca:'MAMBO®',
-  titular:'Mariano Nahuel Arbotto',
+  titular:'',               // ej: nombre y apellido o razón social (consultar con el contador)
   cuit:'',                 // ej: '20-12345678-9'
   domicilio:'',            // ej: 'Calle 123, CABA'
   tel:'+54 9 11 4097-2105',
@@ -1594,23 +1594,23 @@ const LEGAL={
   horario:'Lunes a viernes de 9 a 18 h',
   provincia:'Ciudad Autónoma de Buenos Aires'
 };
-const DC_URL='https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario';
+const DC_URL='https://autogestion.produccion.gob.ar/consumidores';
 function lgProv(){
   const L=LEGAL,f=[];
   f.push('<b>'+L.marca+'</b> es una marca registrada.');
-  f.push(L.titular+(L.cuit?' · CUIT '+L.cuit:''));
+  if(L.titular||L.cuit)f.push((L.titular||'')+(L.cuit?(L.titular?' · ':'')+'CUIT '+L.cuit:''));
   if(L.domicilio)f.push(L.domicilio);
   f.push('Atención al consumidor: '+L.tel+(L.email?' · '+L.email:'')+' · '+L.horario);
-  f.push('<a href="'+DC_URL+'" target="_blank" rel="noopener">Defensa del Consumidor · Para reclamos ingrese aquí</a>');
+  f.push('<a href="'+DC_URL+'" target="_blank" rel="noopener" style="font-size:10.5px;font-weight:500;opacity:.75">Defensa del Consumidor · Para reclamos ingrese aquí</a>');
   return f.join('<br>');
 }
 function lgDatos(){
   const L=LEGAL;
-  return '<ul><li><b>Titular:</b> '+L.titular+'</li>'+(L.cuit?'<li><b>CUIT:</b> '+L.cuit+'</li>':'')+(L.domicilio?'<li><b>Domicilio:</b> '+L.domicilio+'</li>':'')+'<li><b>Teléfono / WhatsApp:</b> '+L.tel+'</li>'+(L.email?'<li><b>Email:</b> '+L.email+'</li>':'')+'<li><b>Horario de atención:</b> '+L.horario+'</li></ul>';
+  return '<ul>'+(L.titular?'<li><b>Titular:</b> '+L.titular+'</li>':'')+(L.cuit?'<li><b>CUIT:</b> '+L.cuit+'</li>':'')+(L.domicilio?'<li><b>Domicilio:</b> '+L.domicilio+'</li>':'')+'<li><b>Teléfono / WhatsApp:</b> '+L.tel+'</li>'+(L.email?'<li><b>Email:</b> '+L.email+'</li>':'')+'<li><b>Horario de atención:</b> '+L.horario+'</li></ul>';
 }
 const LG_FORM=(tipo)=>{
   const baja=tipo==='baja';
-  return '<p>'+(baja?'Solicitá la baja de un servicio contratado a distancia.':'Tenés <b>10 días corridos</b> desde que recibís tu compra para arrepentirte, sin dar explicaciones y sin costo para vos. No hace falta registrarte.')+'</p>'+
+  return '<p>'+(baja?'Solicitá la baja de un servicio contratado a distancia.':'Tenés <b>10 días corridos</b> desde que recibís tu compra para arrepentirte, sin dar explicaciones. No hace falta registrarte. <br><br><b>Importante:</b> los productos personalizados (con nombre bordado o medidas a pedido) no admiten arrepentimiento.')+'</p>'+
   '<label>Nombre y apellido</label><input id="lgf-nombre" maxlength="80" autocomplete="name">'+
   '<label>WhatsApp, email o usuario de Instagram para contactarte</label><input id="lgf-contacto" maxlength="80">'+
   '<label>N.º de pedido (si lo tenés) o nombre con el que compraste</label><input id="lgf-pedido" maxlength="80">'+
@@ -1645,11 +1645,10 @@ const LG={
 <div class="lg-note">La Agencia de Acceso a la Información Pública, en su carácter de Órgano de Control de la Ley N.º 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas sobre protección de datos personales.</div>
 <h3>Seguridad y conservación</h3><p>Aplicamos medidas técnicas para proteger tus datos y los conservamos por el tiempo necesario para cumplir las finalidades y las obligaciones legales (por ejemplo, fiscales y de garantía).</p>`},
   camb:{t:'Cambios y devoluciones',h:()=>`
-<h3>Arrepentimiento (10 días)</h3><p>Podés revocar tu compra dentro de los <b>10 días corridos</b> desde que recibís el producto, sin dar motivos y sin costo. Usá el <b>Botón de arrepentimiento</b> del pie de página: al enviarlo recibís un <b>código de trámite</b> y nos comunicamos dentro de las <b>24 horas</b> para coordinar la devolución.</p>
-<h3>Devolución</h3><p>Solo tenés que poner el producto a nuestra disposición, sin uso y en su estado original. <b>Los gastos de devolución corren por nuestra cuenta.</b> Te reintegramos el importe pagado por el mismo medio de pago.</p>
-<h3>Excepciones</h3><p>De acuerdo con el art. 1116 del Código Civil y Comercial y la normativa vigente, el derecho de arrepentimiento <b>no aplica</b> a:</p><ul><li>Productos <b>confeccionados a medida o claramente personalizados</b> (por ejemplo, con bordado de nombre o identificación, o medidas especiales).</li><li>Productos ya usados o consumidos durante el plazo.</li><li>Compras realizadas para reventa o para integrarlas a un proceso productivo.</li></ul>
-<h3>Producto con defectos o error nuestro</h3><p>Si el producto llega con fallas o no es el que pediste, lo cambiamos o reintegramos el dinero, con costo de envío a nuestro cargo. Escribinos dentro de los 30 días de recibido, con fotos.</p>
-<h3>Cambios de talle</h3><p>Si el talle no le queda a tu perri, escribinos: evaluamos el cambio. En productos personalizados el cambio depende de que se pueda reutilizar.</p>`},
+<h3>Productos personalizados</h3><p>Los productos <b>confeccionados a medida o claramente personalizados</b> (por ejemplo, con nombre o identificación bordados, o con medidas especiales) <b>no admiten arrepentimiento ni devolución</b>, conforme al art. 1116 del Código Civil y Comercial. Por eso te pedimos que revises bien talle, medidas y textos antes de comprar.</p>
+<h3>Arrepentimiento (10 días)</h3><p>Para los productos <b>no personalizados</b>, podés revocar la compra dentro de los <b>10 días corridos</b> desde que la recibís (art. 34, Ley 24.240), con el <b>Botón de arrepentimiento</b> del pie de página. Recibís un código de trámite y te respondemos dentro de las 24 horas para coordinar la devolución. El producto debe estar sin uso y en su estado original.</p>
+<h3>Productos con defectos o error en el pedido</h3><p>Si recibís un producto con fallas o distinto al que pediste, escribinos con fotos y lo resolvemos conforme a la garantía legal (Ley 24.240).</p>
+<h3>Reclamos</h3><p>Podés comunicarte con nosotros o reclamar ante la <a href="${DC_URL}" target="_blank" rel="noopener">Dirección de Defensa del Consumidor</a>.</p>`},
   env:{t:'Envíos y plazos',h:()=>`
 <h3>Modalidades de entrega</h3><ul>
 <li><b>Envío gratis a sucursal de Correo Argentino</b>, a todo el país, en todos los combos.</li>
