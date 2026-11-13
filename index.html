@@ -491,6 +491,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 .acepto{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;margin:14px 0 6px;color:var(--text)}
 .acepto input{margin-top:3px;width:18px;height:18px;flex-shrink:0}
 .acepto a{color:var(--rose);font-weight:700;text-decoration:underline;cursor:pointer}
+
+.fg input.err,.fg select.err,.fg textarea.err{border-color:#dc2626 !important;background:#fef2f2 !important}
+.fg.has-err>label{color:#dc2626}
+.form-err{display:none;background:#fef2f2;border:1.5px solid #dc2626;color:#b91c1c;border-radius:12px;padding:11px 14px;font-size:13.5px;font-weight:700;margin:14px 0 4px}
+.form-err.on{display:block}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:9px}
+.btn-wa img{width:24px;height:24px;object-fit:contain;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -664,6 +671,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
       </select>
     </div>
     <div id="envio-datos"></div>
+    <div class="form-err" id="datos-err" role="alert">⚠️ Hay campos sin completar. Revisá los que están marcados en rojo.</div>
     <button class="btn-primary" onclick="irAPago()">Ir al pago →</button>
     <button class="btn-secondary" onclick="showView('carrito')">← Volver</button>
   </div>
@@ -715,13 +723,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
     </div>
     <div style="background:#dcfce7;border-radius:16px;padding:18px;margin-bottom:20px;text-align:left">
       <div style="font-size:14px;font-weight:700;color:#15803d;margin-bottom:8px">📲 ¡Un paso más!</div>
-      <div style="font-size:13px;color:#166534;line-height:1.6;margin-bottom:12px">Envianos el <strong>comprobante de transferencia</strong> por WhatsApp para que podamos procesar tu pedido.</div>
-      <a id="confirm-comprobante" href="https://wa.me/5491140972105?text=Hola!!%20Realic%C3%A9%20un%20pedido%20de%20MAMBO%C2%AE%20y%20te%20escribo%20para%20dejar%20el%20comprobante%20de%20la%20transferencia%20%F0%9F%98%8A" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#15803d;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:700">💬 Enviar comprobante al +54 9 11 4097-2105</a>
+      <div style="font-size:13px;color:#166534;line-height:1.6;margin-bottom:12px">Enviá tu <strong>comprobante de transferencia</strong> por WhatsApp para que podamos procesar tu pedido. Si falta algún dato (talle, medidas, color), te dejamos el mensaje armado para completarlo.</div>
+      <a id="confirm-comprobante" href="https://wa.me/5491140972105?text=Hola!!%20Realic%C3%A9%20un%20pedido%20de%20MAMBO%C2%AE%20y%20te%20escribo%20para%20dejar%20el%20comprobante%20de%20la%20transferencia%20%F0%9F%98%8A" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#15803d;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:700" class="btn-wa"><img src="https://mambomascotas.github.io/mambo/LogoWhatsapp.png" alt="" onerror="this.remove()">Enviar comprobante por WhatsApp</a>
     </div>
     <div id="confirm-envio" style="display:none;background:#eff6ff;border-radius:16px;padding:18px;margin-bottom:20px;text-align:left">
       <div style="font-size:14px;font-weight:700;color:#1d4ed8;margin-bottom:8px">📦 Datos para el envío</div>
       <div style="font-size:13px;color:#1e3a8a;line-height:1.6;margin-bottom:12px">Pasanos los datos de envío por WhatsApp (te dejamos el mensaje armado, solo completás lo que falta).</div>
-      <a id="confirm-envio-a" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:700">💬 Enviar datos de envío</a>
+      <a id="confirm-envio-a" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:700" class="btn-wa"><img src="https://mambomascotas.github.io/mambo/LogoWhatsapp.png" alt="" onerror="this.remove()">Enviar datos pendientes por WhatsApp</a>
     </div>
     <button class="btn-primary" onclick="reiniciar()">🐾 Hacer otro pedido</button>
   </div>
@@ -1405,7 +1413,7 @@ function agregarCarrito(){
     let bord=document.getElementById('m-bord')?.value||'';
     const idc=!!document.getElementById('m-idc')?.checked;
     const bc=idc?(document.getElementById('m-bordc')?.value||'').trim():'';
-    if(idc&&!bc){const ii=document.getElementById('m-bordc');if(ii){ii.style.borderColor='#dc2626';ii.focus();}return;}
+    if(idc&&!bc){const ii=document.getElementById('m-bordc');if(ii){ii.classList.add('err');ii.style.borderColor='#dc2626';ii.style.background='#fef2f2';ii.scrollIntoView({block:'center'});ii.focus();ii.addEventListener('input',()=>{ii.classList.remove('err');ii.style.borderColor='';ii.style.background='';},{once:true});}toast('⚠️ Hay campos sin completar: escribí el nombre para la identificación',4000);return;}
     if(c.id==='collar')bord=bc;
     const exK=idc?'Identificación collar':'';
     const tl=document.getElementById('m-talle')?.value||'',cc=document.getElementById('m-ccolor')?.value||'';
@@ -1524,19 +1532,58 @@ function datosEnvioTxt(){
   [['Localidad','ed-loc'],['Dirección','ed-dir'],['C.P.','ed-cp'],['Sucursal','ed-suc'],['Mail','ed-mail'],['Observaciones','ed-obs']].forEach(([k,id])=>{const x=g(id);if(x)l.push(k+': '+x);});
   return l.join(' | ');
 }
+// Lista de datos que quedaron sin completar (para pedirlos por WhatsApp)
+function pendLista(lp){
+  const l=(lp.pend||[]).slice();
+  if(lp.modo==='luego'&&(lp.envio==='sucursal'||lp.envio==='domicilio')){
+    if(lp.envio==='domicilio')l.push('Localidad: ','Dirección (calle, altura, piso, depto): ','Código postal: ','Mail: ','Observaciones (si hace falta): ');
+    else l.push('Mail: ','Sucursal de Correo Argentino a la que enviamos: ');
+  }
+  return l;
+}
+function pendItems(carr){
+  const out=[];
+  carr.forEach(i=>{
+    const m=(i.modelo||i.nombre||'').toString().replace(/[<>"`]/g,'').slice(0,40);
+    if(i.conArnes&&!i.talle)out.push('Talle del arnés ('+m+'): ');
+    if(i.conArnes&&!i.talle&&!i.pecho)out.push('Medida de pecho en cm ('+m+'): ');
+    if(i.conCollar&&!i.cuello)out.push('Medida de cuello en cm: ');
+    if(['combo1','combo2','combox2a','combox2c'].includes(i.prodId)&&!i.colorCorrea)out.push('Color de la correa ('+m+'): ');
+  });
+  return out;
+}
+function waComprobante(){
+  const lp=lastPed||{};
+  let t='Hola!! Realicé un pedido de MAMBO® ('+(lp.nombre||'')+') por '+fmt(lp.total||0)+' y te escribo para dejar el comprobante de la transferencia.';
+  const pl=pendLista(lp);
+  if(pl.length)t+='\n\nTe paso los datos que quedaron pendientes:\n'+pl.map(s=>'• '+s).join('\n');
+  return 'https://wa.me/5491140972105?text='+encodeURIComponent(t);
+}
 function waDatosEnvio(){
-  const n=lastPed.nombre||'',pr=lastPed.prov||'';
-  const dom=lastPed.envio==='domicilio';
-  const t=dom?`Hola! Hice un pedido en la web. Te paso los datos para el envío:\n\nNombre y Apellido: ${n}\nProvincia: ${pr}\nLocalidad: \nDirección (Calle-Altura-Piso-Depto): \nC.P.: \nMail: \n\nObservaciones de ser necesario: `
-    :`Hola! Hice un pedido en la web. Te paso los datos para el envío a sucursal de Correo:\n\nNombre y Apellido: ${n}\nProvincia: ${pr}\nMail: \n\nSucursal a la que enviamos: `;
+  const lp=lastPed||{};
+  const pl=pendLista(lp);
+  const t='Hola! Hice un pedido en la web ('+(lp.nombre||'')+'). Te paso los datos que quedaron pendientes:'+(pl.length?'\n\n'+pl.map(s=>'• '+s).join('\n'):'');
   return 'https://wa.me/5491140972105?text='+encodeURIComponent(t);
 }
 let lastPed={};
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('err')){t.classList.remove('err');t.closest('.fg')?.classList.remove('has-err');if(!document.querySelector('#view-datos .err'))document.getElementById('datos-err')?.classList.remove('on');}});
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('err')){t.classList.remove('err');t.closest('.fg')?.classList.remove('has-err');if(!document.querySelector('#view-datos .err'))document.getElementById('datos-err')?.classList.remove('on');}});
 function irAPago(){
   const n=document.getElementById('d-nombre').value.trim();
   const ig=document.getElementById('d-ig').value.trim();
   const prov=document.getElementById('d-prov').value;
-  if(!n||!ig||!prov){toast('Completá todos los campos');return;}
+  const bad=[];
+  const marca=(id,mal)=>{const el=document.getElementById(id);if(!el)return;el.classList.toggle('err',mal);el.closest('.fg')?.classList.toggle('has-err',mal);if(mal)bad.push(el);};
+  marca('d-nombre',!n);
+  marca('d-ig',ig.replace(/\D/g,'').length<8);
+  marca('d-prov',!prov);
+  const er=document.getElementById('datos-err');
+  if(bad.length){
+    if(er){er.textContent=(!ig||ig.replace(/\D/g,'').length<8)&&n&&prov?'⚠️ Ingresá un WhatsApp válido (con código de área).':'⚠️ Hay campos sin completar. Revisá los que están marcados en rojo.';er.classList.add('on');}
+    bad[0].scrollIntoView({behavior:'smooth',block:'center'});try{bad[0].focus({preventScroll:true});}catch(_){}
+    return;
+  }
+  if(er)er.classList.remove('on');
   const sub=carrito.reduce((s,i)=>s+i.precio,0);const total=sub+envioCosto;
   const eL={sucursal:'Correo Sucursal',domicilio:'Correo Domicilio',urquiza:'Retiro Urquiza',moto:'Motito CABA',motogba:'Motito GBA'};
   document.getElementById('pago-resumen-items').innerHTML=
@@ -1701,12 +1748,12 @@ async function confirmarPedido(){
   const lim=x=>String(x||'').replace(/[<>"`]/g,'').slice(0,60);
   const nId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2,8);
   const pedido={id:nId,num:Date.now(),fecha:new Date().toISOString(),cliente:lim(ig),nombre:lim(n),provincia:lim(prov),estado:'shop',envio:ENVIO_GESTION[envioTipo]||envioTipo,envioCosto,totalCobrado:(metodoPago==='mp'&&mpDisponible())?totalMP()+envioCosto:total,pago:(metodoPago==='mp'&&mpDisponible())?'mercadopago':'transferencia',pagoEstado:(metodoPago==='mp'&&mpDisponible())?'pendiente':'',origen:'shop',notas:notasPedido(),
-    items:carrito.map(i=>({id:i.id,pk:i.pk||'',pdiv:i.pdiv||1,extra:i.extra||'',tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),bordadoCollar:lim(i.bordadoCollar||''),pecho:lim(i.pecho||''),fotoUrl:String(i.foto||'').startsWith(SUPA_URL+'/storage/v1/object/public/')?i.foto:'',cuello:lim(i.cuello||''),cuelloAConfirmar:!!(i.conCollar&&!i.cuello),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
+    items:carrito.map(i=>({id:i.id,pk:i.pk||'',pdiv:i.pdiv||1,extra:i.extra||'',tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),bordadoCollar:lim(i.bordadoCollar||''),pecho:lim(i.pecho||''),fotoUrl:String(i.foto||'').startsWith(SUPA_URL+'/storage/v1/object/public/')?i.foto:'',cuello:lim(i.cuello||''),cuelloAConfirmar:!!(i.conCollar&&!i.cuello),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),color:''}))};
   const btn=document.getElementById('btn-confirmar');btn.textContent='Guardando…';btn.disabled=true;
   try{
     const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'return=minimal'},body:JSON.stringify({id:pedido.id,data:pedido})});
     if(!resp.ok){let t='';try{t=(await resp.text()).slice(0,140);}catch(_){}console.error('pedido',resp.status,t);throw new Error('HTTP '+resp.status+(t?' · '+t:''));}
-    lastPed={nombre:n,prov:prov,envio:envioTipo,modo:envioModo,envioCosto};
+    lastPed={nombre:n,prov:prov,envio:envioTipo,modo:envioModo,envioCosto,total,pend:pendItems(carrito)};
     if(metodoPago==='mp'&&mpDisponible()){
       try{localStorage.setItem('mambo_lastped',JSON.stringify(lastPed));}catch(e){}
       btn.textContent='Abriendo Mercado Pago…';
@@ -1715,9 +1762,9 @@ async function confirmarPedido(){
       if(!rr.ok||!dd.url)throw new Error('mp');
       window.location.href=dd.url;return;
     }
-    const ca=document.getElementById('confirm-comprobante');if(ca)ca.href='https://wa.me/5491140972105?text='+encodeURIComponent('Hola!! Realicé un pedido de MAMBO® ('+n+') por '+fmt(total)+' y te escribo para dejar el comprobante de la transferencia 😊');
+    const ca=document.getElementById('confirm-comprobante');if(ca)ca.href=waComprobante();
     const wb=document.getElementById('confirm-envio');
-    if(wb){const nec=(envioTipo==='sucursal'||envioTipo==='domicilio')&&envioModo==='luego';wb.style.display=nec?'block':'none';if(nec)document.getElementById('confirm-envio-a').href=waDatosEnvio();}
+    if(wb){wb.style.display='none';}
     document.getElementById('confirm-alias').textContent=ALIAS;
     document.getElementById('confirm-total-val').textContent=`Total: ${fmt(total)}`;
     showView('confirmado');
@@ -1754,7 +1801,7 @@ cargarStock();
   if(t)t.innerHTML=r==='error'?'Pago<br>no completado':'¡Gracias por<br>tu compra!';
   const pp=document.querySelector('#view-confirmado .confirm-page > p');if(pp)pp.innerHTML=msg+(dom&&r!=='error'?'<br><br>🏠 El envío a domicilio ('+fmt(lp.envioCosto)+') se transfiere aparte al alias <strong style="color:var(--text)">'+ALIAS+'</strong> (a nombre de Mariano Nahuel Arbotto).':'');
   const wb=document.getElementById('confirm-envio');
-  if(wb&&r!=='error'&&(lp.envio==='sucursal'||lp.envio==='domicilio')&&lp.modo==='luego'){wb.style.display='block';document.getElementById('confirm-envio-a').href=waDatosEnvio();}
+  if(wb&&r!=='error'&&pendLista(lp).length){wb.style.display='block';document.getElementById('confirm-envio-a').href=waDatosEnvio();}
   showView('confirmado');
   try{history.replaceState(null,'',location.pathname);}catch(e){}
 })();
