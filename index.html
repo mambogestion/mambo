@@ -1705,7 +1705,7 @@ async function confirmarPedido(){
   const btn=document.getElementById('btn-confirmar');btn.textContent='Guardando…';btn.disabled=true;
   try{
     const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify({id:pedido.id,data:pedido})});
-    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    if(!resp.ok){let t='';try{t=(await resp.text()).slice(0,140);}catch(_){}console.error('pedido',resp.status,t);throw new Error('HTTP '+resp.status+(t?' · '+t:''));}
     lastPed={nombre:n,prov:prov,envio:envioTipo,modo:envioModo,envioCosto};
     if(metodoPago==='mp'&&mpDisponible()){
       try{localStorage.setItem('mambo_lastped',JSON.stringify(lastPed));}catch(e){}
@@ -1721,7 +1721,7 @@ async function confirmarPedido(){
     document.getElementById('confirm-alias').textContent=ALIAS;
     document.getElementById('confirm-total-val').textContent=`Total: ${fmt(total)}`;
     showView('confirmado');
-  }catch(e){toast('Error, intentá de nuevo');btn.textContent='✅ Confirmar pedido y finalizar compra';btn.disabled=false;}
+  }catch(e){console.error(e);toast('No se pudo guardar el pedido ('+String((e&&e.message)||e).slice(0,160)+'). Intentá de nuevo o escribinos por WhatsApp.',9000);btn.textContent=(metodoPago==='mp'&&mpDisponible())?'💳 Pagar con Mercado Pago':'✅ Confirmar pedido y finalizar compra';btn.disabled=false;}
 }
 
 function mapTipo(id){const m={arnes:'Arnés',combo1:'Combo 1 — Arnés + Correa',combo2:'Combo 2 — Arnés + Correa + Collar',combox2a:'Arnés',combox2c:'Combo 1 — Arnés + Correa',collar:'Collar',correa:'Correa',cinturon:'Cinturón auto'};return m[id]||id;}
@@ -1735,7 +1735,7 @@ function showView(id){
   if(id==='carrito')renderCarrito();
   if(id==='datos')renderEnvioDatos();
 }
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+function toast(msg,ms){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),ms||2500);}
 
 init();
 initBanners();
