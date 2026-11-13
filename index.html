@@ -1680,7 +1680,7 @@ async function lgEnviar(tipo){
   const data={codigo,tipo,nombre,contacto,pedido,producto,motivo,fecha:d.toISOString(),estado:'nuevo'};
   btn.disabled=true;btn.textContent='Enviando…';err.style.display='none';
   try{
-    const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos`,{method:'POST',headers:SUPA_H,body:JSON.stringify({id:codigo,data})});
+    const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos`,{method:'POST',headers:{...SUPA_H,'Prefer':'return=minimal'},body:JSON.stringify({id:codigo,data})});
     if(!r.ok)throw new Error('HTTP '+r.status);
     document.getElementById('lg-t').textContent='Solicitud recibida ✅';
     document.getElementById('lg-b').innerHTML='<p>Registramos tu solicitud de <b>'+(tipo==='baja'?'baja':'arrepentimiento')+'</b>. Este es tu <b>código de trámite</b>:</p><div class="lg-code">'+codigo+'</div><p>Guardalo o sacale una captura: es tu constancia. Nos vamos a comunicar con vos dentro de las <b>24 horas</b> por el medio de contacto que indicaste.</p><button class="lg-send" onclick="lgCerrar()">Cerrar</button>';
@@ -1704,7 +1704,7 @@ async function confirmarPedido(){
     items:carrito.map(i=>({id:i.id,pk:i.pk||'',pdiv:i.pdiv||1,extra:i.extra||'',tipo:i.tipo,modelo:i.modelo,bordado:lim(i.bordado),bordadoCollar:lim(i.bordadoCollar||''),pecho:lim(i.pecho||''),fotoUrl:String(i.foto||'').startsWith(SUPA_URL+'/storage/v1/object/public/')?i.foto:'',cuello:lim(i.cuello||''),cuelloAConfirmar:!!(i.conCollar&&!i.cuello),largo:i.largo,swap:i.swap,precio:i.precio,cant:1,stockDisp:!!(i.conArnes&&i.modelo&&stockQty(i.modelo,i.talle)>0),talle:i.talle||'',talleAConfirmar:!!(i.conArnes&&!i.talle),colorCorrea:i.colorCorrea||'',accesorios:'pendiente',alias:lim(i.bordado),pecho:'',cuello:'',color:''}))};
   const btn=document.getElementById('btn-confirmar');btn.textContent='Guardando…';btn.disabled=true;
   try{
-    const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify({id:pedido.id,data:pedido})});
+    const resp=await fetch(`${SUPA_URL}/rest/v1/pedidos`,{method:'POST',headers:{...SUPA_H,'Prefer':'return=minimal'},body:JSON.stringify({id:pedido.id,data:pedido})});
     if(!resp.ok){let t='';try{t=(await resp.text()).slice(0,140);}catch(_){}console.error('pedido',resp.status,t);throw new Error('HTTP '+resp.status+(t?' · '+t:''));}
     lastPed={nombre:n,prov:prov,envio:envioTipo,modo:envioModo,envioCosto};
     if(metodoPago==='mp'&&mpDisponible()){
