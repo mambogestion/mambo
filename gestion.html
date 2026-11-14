@@ -695,7 +695,7 @@ hr{border:none;border-top:1px solid var(--gray2);margin:12px 0}
 
 </main>
 
-<button class="fab" onclick="openNuevo()">+</button>
+<button class="fab" id="fab" onclick="fabClick(event)" title="Nuevo pedido (mantené apretado y arrastrá para moverlo)">+</button>
 <div class="undo-btns">
   <button class="undo-btn" id="btn-undo" onclick="doUndo()" title="Deshacer" disabled>↩</button>
   <button class="undo-btn" id="btn-redo" onclick="doRedo()" title="Rehacer" disabled>↪</button>
@@ -1127,10 +1127,22 @@ window.fetch=async function(u,o){
   else if(write&&!r.ok){try{toast('⚠️ No se pudo guardar (error '+r.status+')');}catch(_){}}
   return r;
 };
+// ── Inactividad: sin movimiento del usuario no se consulta nada; a los 60 min se cierra la sesión ──
+let _ult=Date.now();
+const IDLE_PAUSA=15*60*1000,IDLE_SALIR=60*60*1000;
+function inactivo(){return Date.now()-_ult>IDLE_PAUSA;}
+function actividad(){
+  const eraInactivo=inactivo();_ult=Date.now();
+  if(eraInactivo&&!_pend.length&&document.getElementById('login-screen').style.display!=='flex'){authEnsure().then(ok=>{if(ok===false)mostrarLogin();else loadData();});}
+}
+['click','keydown','touchstart','scroll'].forEach(ev=>window.addEventListener(ev,()=>{if(Date.now()-_ult>2000||inactivo())actividad();},{passive:true}));
+setInterval(()=>{
+  if(Date.now()-_ult>IDLE_SALIR&&!_pend.length&&localStorage.getItem(SESS_KEY)){localStorage.removeItem(SESS_KEY);mostrarLogin();}
+},60*1000);
 let _baseCaida=0;   // momento del último error 5xx de la base: mientras tanto no se consulta en segundo plano
 function baseCaida(){return Date.now()-_baseCaida<5*60*1000;}
 let _authTimer=null;
-function authTimer(){if(_authTimer)return;_authTimer=setInterval(()=>{if(baseCaida()||document.hidden)return;authEnsure().then(o=>{if(o===false)mostrarLogin();});},5*60*1000);}
+function authTimer(){if(_authTimer)return;_authTimer=setInterval(()=>{if(baseCaida()||document.hidden||inactivo())return;authEnsure().then(o=>{if(o===false)mostrarLogin();});},5*60*1000);}
 async function authInit(){
   const ok=await authEnsure();
   if(ok===false){mostrarLogin();return false;}
@@ -1157,7 +1169,7 @@ function authLogout(){localStorage.removeItem(SESS_KEY);localStorage.removeItem(
 let AR=[];
 async function arCargar(){
   try{
-    if(baseCaida())return;
+    if(baseCaida()||inactivo())return;
     if(!(await authEnsure()))return;
     const r=await fetch(`${SUPA_URL}/rest/v1/arrepentimientos?select=id,data&order=id.desc&limit=300`,{headers:supaHeaders});
     if(!r.ok)return;
@@ -2960,13 +2972,13 @@ const FALT_ITEMS = {
     {id:'ppl_25',   label:'Pasadores plásticos 2.5cm',           unidad:'u'},
     {id:'heb_25',   label:'Hebillas 2.5cm',                      unidad:'u'},
     {id:'reg_25',   label:'Reguladores 2.5cm',                   unidad:'u'},
-    {id:'velc_25',  label:'Velcro negro 2.5cm',                  unidad:'m'},
+    {id:'velc_25',  label:'Velcro negro 2.5cm',                  unidad:'rollo'},
     {id:'_sub2', label:'🔹 Arneses grandes (4cm)', unidad:'', sub:true},
     {id:'med_4',    label:'Medialunas 4cm',                      unidad:'u'},
     {id:'pov_4',    label:'Pasadores ovales 4cm',                unidad:'u'},
     {id:'heb_4',    label:'Hebillas 4cm',                        unidad:'u'},
     {id:'reg_4',    label:'Reguladores plásticos 4cm',            unidad:'u'},
-    {id:'velc_38',  label:'Velcro negro 3.8cm',                  unidad:'m'},
+    {id:'velc_38',  label:'Velcro negro 3.8cm',                  unidad:'rollo'},
     {id:'_sub3', label:'🏷️ Collares (3cm)', unidad:'', sub:true},
     {id:'med_3col', label:'Medialunas 3cm',                      unidad:'u'},
     {id:'reg_2col', label:'Reguladores metálicos 3cm',           unidad:'u'},
@@ -2998,8 +3010,8 @@ const FALT_ITEMS = {
     {id:'etq_red', label:'Etiquetas redondas', unidad:'u', paso:100},
   ],
   otros: [
-    {id:'rem_10nq', label:'Remaches 10mm tapados niquelados', unidad:'u', paso:1000},
-    {id:'rem_8nq',  label:'Remaches 8mm tapados niquelados',  unidad:'u', paso:1000},
+    {id:'rem_10nq', label:'Remaches 10mm tapados niquelados', unidad:'u', paso:500, opts:[500,1000,2000]},
+    {id:'rem_8nq',  label:'Remaches 8mm tapados niquelados',  unidad:'u', paso:500, opts:[500,1000,2000]},
   ]
 };
 
@@ -3017,6 +3029,7 @@ const MARGEN_CORTE=1;      // cm de separación entre piezas
 const PLANCHA=[160,80];    // goma eva, cm
 const CINTA_COLORES=['negra','fucsia','rosa','azul','verde militar','turquesa','celeste','violeta','lila','roja'];
 const CP30_COLOR={cp30_negra:'negra',cp30_fucsia:'fucsia',cp30_rosa:'rosa',cp30_azul:'azul',cp30_verde:'verde militar',cp30_turq:'turquesa',cp30_cel:'celeste',cp30_viol:'violeta',cp30_lila:'lila',cp30_roja:'roja'};
+function uTxt(u,n){return u==='rollo'?(n===1?'rollo':'rollos'):u;}   // singular/plural de la unidad
 const ROLLO_M=25;   // metros por rollo de cinta
 let insumos={panal:{stock:0,desdeTs:null},goma:{stock:0,desdeTs:null},anchoPanal:140,ajuste:100,avisoSem:3,
   obj:{chico:10,grande:10,correa:14,collar:5,cinturon:1},   // mínimo semanal de producción por tipo de producto
@@ -3263,15 +3276,17 @@ function insumoObj(g,v){
   v=parseFloat(v);if(isNaN(v)||v<0)return;
   insumos.obj[g]=v;saveInsumos();renderFaltantes();renderAll();
 }
-function aplicarCompraAuto(id,cant){
+function aplicarCompraAuto(id,cant,enMetros){
   if(id==='panal'||id==='gomaeva'){
     const mat=id==='panal'?'panal':'goma';
     const e=insumoEstado(mat);
     insumos[mat]={stock:(e?e.restante:0)+cant,desdeTs:Date.now()};
   } else {
     const e=stkInfo(id);
-    if(insumos.rec[id].g==='cinta')cant*=ROLLO_M;   // se compra en rollos de 25 m
-    if(insumos.rec[id].g==='ribete')cant*=RIBETE_ROLLO_M;   // rollos de 100 m
+    if(!enMetros){   // si se cargó en rollos enteros
+      if(insumos.rec[id].g==='cinta')cant*=ROLLO_M;   // rollos de 25 m
+      if(insumos.rec[id].g==='ribete')cant*=RIBETE_ROLLO_M;   // rollos de 100 m
+    }
     insumos.stk[id]={stock:e.restante+cant,desdeTs:Date.now()};
   }
   saveInsumos();
@@ -3483,6 +3498,10 @@ function confirmarComprado(id){
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   const cant = faltantes[id];
+  const gI=(trackedId(id)&&insumos.rec[id])?insumos.rec[id].g:'';
+  const enM=gI==='cinta'||gI==='ribete';          // cinta y ribete se compran por metro (rollo completo o parcial)
+  const rolloM=gI==='ribete'?RIBETE_ROLLO_M:ROLLO_M;
+  const valIni=enM?cant*rolloM:cant;
   const overlay = document.createElement('div');
   overlay.classList.add('falt-confirm');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
@@ -3491,15 +3510,16 @@ function confirmarComprado(id){
       <div style="font-size:36px;margin-bottom:10px">🛒</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;margin-bottom:6px">¿Cuánto compraste?</div>
       <div style="font-size:14px;font-weight:600;color:#374151;margin-bottom:2px">${item.label}</div>
-      <div style="font-size:12px;color:#9ca3af;margin-bottom:14px">Faltaban <strong style="color:var(--pink-dark)">${cant} ${item.unidad}</strong></div>
+      <div style="font-size:12px;color:#9ca3af;margin-bottom:14px">Faltaban <strong style="color:var(--pink-dark)">${cant} ${uTxt(item.unidad,cant)}</strong>${enM?` (${cant*rolloM} m)`:''}</div>
       <div style="margin-bottom:16px">
-        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;display:block;margin-bottom:6px">Cantidad comprada</label>
-        <input id="falt-compra-cant" type="number" min="0" value="${cant}" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;text-align:center;outline:none;color:var(--green)">
-        <div id="falt-compra-resto" style="font-size:12px;color:#9ca3af;margin-top:6px">Quedan pendientes: <strong id="falt-compra-resta" style="color:var(--pink-dark)">0 ${item.unidad}</strong></div>
+        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;display:block;margin-bottom:6px">${enM?'Metros comprados':'Cantidad comprada'}</label>
+        <input id="falt-compra-cant" type="number" min="0" ${enM?'step="0.5" inputmode="decimal"':''} value="${valIni}" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;text-align:center;outline:none;color:var(--green)">
+        ${enM?`<div style="font-size:12px;color:#9ca3af;margin-top:6px">Rollo completo = ${rolloM} m. Podés poner un rollo parcial (ej. 12,5).</div>`:''}
+        <div id="falt-compra-resto" style="font-size:12px;color:#9ca3af;margin-top:6px;${enM?'display:none':''}">Quedan pendientes: <strong id="falt-compra-resta" style="color:var(--pink-dark)">0 ${item.unidad}</strong></div>
       </div>
       <div style="display:flex;gap:8px">
         <button onclick="document.querySelector('.falt-confirm').remove()" style="flex:1;padding:12px;border-radius:11px;border:1.5px solid #e5e7eb;background:#f7f7f7;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#374151">← Volver</button>
-        <button onclick="marcarCompradoConfirmado('${id}',${cant})" style="flex:1;padding:12px;border-radius:11px;border:none;background:var(--green);color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">✓ Confirmar</button>
+        <button onclick="marcarCompradoConfirmado('${id}',${cant},${enM})" style="flex:1;padding:12px;border-radius:11px;border:none;background:var(--green);color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">✓ Confirmar</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -3509,18 +3529,18 @@ function confirmarComprado(id){
   inp.addEventListener('input', ()=>{
     const comprado = Math.min(parseInt(inp.value)||0, cant);
     const quedan = Math.max(0, cant - comprado);
-    resta.textContent = `${quedan} ${item.unidad}`;
+    resta.textContent = `${quedan} ${uTxt(item.unidad,quedan)}`;
     resta.style.color = quedan === 0 ? 'var(--green)' : 'var(--pink-dark)';
   });
   inp.focus(); inp.select();
 }
 
-function marcarCompradoConfirmado(id, cantOriginal){
+function marcarCompradoConfirmado(id, cantOriginal, enM){
   const inp = document.querySelector('#falt-compra-cant');
   if(trackedId(id)){
-    const c=inp?(parseFloat(inp.value)||0):cantOriginal;
+    const c=inp?(parseFloat(inp.value)||0):(enM?cantOriginal*(insumos.rec[id]&&insumos.rec[id].g==='ribete'?RIBETE_ROLLO_M:ROLLO_M):cantOriginal);
     document.querySelectorAll('.falt-confirm').forEach(el=>el.remove());
-    if(c>0){aplicarCompraAuto(id,c);toast('✅ Sumado al stock de insumos');}
+    if(c>0){aplicarCompraAuto(id,c,!!enM);toast(enM?'✅ Sumados '+c+' m al stock':'✅ Sumado al stock de insumos');}
     renderFaltantes();renderAll();
     return;
   }
@@ -3557,6 +3577,12 @@ async function saveFaltantes() {
   } catch(e) {}
 }
 
+function faltSet(id, n) {
+  if(trackedId(id))return;
+  if(faltantes[id]===n)delete faltantes[id]; else faltantes[id]=n;   // tocar de nuevo la misma cantidad la quita
+  saveFaltantes();
+  renderFaltantes();
+}
 function faltCambiar(id, delta) {
   if(trackedId(id)){toast('Este insumo se calcula solo desde el stock');return;}
   const cur = faltantes[id] || 0;
@@ -3594,7 +3620,7 @@ function renderFaltantes() {
         <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray3);margin-bottom:5px">${sec.label}</div>
         ${items.map(i => `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray2);gap:8px">
           <span style="font-size:13px;font-weight:600;flex:1">${i.label}</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--pink-dark);white-space:nowrap">${faltantes[i.id]} ${i.unidad}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--pink-dark);white-space:nowrap">${faltantes[i.id]} ${uTxt(i.unidad,faltantes[i.id])}</span>
           <button onclick="confirmarComprado('${i.id}')" style="background:var(--yellow-bg);color:var(--yellow);border:1.5px solid #fbbf24;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:'Nunito',sans-serif;flex-shrink:0">⏳ Pendiente</button>
         </div>`).join('')}
       </div>`;
@@ -3658,10 +3684,10 @@ function renderFaltantes() {
         <span style="font-size:13px;font-weight:${cant>0?'700':'500'};color:${cant>0?'var(--text)':'var(--gray3)'};flex:1;padding-right:8px">${item.label}</span>
         <div style="display:flex;align-items:center;flex-shrink:0;${trackedId(item.id)?'opacity:.4':''}" title="${trackedId(item.id)?'Se calcula solo desde la tarjeta de panal y goma eva':''}">
           <button onclick="faltCambiar('${item.id}',-${item.paso||1})" style="width:30px;height:30px;border-radius:8px 0 0 8px;border:1.5px solid var(--gray2);background:var(--gray);font-size:16px;cursor:pointer;font-weight:700;color:var(--text);line-height:1">−</button>
-          <div style="min-width:64px;padding:0 4px;height:30px;border-top:1.5px solid var(--gray2);border-bottom:1.5px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${cant>0?'var(--pink-dark)':'var(--gray3)'};background:#fff">${cant>0?cant+' '+item.unidad:'—'}</div>
+          <div style="min-width:64px;padding:0 4px;height:30px;border-top:1.5px solid var(--gray2);border-bottom:1.5px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:${cant>0?'var(--pink-dark)':'var(--gray3)'};background:#fff">${cant>0?cant+' '+uTxt(item.unidad,cant):'—'}</div>
           <button onclick="faltCambiar('${item.id}',${item.paso||1})" style="width:30px;height:30px;border-radius:0 8px 8px 0;border:1.5px solid var(--gray2);background:${cant>0?'var(--pink-dark)':'var(--gray)'};color:${cant>0?'#fff':'var(--text)'};font-size:16px;cursor:pointer;font-weight:700;line-height:1">+</button>
         </div>${vinc}
-      </div>`;
+      </div>${item.opts?`<div style="display:flex;gap:6px;margin:-2px 0 8px 12px;flex-wrap:wrap"><span style="font-size:11px;color:var(--gray3);align-self:center">Comprar:</span>${item.opts.map(o=>`<button onclick="faltSet('${item.id}',${o})" style="padding:4px 11px;border-radius:14px;border:1.5px solid ${cant===o?'var(--pink-dark)':'var(--gray2)'};background:${cant===o?'var(--pink-dark)':'#fff'};color:${cant===o?'#fff':'var(--text)'};font-size:12px;font-weight:700;cursor:pointer">${o}</button>`).join('')}</div>`:''}`;
     }).join('');
   });
 }
@@ -3673,7 +3699,7 @@ function copiarListaFaltantes() {
     const items = FALT_ITEMS[sec.id].filter(i => !i.sub && faltantes[i.id]);
     if (!items.length) return;
     texto += `${sec.label}\n`;
-    items.forEach(i => { texto += `• ${i.label}: *${faltantes[i.id]} ${i.unidad}*\n`; });
+    items.forEach(i => { texto += `• ${i.label}: *${faltantes[i.id]} ${uTxt(i.unidad,faltantes[i.id])}*\n`; });
     texto += '\n';
   });
   navigator.clipboard.writeText(texto).then(() => toast('📋 Lista copiada'));
@@ -4783,6 +4809,23 @@ document.addEventListener('click', function(e){
 authInit().then(ok=>{if(ok)loadData();});
 loadMesesCollapsed();
 initVista();
+
+// ── Botón + movible: se arrastra y recuerda dónde lo dejaste ──
+(function(){
+  const f=document.getElementById('fab');if(!f)return;
+  let drag=false,moved=false,sx=0,sy=0,ox=0,oy=0,t0=0;
+  const clamp=(l,t)=>({l:Math.max(4,Math.min(innerWidth-f.offsetWidth-4,l)),t:Math.max(4,Math.min(innerHeight-f.offsetHeight-4,t))});
+  const put=(l,t)=>{const c=clamp(l,t);f.style.left=c.l+'px';f.style.top=c.t+'px';f.style.right='auto';f.style.bottom='auto';};
+  try{const s=JSON.parse(localStorage.getItem('mambo_fab')||'null');if(s&&typeof s.l==='number')put(s.l,s.t);}catch(e){}
+  addEventListener('resize',()=>{if(f.style.left)put(parseFloat(f.style.left),parseFloat(f.style.top));});
+  f.style.touchAction='none';
+  f.addEventListener('pointerdown',e=>{drag=true;moved=false;sx=e.clientX;sy=e.clientY;const r=f.getBoundingClientRect();ox=r.left;oy=r.top;t0=Date.now();try{f.setPointerCapture(e.pointerId);}catch(_){}});
+  f.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(!moved&&Math.hypot(dx,dy)<8)return;moved=true;put(ox+dx,oy+dy);});
+  const fin=()=>{if(!drag)return;drag=false;if(moved){try{localStorage.setItem('mambo_fab',JSON.stringify({l:parseFloat(f.style.left),t:parseFloat(f.style.top)}));}catch(e){}}};
+  f.addEventListener('pointerup',fin);f.addEventListener('pointercancel',fin);
+  window.fabClick=function(e){if(moved){e.preventDefault();return;}openNuevo();};
+  f.addEventListener('dblclick',()=>{f.style.left=f.style.top='';f.style.right='16px';f.style.bottom='20px';try{localStorage.removeItem('mambo_fab');}catch(e){}});
+})();
 </script>
 </body>
 </html>

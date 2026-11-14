@@ -370,6 +370,11 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 .mt span{position:absolute;left:0;right:0;bottom:0;padding:9px 2px 2px;text-align:center;font-size:9.5px;font-weight:700;line-height:1.1;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .mod-sel{display:inline;font-size:12px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--gray3)}
 .mod-sel.ok{color:var(--rose);font-weight:800}
+.m-sec{background:#fdf1f6;border:1.5px solid #f6d3e2;border-radius:14px;padding:12px 13px 4px;margin-bottom:12px}
+.m-sec-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#111;margin-bottom:10px;padding-bottom:8px;border-bottom:1.5px solid #f6d3e2}
+.m-sec-h i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--rose);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;letter-spacing:0}
+.m-sec-h small{margin-left:auto;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:none;color:var(--rose)}
+.m-sec .fg select,.m-sec .fg input[type=text],.m-sec .fg input[type=number]{background:#fff}
 .opt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .opt-row:empty,.opt-row:not(:has(.fg)){display:none}
 .opt-row .fg{margin-bottom:10px}
@@ -504,10 +509,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--te
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo">
+  <a class="nav-logo" href="index.html" aria-label="MAMBO® — inicio" style="text-decoration:none">
     <img class="logo-round" src="https://mambomascotas.github.io/mambo/logo.png" alt="MAMBO®">
     <img class="logo-letras" src="https://mambomascotas.github.io/mambo/logoletras.png" alt="MAMBO® Mascotas Exigentes">
-  </div>
+  </a>
   <div class="nav-busca"><div class="busca-in"><input type="search" id="q-busca" placeholder="¿Qué estás buscando?" oninput="buscar(this.value)" autocomplete="off" aria-label="Buscar productos"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div></div>
   <div class="nav-right">
     <a class="nav-ig" href="https://www.instagram.com/mambo.mascotasexigentes/" target="_blank" rel="noopener" aria-label="Instagram de MAMBO®"><img src="https://mambomascotas.github.io/mambo/Instagram.png" alt="Instagram" onerror="this.replaceWith(document.createTextNode('Instagram'))"></a>
@@ -1119,10 +1124,19 @@ function renderModal(){
   const pechoF=hasMod?`<div class="fg"><label>📐 Contorno de pecho (cm) <span class="lbl-s">opcional</span></label><input type="number" inputmode="decimal" min="20" max="120" id="m-pecho" placeholder="ej: 52"><div class="bord-hint" style="margin-top:4px">Es lo único que necesitamos para tu talle. Si no lo tenés, lo confirmás luego por WhatsApp.</div></div>`:'';
   const hasCollar=c.id==='collar'||c.id==='combo2'||(hasSwap&&c.id==='combo1');
   const cuelloF=hasCollar?`<div class="fg" id="m-cuello-wrap" style="display:${(c.id==='collar'||c.id==='combo2')?'block':'none'}"><label>📐 Contorno de cuello (cm) <span class="lbl-s">opcional</span></label><input type="number" inputmode="decimal" min="15" max="80" id="m-cuello" placeholder="ej: 35"><div class="bord-hint" style="margin-top:4px">Para el collar. Si no lo tenés, lo confirmás luego por WhatsApp.</div></div>`:'';
-  const opts=`<div class="opt-row">${talleF}${colF}</div>${pechoF}${cuelloF}<div class="opt-row">
-    ${c.hasCorrea&&!c.isX2?`<div class="fg"><label>Largo de correa</label><select id="m-largo" onchange="onMLargo()"><option value="1.20mt">1.20mt (estándar)</option><option value="2mt">2mt</option><option value="3mt">3mt</option><option value="4mt">4mt</option><option value="5mt">5mt</option><option value="10mt">10mt</option></select></div>`:''}
-    ${hasSwap?`<div class="fg" id="m-swap-wrap" style="display:block"><label>¿Cambiar correa 1.20mt por?</label><select id="m-swap" onchange="toggleCuello()"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:''}
-    </div>`;
+  const ccLbl=c.id==='collar'?'Color del collar':'<b>Color de correa'+(c.id==='combo2'?' y collar':'')+'</b>';
+  const colF2=((c.hasCorrea&&!c.isX2)||c.id==='collar')?`<div class="fg"><label id="m-cc-lbl">${ccLbl}</label>${ccolorSel('m-ccolor',!hasMod)}</div>`:'';
+  const largoF=c.hasCorrea&&!c.isX2?`<div class="fg" id="m-largo-wrap"><label>Largo de correa</label><select id="m-largo" onchange="onMLargo()"><option value="1.20mt">1.20mt (estándar)</option><option value="2mt">2mt</option><option value="3mt">3mt</option><option value="4mt">4mt</option><option value="5mt">5mt</option><option value="10mt">10mt</option></select></div>`:'';
+  const swapF=hasSwap?`<div class="fg" id="m-swap-wrap" style="display:block"><label>¿Cambiar correa 1.20mt por?</label><select id="m-swap" onchange="toggleCuello()"><option value="">Correa 1.20mt (estándar)</option><option value="cinturon">🚗 Cinturón seguridad auto</option><option value="collar">🐾 Collar</option></select></div>`:'';
+  const idcF=(c.id==='collar'||c.id==='combo2')?bordOpc(c):(c.id==='combo1'?`<div id="m-idc-wrap" style="display:none">${bordOpc(c)}</div>`:'');
+  const secArn=hasMod?`<div class="m-sec"><div class="m-sec-h"><i>1</i>Arnés</div>
+      <div class="fg"><label>Modelo <span class="mod-sel" id="m-mod-sel">Elegí un modelo</span></label><input type="hidden" id="m-mod"><div class="mod-grid" id="m-mod-grid"></div><div class="stk-info" id="m-mod-grid-info"></div></div>
+      ${talleF}${pechoF}</div>`:'';
+  const nAcc=hasMod?(hasBord?3:2):1;
+  const accTit=hasMod?'Accesorios':(c.id==='collar'?'Collar':'Correa');
+  const accBody=`${swapF}${largoF}${colF2}${cuelloF}${idcF}`;
+  const secAcc=accBody.trim()?`<div class="m-sec"><div class="m-sec-h"><i>${nAcc}</i>${accTit}</div>${accBody}</div>`:'';
+  const opts='';
 
   document.getElementById('modal-inner').innerHTML=`<div class="m-grid${c.isX2?' is-x2':''}">
     <div class="m-left"><div class="modal-img">${fotoModal?`<img src="${BASE_URL}${fotoModal}" alt="${c.name}" decoding="async">`:c.emoji}<div class="modal-cap" id="m-cap"></div></div></div>
@@ -1133,7 +1147,7 @@ function renderModal(){
     </div>
     <div class="modal-desc">${c.desc}</div>
     <div class="m-body">
-    ${c.isX2?renderPerros(c):renderSingle(c,hasMod,hasColor,hasBord,opts)}
+    ${c.isX2?renderPerros(c):renderSingle(c,hasMod,hasColor,hasBord,secArn,secAcc)}
     </div>
     <div class="m-cta"><button class="btn-primary" onclick="agregarCarrito()">🛒 Agregar al carrito</button></div>
     </div></div>`;
@@ -1144,12 +1158,9 @@ function renderModal(){
   if(hasMod)precargarFotos(c.id);
 }
 
-function renderSingle(c,hasMod,hasColor,hasBord,opts){
-  return`${hasMod?`<div class="fg"><label>Modelo <span class="mod-sel" id="m-mod-sel">Elegí un modelo</span></label><input type="hidden" id="m-mod"><div class="mod-grid" id="m-mod-grid"></div><div class="stk-info" id="m-mod-grid-info"></div></div>`:''}
-    ${opts||''}
-    ${hasColor?`<div class="fg"><label>Color</label><input type="text" id="m-color" placeholder="ej: Negro, Rosa, Celeste…"></div>`:''}
-    ${hasBord?`<div class="fg"><label>🧵 Identificación bordada <span class="lbl-inc">Incluida con tu arnés</span></label><div class="bord-hint">Nombre + hasta 2 teléfonos, y puede llevar <strong>un emoji</strong> o <strong>la foto de tu perri</strong> (o ninguno de los dos). Ej: <strong>LUNA 1123456789 / 1187654321</strong></div>${fotoBloque('m')}<input type="text" id="m-bord" placeholder="ej: LUNA 1123456789 / 1187654321" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="m-emojis"></div></div>`:''}
-    ${(c.id==='collar'||c.id==='combo2')?bordOpc(c):''}`;
+function renderSingle(c,hasMod,hasColor,hasBord,secArn,secAcc){
+  const ident=hasBord?`<div class="m-sec"><div class="m-sec-h"><i>2</i>Identificación<small>Incluida con tu arnés</small></div><div class="fg"><div class="bord-hint">Nombre + hasta 2 teléfonos, y puede llevar <strong>un emoji</strong> o <strong>la foto de tu perri</strong> (o ninguno de los dos). Ej: <strong>LUNA 1123456789 / 1187654321</strong></div>${fotoBloque('m')}<input type="text" id="m-bord" placeholder="ej: LUNA 1123456789 / 1187654321" oninput="this.value=this.value.toUpperCase()" autocomplete="off"><div class="emoji-row" id="m-emojis"></div></div></div>`:'';
+  return`${secArn||''}${ident}${hasColor?`<div class="fg"><label>Color</label><input type="text" id="m-color" placeholder="ej: Negro, Rosa, Celeste…"></div>`:''}${secAcc||''}`;
 }
 
 function exIdC(){return precios['Identificación collar']||PRECIOS_DEFAULT['Identificación collar'];}
@@ -1158,7 +1169,17 @@ function bordOpc(c){
   return`<div class="fg bord-opc"><label class="chk-idc"><input type="checkbox" id="m-idc" onchange="toggleIdC()"> 🧵 Agregar identificación bordada al collar <b>+${fmt(e.transf)}</b></label>
     <div id="m-idc-box" style="display:none"><div class="bord-hint">Nombre + hasta 2 teléfonos. Ej: <strong>LUNA 1123456789 / 1187654321</strong></div><input type="text" id="m-bordc" placeholder="ej: LUNA 1123456789" oninput="this.value=this.value.toUpperCase()"></div></div>`;
 }
-function toggleCuello(){const w=document.getElementById('m-cuello-wrap');if(!w||!curProd||curProd.id!=='combo1')return;w.style.display=document.getElementById('m-swap')?.value==='collar'?'block':'none';}
+function toggleCuello(){
+  const c=curProd;if(!c)return;
+  const sw=document.getElementById('m-swap')?.value||'';
+  if(c.id!=='combo1')return;
+  const col=sw==='collar',show=(id,on)=>{const w=document.getElementById(id);if(w)w.style.display=on?'block':'none';};
+  show('m-cuello-wrap',col);show('m-idc-wrap',col);
+  if(!col){const k=document.getElementById('m-idc');if(k&&k.checked){k.checked=false;toggleIdC();}}
+  show('m-largo-wrap',sw==='');
+  if(sw!==''){const l=document.getElementById('m-largo');if(l&&l.value!=='1.20mt'){l.value='1.20mt';onMLargo();}}
+  const lb=document.getElementById('m-cc-lbl');if(lb)lb.innerHTML=col?'Color del collar':'<b>Color de correa</b>';
+}
 function toggleIdC(){
   const on=document.getElementById('m-idc')?.checked;
   const b=document.getElementById('m-idc-box');if(b)b.style.display=on?'block':'none';
@@ -1417,7 +1438,7 @@ function agregarCarrito(){
     if(c.id==='collar')bord=bc;
     const exK=idc?'Identificación collar':'';
     const tl=document.getElementById('m-talle')?.value||'',cc=document.getElementById('m-ccolor')?.value||'';
-    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,bordadoCollar:c.id==='combo2'?bc:'',extra:exK,pecho,cuello,conCollar:cuelloOn,foto:FOTOS_SUBIDAS['m']||'',largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf+(exK?exIdC().transf:0),tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:!!document.getElementById('m-talle'),pk:claveP(c,largo),pdiv:1});
+    carrito.push({id:Date.now()+'',prodId:c.id,nombre:c.short||c.name,emoji:c.emoji,modelo:mod,bordado:bord,bordadoCollar:(c.id==='combo2'||(c.id==='combo1'&&swap==='collar'))?bc:'',extra:exK,pecho,cuello,conCollar:cuelloOn,foto:FOTOS_SUBIDAS['m']||'',largo,swap,swapLabel:swap?swL[swap]:'',precio:p.transf+(exK?exIdC().transf:0),tipo:mapTipo(c.id),talle:tl,colorCorrea:cc,conArnes:!!document.getElementById('m-talle'),pk:claveP(c,largo),pdiv:1});
   }
   FOTOS_SUBIDAS={};updateUI();cerrarModalBtn();abrirDrawer();
 }
